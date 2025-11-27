@@ -11,7 +11,7 @@ Aplicação  de gestão financeira desenvolvida com React Native.
 - [x] Persistência de sessão com AsyncStorage
 - [x] Armazenamento seguro com Expo SecureStore
 
-### 💰 **Tela Inicial**
+### 🏠 **Tela Inicial**
 - [ ] Resumo financeiro
 - [ ] Gráficos
 - [ ] Listar/Filtrar transações
