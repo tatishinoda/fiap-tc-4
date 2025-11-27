@@ -1,0 +1,29 @@
+// Regras de segurança Firestore - ByteBank Mobile
+// Para aplicar essas regras: Firebase Console > Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regra para usuários - apenas usuários autenticados podem acessar seus próprios dados
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Regra para transações - apenas usuários autenticados podem acessar suas próprias transações
+    match /transactions/{transactionId} {
+      allow read, write: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // Regra para contas bancárias - apenas usuários autenticados podem acessar suas próprias contas
+    match /accounts/{accountId} {
+      allow read, write: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // Bloquear acesso a qualquer outro documento
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
