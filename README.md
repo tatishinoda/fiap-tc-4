@@ -1,6 +1,6 @@
 # 🏦 ByteBank Mobile
 
-Uma aplicação completa de gestão financeira pessoal desenvolvida com React Native
+Aplicação  de gestão financeira desenvolvida com React Native.
 
 ## 📱 Funcionalidades
 
@@ -33,38 +33,40 @@ Uma aplicação completa de gestão financeira pessoal desenvolvida com React Na
    
 ```   
 bytebank-mobile/   
-├── .env                   # Variáveis de ambiente
+├── .env                   # Variáveis de ambiente (Firebase)
 ├── .env.example           # Template das variáveis
-├── .gitignore             # Arquivos ignorados
-├── app.json               # Configuração Expo
-├── App.tsx                # App principal
-├── package.json           # Dependências
+├── .gitignore             # Arquivos ignorados pelo Git
+├── app.json               # Configuração do Expo
+├── App.tsx                # Componente principal da aplicação
+├── index.ts               # Ponto de entrada
+├── package.json           # Dependências e scripts
 ├── tsconfig.json          # Configuração TypeScript
-├── firestore.rules        # Regras Firestore
-├── storage.rules          # Regras Storage
+├── firestore.rules        # Regras de segurança Firestore
+├── storage.rules          # Regras de segurança Storage
 ├── README.md              # Documentação principal
-├── FIREBASE.md            # Documentação Firebase
-├── assets/                # Recursos estáticos
+├── FIREBASE.md            # Guia do Firebase
+├── assets/                # Recursos estáticos (ícones, splash)
 └── src/                   # Código fonte
     ├── components/        # Componentes reutilizáveis
-    ├── config/            # Configurações (Firebase)
-    ├── context/           # Contextos React
+    ├── config/            # Configurações
+    │   └── firebase.ts    # Configuração Firebase
+    ├── context/           # Contextos React (estado global)
     ├── hooks/             # Custom hooks
-    ├── navigation/        # Navegação
-    ├── screens/           # Telas
-    │   ├── auth/          # Autenticação
-    │   └── protected/     # Protegidas
-    ├── services/          # Serviços/APIs
-    ├── types/             # Tipos TypeScript
-    └── utils/             # Utilitários
+    ├── navigation/        # Sistema de navegação
+    ├── screens/           # Telas da aplicação
+    │   ├── auth/          # Telas de autenticação
+    │   └── protected/     # Telas protegidas (requer login)
+    ├── services/          # Lógica de negócio/APIs
+    ├── types/             # Definições TypeScript
+    └── utils/             # Funções utilitárias
 ```
 
 ## 🛠️ **Tecnologias Utilizadas**
 
 ### **Core**
-- **React Native** 0.74.0
+- **React Native** 0.74.5
 - **Expo** SDK 51
-- **TypeScript** 5.1.3
+- **TypeScript** 5.3.3
 
 ### **Firebase & Backend**
 - **Firebase** 10.7.1
@@ -127,34 +129,3 @@ npm run ios        # Executar no iOS
 npm run web        # Executar na web
 npm run build      # Build de produção
 ```
-
-
-
-
-
-
-## 🎯 **Próximos Passos**
-
-### **Funcionalidades Planejadas**
-- [ ] Tela de Login / Gerenciamento de Estado (Gerencie o estado global (como login e dados de transações) usando Context API)
-- [ ] [Home Page] Exibir gráficos (Baseados nas transações do usuário)
-- [ ] [Home Page] Exibir análises financeiras (Baseados nas transações do usuário)
-- [ ] [Home Page] Implementar animações para transições entre seções do dashboard (Implementar animações para transições entre seções do dashboard utilizando Animated)
-avançados (por data, categoria, etc.) na lista de transações
-- [ ] [Adicionar/Editar Transação] Permitir adicionar e editar transações
-- [ ] [Adicionar/Editar Transação] Validação Avançada de campos, como o valor e a categoria da transação
-- [ ] [Adicionar/Editar Transação] Upload de Recibos: Permitir o upload de recibos ou documentos relacionados à transação, salvando-os no Firebase Storage
-- [ ] [Listagem de Transações] Incluir filtros
-avançados (por data, categoria, etc.) na lista de transações com Cloud Firestore para buscar as transações  (Baseados nas transações do usuário)
-- [ ] [Listagem de Transações] Implementar scroll infinito ou paginação
-
-
-### **Status REAL do Projeto**
-✅ **Configuração Base** - Código pronto e Firebase configurado  
-✅ **Firebase Integration** - Credenciais configuradas e testadas 
-✅ **Autenticação** - Testado  
-✅ **Navegação** - Testado navegação e proteção de rotas
-🔄 **Transações** - Interface pronta, aguardando dados reais  
-📋 **Próximo passo** - **IMPLEMENTAR SISTEMA DE TRANSAÇÕES**  
-⏳ **Adicionar Transações** - Próxima funcionalidade  
-⏳ **Listagem Transações** - Aguardando implementação  
