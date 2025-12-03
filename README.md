@@ -129,3 +129,30 @@ npm run ios        # Executar no iOS
 npm run web        # Executar na web
 npm run build      # Build de produção
 ```
+
+
+## 🎯 **Próximos Passos**
+
+### **Funcionalidades Planejadas**
+- [ ] Tela de Login / Gerenciamento de Estado (Gerencie o estado global (como login e dados de transações) usando Context API)
+- [ ] [Home Page] Exibir gráficos (Baseados nas transações do usuário)
+- [ ] [Home Page] Exibir análises financeiras (Baseados nas transações do usuário)
+- [ ] [Home Page] Implementar animações para transições entre seções do dashboard (Implementar animações para transições entre seções do dashboard utilizando Animated)
+avançados (por data, categoria, etc.) na lista de transações
+- [ ] [Adicionar/Editar Transação] Permitir adicionar e editar transações
+- [ ] [Adicionar/Editar Transação] Validação Avançada de campos, como o valor e a categoria da transação
+- [ ] [Adicionar/Editar Transação] Upload de Recibos: Permitir o upload de recibos ou documentos relacionados à transação, salvando-os no Firebase Storage
+- [ ] [Listagem de Transações] Incluir filtros
+avançados (por data, categoria, etc.) na lista de transações com Cloud Firestore para buscar as transações  (Baseados nas transações do usuário)
+- [ ] [Listagem de Transações] Implementar scroll infinito ou paginação
+
+
+### **Status REAL do Projeto**
+✅ **Configuração Base** - Código pronto e Firebase configurado  
+✅ **Firebase Integration** - Credenciais configuradas e testadas 
+✅ **Autenticação** - Testado  
+✅ **Navegação** - Testado navegação e proteção de rotas
+🔄 **Transações** - Interface pronta, aguardando dados reais  
+📋 **Próximo passo** - **IMPLEMENTAR SISTEMA DE TRANSAÇÕES**  
+⏳ **Adicionar Transações** - Próxima funcionalidade  
+⏳ **Listagem Transações** - Aguardando implementação  

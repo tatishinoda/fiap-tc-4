@@ -5,8 +5,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { useAuth } from '../hooks/useAuth';
 import { RootStackParamList, TabParamList } from '../types/navigation';
 
@@ -66,12 +64,7 @@ function ProtectedTabs() {
       {/* Header Fixo */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <View>
-            <Text style={styles.welcomeText}>Olá, {user?.name?.split(' ')[0]}!</Text>
-            <Text style={styles.dateText}>
-              {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
-            </Text>
-          </View>
+          <Text style={styles.welcomeText}>Olá, {user?.name?.split(' ')[0]}!</Text>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
           </TouchableOpacity>
@@ -170,12 +163,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  dateText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    opacity: 0.8,
-    textTransform: 'capitalize',
   },
   logoutButton: {
     padding: 8,
