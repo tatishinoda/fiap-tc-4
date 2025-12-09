@@ -46,9 +46,10 @@ bytebank-mobile/
 ## 🛠️ **Tecnologias Utilizadas**
 
 ### **Core**
-- **React Native** 0.74.5
-- **Expo** SDK 51
-- **TypeScript** 5.3.3
+- **React** 19.1.0
+- **React Native** 0.81.5
+- **Expo** SDK 54
+- **TypeScript** 5.x
 
 ### **Firebase & Backend**
 - **Firebase** 10.7.1
@@ -57,20 +58,22 @@ bytebank-mobile/
 - **Firebase Storage** - Armazenamento
 
 ### **Navegação & Estado**
-- **React Navigation** 6.x
+- **React Navigation** 7.x
 - **React Hook Form** 7.66.0
-- **AsyncStorage** 1.23.1
+- **AsyncStorage** 2.2.0
+- **Zustand** 5.0.9
 
 ### **UI & Animações**
-- **Expo Vector Icons** 14.0.2
-- **React Native Reanimated** 3.10.1
-- **React Native Gesture Handler** 2.16.1
+- **Expo Vector Icons** 15.0.3
+- **React Native Reanimated** 4.1.1
+- **React Native Gesture Handler** 2.28.0
+- **NativeWind** 4.2.1
 
 ### **Utilitários**
 - **Axios** 1.13.2
 - **Date-fns** 3.0.0
 - **UUID** 11.1.0
-- **Expo SecureStore** 13.0.2
+- **Expo SecureStore** 15.0.0
 
 ## 🚀 **Como Executar**
 
