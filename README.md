@@ -2,39 +2,14 @@
 
 Aplicação de gestão financeira desenvolvida com React Native.
 
-## 📱 Funcionalidades
+## 📱 Funcionalidades Principais
 
-### 🔐 **Autenticação & Segurança**
-- [x] Registrar novo Login
-- [x] Login com email e senha
-- [x] Autenticação segura via Firebase Auth
-- [x] Persistência de sessão com AsyncStorage
-- [x] Armazenamento seguro com Expo SecureStore
-
-### 💰 **Sistema Financeiro**
-- [x] Cálculo automático de saldo baseado em transações
-- [ ] Resumo financeiro (receitas, despesas, saldo)
-- [ ] Gráficos de análise financeira
-- [ ] Transações (depósitos, saques, investimentos, metas)
-
-### 🏠 **Tela Inicial**
-- [ ] Dashboard com visão geral financeira
-- [ ] Gráficos interativos
-- [ ] Listar/Filtrar transações recentes
-- [ ] Adicionar/Editar transações
-- [ ] Anexar arquivos às transações
-
-### ☁️ **Cloud & Sincronização**
-- [x] Integração com Firebase Firestore
-- [ ] Sincronização em tempo real
-- [x] Regras de segurança configuradas
-- [ ] Armazenamento de arquivos (Storage)
-
-### 🎨 **Interface & Experiência**
-- [x] Design moderno e intuitivo
-- [x] Navegação em abas
-- [x] Interface responsiva
-- [ ] Animações e transições suaves
+- 🔐 **Autenticação completa** - Login, cadastro e gerenciamento de sessão com Firebase
+- 💰 **Gestão financeira** - Adicionar transações (depósitos, saques, transferências, pagamentos, investimentos)
+- 📊 **Dashboard interativo** - Visão geral do saldo, gráfico de entradas vs saídas
+- 📋 **Listagem de transações** - Busca e filtros por tipo
+- 🎨 **Design moderno** - Interface responsiva com componentes reutilizáveis
+- ☁️ **Sincronização em nuvem** - Dados armazenados no Firebase Firestore
 
 ## 📁 **Estrutura do Projeto**
    
@@ -117,11 +92,42 @@ npm install
 ```
 
 ### **3. Configurar Firebase**
+
+#### **3.1. Criar arquivo de configuração**
 ```bash
-# Copie o arquivo de exemplo e configure suas credenciais
-npm run setup
-# Edite o .env com suas credenciais do Firebase Console
+# Copie o arquivo de exemplo
+cp src/config/firebase.example.ts src/config/firebase.ts
 ```
+
+#### **3.2. Adicionar credenciais do Firebase**
+1. Acesse o [Firebase Console](https://console.firebase.google.com/)
+2. Crie um novo projeto ou use um existente
+3. Vá em **Configurações do Projeto** > **Seus aplicativos**
+4. Copie as credenciais do Firebase
+5. Cole no arquivo `src/config/firebase.ts`:
+
+```typescript
+const firebaseConfig = {
+  apiKey: "sua-api-key",
+  authDomain: "seu-projeto.firebaseapp.com",
+  projectId: "seu-projeto-id",
+  storageBucket: "seu-storage-bucket",
+  messagingSenderId: "seu-messaging-id",
+  appId: "seu-app-id",
+  measurementId: "seu-measurement-id"
+};
+```
+
+> ⚠️ **Importante**: Não compartilhe suas credenciais! O arquivo `firebase.ts` está no `.gitignore`
+
+#### **3.3. Configurar Firestore e Storage**
+No Firebase Console:
+1. Habilite **Authentication** > **Email/Password**
+2. Crie um banco **Firestore Database** (modo teste)
+3. Habilite **Storage** (opcional, para uploads)
+4. Configure as regras de segurança (veja `firestore.rules` e `storage.rules`)
+
+> 📚 Para mais detalhes, consulte [FIREBASE.md](FIREBASE.md)
 
 ### **4. Executar o projeto**
 ```bash
@@ -131,16 +137,6 @@ npm start
 ### **4. Testar no dispositivo**
 - Instale o **Expo Go** no seu celular
 - Escaneie o QR Code gerado
-
-### **5. Visualizar dados no Firebase**
-📋 **Consulte**: [FIREBASE.md](FIREBASE.md) para entender como os dados são organizados no Firebase.
-
-## 📚 **Documentação**
-
-- **[SINGLE_ACCOUNT_MODEL.md](SINGLE_ACCOUNT_MODEL.md)** - Modelo de conta única (essencial!)
-- **[COMPLETE_SYSTEM.md](COMPLETE_SYSTEM.md)** - Sistema completo de transações e investimentos
-- **[FIRESTORE_SETUP.md](FIRESTORE_SETUP.md)** - Configuração detalhada do Firestore
-- **[FIREBASE.md](FIREBASE.md)** - Guia de configuração do Firebase
 
 ## 🔧 **Configurações de Desenvolvimento**
 
