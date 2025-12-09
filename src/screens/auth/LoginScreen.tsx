@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../../hooks/useAuth';
 import { RootStackParamList } from '../../types/navigation';
+import { colors } from '../../theme/colors';
+import { validateLoginForm } from '../../utils';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -31,15 +33,14 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+    // Validação centralizada
+    if (!validateLoginForm(email, password)) {
       return;
     }
 
     setIsLoading(true);
     try {
       await signIn(email.trim(), password);
-      // A navegação será automática via AuthContext
     } catch (error: any) {
       Alert.alert('Erro de Login', error.message);
     } finally {
@@ -52,7 +53,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="light" backgroundColor="#1A73E8" />
+      <StatusBar style="light" backgroundColor={colors.brand.forest} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
         <View style={styles.header}>
@@ -69,6 +70,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             <TextInput
               style={styles.input}
               placeholder="E-mail"
+              placeholderTextColor="#999"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -83,6 +85,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             <TextInput
               style={styles.input}
               placeholder="Senha"
+              placeholderTextColor="#999"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -130,7 +133,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A73E8',
+    backgroundColor: colors.brand.forest,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   loginButton: {
-    backgroundColor: '#1A73E8',
+    backgroundColor: colors.brand.forest,
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',

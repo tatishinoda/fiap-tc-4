@@ -14,52 +14,72 @@ interface QuickActionsProps {
   actions: QuickAction[];
 }
 
+/**
+ * Quick Actions Component
+ * Card flutuante elevado posicionado sobre o card de saldo
+ */
 export function QuickActions({ actions }: QuickActionsProps) {
   return (
-    <View style={styles.container}>
-      {actions.map((action) => (
-        <TouchableOpacity
-          key={action.id}
-          style={styles.actionButton}
-          onPress={action.onPress}
-          activeOpacity={0.7}
-        >
-          <Ionicons name={action.icon as any} size={28} color={action.color} />
-          <Text style={styles.actionText}>{action.title}</Text>
-        </TouchableOpacity>
+    <View style={styles.floatingCard}>
+      {actions.map((action, index) => (
+        <React.Fragment key={action.id}>
+          {index > 0 && <View style={styles.divider} />}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={action.onPress}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.iconCircle, { backgroundColor: action.color }]}>
+              <Ionicons name={action.icon as any} size={20} color="#FFFFFF" />
+            </View>
+            <Text style={styles.actionText}>
+              {action.title}
+            </Text>
+          </TouchableOpacity>
+        </React.Fragment>
       ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  floatingCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 28,
-    gap: 12,
-  },
-  actionButton: {
+    justifyContent: 'space-around',
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    paddingVertical: 24,
+    paddingVertical: 18,
     paddingHorizontal: 16,
+    marginHorizontal: 20,
+    marginTop: -40,
+    marginBottom: 24,
+  },
+  actionButton: {
     alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0, 0, 0, 0.04)',
+    paddingVertical: 4,
+  },
+  divider: {
+    width: 1,
+    height: 44,
+    backgroundColor: '#e5e5e5',
+    marginHorizontal: 4,
+  },
+  iconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   actionText: {
-    marginTop: 12,
-    fontSize: 11,
-    color: '#555',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1a1a1a',
     textAlign: 'center',
-    fontWeight: '500',
-    lineHeight: 14,
+    letterSpacing: -0.1,
   },
 });

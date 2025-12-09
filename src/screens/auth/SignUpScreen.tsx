@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../../hooks/useAuth';
 import { RootStackParamList } from '../../types/navigation';
+import { colors } from '../../theme/colors';
+import { validateSignUpForm } from '../../utils';
 
 type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
 
@@ -33,28 +35,17 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
 
   const { signUp } = useAuth();
 
-  const handleRegister = async () => {
-    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
+  const handleSignUp = async () => {
+    // Validação centralizada
+    if (!validateSignUpForm(name, email, password, confirmPassword)) {
       return;
     }
 
     setIsLoading(true);
     try {
       await signUp(email.trim(), password, name.trim());
-      // A navegação será automática via AuthContext
     } catch (error: any) {
-      Alert.alert('Erro de Cadastro', error.message);
+      Alert.alert('Erro ao Criar Conta', error.message);
     } finally {
       setIsLoading(false);
     }
@@ -65,31 +56,24 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <StatusBar style="light" backgroundColor="#1A73E8" />
+      <StatusBar style="light" backgroundColor={colors.brand.forest} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-            disabled={isLoading}
-          >
-            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-          <Ionicons name="person-add-outline" size={60} color="#FFFFFF" />
-          <Text style={styles.title}>Criar Conta</Text>
-          <Text style={styles.subtitle}>Junte-se ao ByteBank</Text>
+          <Ionicons name="wallet-outline" size={60} color="#FFFFFF" />
+          <Text style={styles.title}>ByteBank</Text>
         </View>
 
         {/* Form */}
         <View style={styles.form}>
-          <Text style={styles.formTitle}>Dados da conta</Text>
+          <Text style={styles.formTitle}>Criar conta</Text>
 
           <View style={styles.inputContainer}>
             <Ionicons name="person-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Nome completo"
+              placeholderTextColor="#999"
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
@@ -102,6 +86,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
             <TextInput
               style={styles.input}
               placeholder="E-mail"
+              placeholderTextColor="#999"
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -116,6 +101,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
             <TextInput
               style={styles.input}
               placeholder="Senha"
+              placeholderTextColor="#999"
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -139,6 +125,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
             <TextInput
               style={styles.input}
               placeholder="Confirmar senha"
+              placeholderTextColor="#999"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry={!showConfirmPassword}
@@ -158,11 +145,11 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
           </View>
 
           <TouchableOpacity
-            style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
-            onPress={handleRegister}
+            style={[styles.signUpButton, isLoading && styles.signUpButtonDisabled]}
+            onPress={handleSignUp}
             disabled={isLoading}
           >
-            <Text style={styles.registerButtonText}>
+            <Text style={styles.signUpButtonText}>
               {isLoading ? 'Criando conta...' : 'Criar conta'}
             </Text>
           </TouchableOpacity>
@@ -186,7 +173,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A73E8',
+    backgroundColor: colors.brand.forest,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -196,25 +183,12 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 40,
-    position: 'relative',
-  },
-  backButton: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    padding: 10,
-    zIndex: 1,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#E3F2FD',
-    marginTop: 8,
   },
   form: {
     backgroundColor: '#FFFFFF',
@@ -251,17 +225,17 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 4,
   },
-  registerButton: {
-    backgroundColor: '#1A73E8',
+  signUpButton: {
+    backgroundColor: colors.brand.forest,
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 8,
   },
-  registerButtonDisabled: {
+  signUpButtonDisabled: {
     backgroundColor: '#B0BEC5',
   },
-  registerButtonText: {
+  signUpButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',

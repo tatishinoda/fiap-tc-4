@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { format } from 'date-fns';
 import { Transaction } from '../types';
+import { formatAmount, getTransactionColor, getCategoryColor, getCategoryIcon } from '../utils';
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
@@ -17,45 +17,13 @@ export function RecentTransactions({
   onSeeAll,
   showTitle = false
 }: RecentTransactionsProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value / 100);
-  };
-
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case 'income':
-        return 'arrow-up-circle';
-      case 'expense':
-        return 'arrow-down-circle';
-      case 'transfer':
-        return 'swap-horizontal';
-      default:
-        return 'ellipse';
-    }
-  };
-
-  const getTransactionColor = (type: string) => {
-    switch (type) {
-      case 'income':
-        return '#4CAF50';
-      case 'expense':
-        return '#F44336';
-      case 'transfer':
-        return '#FF9800';
-      default:
-        return '#757575';
-    }
-  };
 
   if (isLoading) {
     return (
       <View style={styles.container}>
         {showTitle && (
           <View style={styles.titleHeader}>
-            <Text style={styles.title}>Transações recentes</Text>
+            <Text style={styles.sectionTitle}>Transações recentes</Text>
           </View>
         )}
         <View style={styles.loadingContainer}>
@@ -69,63 +37,56 @@ export function RecentTransactions({
     <View style={styles.container}>
       {showTitle && (
         <View style={styles.titleHeader}>
-          <Text style={styles.title}>Transações recentes</Text>
+          <Text style={styles.sectionTitle}>Transações recentes</Text>
           <TouchableOpacity onPress={onSeeAll}>
-            <Text style={styles.seeAllText}>Ver todas</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      
-      {!showTitle && (
-        <View style={styles.header}>
-          <TouchableOpacity onPress={onSeeAll}>
-            <Text style={styles.seeAllText}>Ver todas</Text>
+            <Text style={styles.seeAllText}>Ver todas </Text>
           </TouchableOpacity>
         </View>
       )}
       
       {transactions.length === 0 ? (
         <View style={styles.emptyState}>
-          <Ionicons name="receipt-outline" size={48} color="#E0E0E0" />
+          <Ionicons name="receipt-outline" size={56} color="#999999" />
           <Text style={styles.emptyText}>Nenhuma transação encontrada</Text>
-          <Text style={styles.emptySubtext}>
-            Comece adicionando sua primeira transação
-          </Text>
+          <Text style={styles.emptySubtext}>Comece adicionando sua primeira transação</Text>
         </View>
       ) : (
         <View style={styles.transactionsList}>
           {transactions.slice(0, 5).map((transaction) => (
-            <TouchableOpacity key={transaction.id} style={styles.transactionItem}>
+            <TouchableOpacity 
+              key={transaction.id} 
+              style={styles.transactionItem}
+              activeOpacity={0.7}
+            >
               <View style={styles.transactionLeft}>
                 <View style={[
                   styles.iconContainer,
-                  { backgroundColor: `${getTransactionColor(transaction.type)}15` }
+                  { backgroundColor: getCategoryColor(transaction.category) }
                 ]}>
                   <Ionicons 
-                    name={getTransactionIcon(transaction.type)} 
-                    size={18} 
-                    color={getTransactionColor(transaction.type)} 
+                    name={getCategoryIcon(transaction.category)} 
+                    size={22} 
+                    color="#FFFFFF" 
                   />
                 </View>
                 <View style={styles.transactionInfo}>
-                  <Text style={styles.description}>
+                  <Text style={styles.transactionTitle}>
                     {transaction.description}
                   </Text>
-                  <Text style={styles.category}>
+                  <Text style={styles.transactionCategory}>
                     {transaction.category}
-                  </Text>
-                  <Text style={styles.date}>
-                    {format(transaction.date, 'dd/MM/yyyy')}
                   </Text>
                 </View>
               </View>
-              <Text style={[
-                styles.amount,
-                { color: getTransactionColor(transaction.type) }
-              ]}>
-                {transaction.type === 'expense' ? '-' : '+'}
-                {formatCurrency(Math.abs(transaction.amount))}
-              </Text>
+              <View style={styles.transactionRight}>
+                <Text style={[
+                  styles.amount,
+                  { color: getTransactionColor(transaction.type) }
+                ]}>
+                  {formatAmount(transaction.amount, transaction.type)}
+                </Text>
+                <Ionicons name="chevron-forward" size={18} color="#999999" />
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -136,99 +97,82 @@ export function RecentTransactions({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   titleHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
-  title: {
+  sectionTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginBottom: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
   },
   seeAllText: {
-    color: '#1A73E8',
     fontSize: 14,
     fontWeight: '600',
+    color: '#024D60',
   },
   loadingContainer: {
-    paddingVertical: 32,
+    padding: 40,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 2,
   },
   loadingText: {
     fontSize: 14,
-    color: '#999',
-    fontWeight: '400',
+    color: '#999999',
   },
   emptyState: {
+    padding: 40,
     alignItems: 'center',
-    paddingVertical: 40,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0, 0, 0, 0.04)',
+    borderRadius: 16,
   },
   emptyText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#666',
-    marginTop: 12,
-    marginBottom: 6,
+    color: '#333333',
+    marginTop: 16,
   },
   emptySubtext: {
-    fontSize: 13,
-    color: '#999',
+    fontSize: 14,
+    color: '#666666',
+    marginTop: 8,
     textAlign: 'center',
-    fontWeight: '400',
   },
   transactionsList: {
     gap: 12,
   },
   transactionItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 6,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     elevation: 2,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0, 0, 0, 0.04)',
   },
   transactionLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginRight: 12,
   },
   iconContainer: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
@@ -236,25 +180,25 @@ const styles = StyleSheet.create({
   transactionInfo: {
     flex: 1,
   },
-  description: {
-    fontSize: 14,
+  transactionTitle: {
+    fontSize: 15,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 3,
+    color: '#1a1a1a',
+    marginBottom: 4,
   },
-  category: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 2,
+  transactionCategory: {
+    fontSize: 13,
     fontWeight: '400',
+    color: '#666666',
   },
-  date: {
-    fontSize: 11,
-    color: '#999',
-    fontWeight: '400',
+  transactionRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   amount: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: -0.3,
   },
 });

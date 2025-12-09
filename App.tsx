@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import { LogBox } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-gesture-handler';
+import './global.css';
 
-import { AuthProvider } from './src/context/AuthContext';
+import { AppProviders } from './src/context';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
 // Ignorar warnings específicos do Firebase + Hermes
@@ -35,8 +36,8 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
+    <AppProviders>
       <AppNavigator />
-    </AuthProvider>
+    </AppProviders>
   );
 }

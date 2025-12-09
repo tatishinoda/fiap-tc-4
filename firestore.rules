@@ -9,15 +9,19 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Regra para transações - apenas usuários autenticados podem acessar suas próprias transações
+    // Regra para transações - cada usuário acessa apenas suas próprias transações
     match /transactions/{transactionId} {
-      allow read, write: if request.auth != null && 
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && 
         resource.data.userId == request.auth.uid;
     }
     
-    // Regra para contas bancárias - apenas usuários autenticados podem acessar suas próprias contas
-    match /accounts/{accountId} {
-      allow read, write: if request.auth != null && 
+    // Regra para investimentos - cada usuário acessa apenas seus próprios investimentos
+    match /investments/{investmentId} {
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && 
         resource.data.userId == request.auth.uid;
     }
     

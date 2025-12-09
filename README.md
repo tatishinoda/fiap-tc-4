@@ -1,6 +1,6 @@
 # 🏦 ByteBank Mobile
 
-Aplicação  de gestão financeira desenvolvida com React Native.
+Aplicação de gestão financeira desenvolvida com React Native.
 
 ## 📱 Funcionalidades
 
@@ -11,23 +11,30 @@ Aplicação  de gestão financeira desenvolvida com React Native.
 - [x] Persistência de sessão com AsyncStorage
 - [x] Armazenamento seguro com Expo SecureStore
 
+### 💰 **Sistema Financeiro**
+- [x] Cálculo automático de saldo baseado em transações
+- [ ] Resumo financeiro (receitas, despesas, saldo)
+- [ ] Gráficos de análise financeira
+- [ ] Transações (depósitos, saques, investimentos, metas)
+
 ### 🏠 **Tela Inicial**
-- [ ] Resumo financeiro
-- [ ] Gráficos
-- [ ] Listar/Filtrar transações
+- [ ] Dashboard com visão geral financeira
+- [ ] Gráficos interativos
+- [ ] Listar/Filtrar transações recentes
 - [ ] Adicionar/Editar transações
-- [ ] Anexar arquivos as transações
+- [ ] Anexar arquivos às transações
 
 ### ☁️ **Cloud & Sincronização**
-- [ ] Sincronização em tempo real com Firebase
-- [ ] Armazenamento seguro no Cloud Firestore
+- [x] Integração com Firebase Firestore
+- [ ] Sincronização em tempo real
+- [x] Regras de segurança configuradas
+- [ ] Armazenamento de arquivos (Storage)
 
 ### 🎨 **Interface & Experiência**
 - [x] Design moderno e intuitivo
 - [x] Navegação em abas
 - [x] Interface responsiva
-- [ ] Temas e cores personalizadas
-- [ ] Animações
+- [ ] Animações e transições suaves
 
 ## 📁 **Estrutura do Projeto**
    
@@ -95,17 +102,28 @@ bytebank-mobile/
 ### **Pré-requisitos**
 - Node.js 18+ (recomendado)
 - npm ou yarn
-- Expo CLI: `npm install expo-cli`
-- Conta no Firebase (Este projeto já está configurado com Firebase)
+- Expo CLI: `npm install -g expo-cli`
+- Conta no Firebase (gratuita)
 
 ### **1. Clone o projeto**
+```bash
+git clone <seu-repositorio>
+cd bytebank-mobile
+```
 
 ### **2. Instalar dependências**
 ```bash
 npm install
 ```
 
-### **3. Executar o projeto**
+### **3. Configurar Firebase**
+```bash
+# Copie o arquivo de exemplo e configure suas credenciais
+npm run setup
+# Edite o .env com suas credenciais do Firebase Console
+```
+
+### **4. Executar o projeto**
 ```bash
 npm start
 ```
@@ -115,9 +133,14 @@ npm start
 - Escaneie o QR Code gerado
 
 ### **5. Visualizar dados no Firebase**
-📋 **Consulte**: [FIREBASE.md](FIREBASE.md) para entender como os dados são organizados no Firebase   .
-   
+📋 **Consulte**: [FIREBASE.md](FIREBASE.md) para entender como os dados são organizados no Firebase.
 
+## 📚 **Documentação**
+
+- **[SINGLE_ACCOUNT_MODEL.md](SINGLE_ACCOUNT_MODEL.md)** - Modelo de conta única (essencial!)
+- **[COMPLETE_SYSTEM.md](COMPLETE_SYSTEM.md)** - Sistema completo de transações e investimentos
+- **[FIRESTORE_SETUP.md](FIRESTORE_SETUP.md)** - Configuração detalhada do Firestore
+- **[FIREBASE.md](FIREBASE.md)** - Guia de configuração do Firebase
 
 ## 🔧 **Configurações de Desenvolvimento**
 
@@ -129,30 +152,3 @@ npm run ios        # Executar no iOS
 npm run web        # Executar na web
 npm run build      # Build de produção
 ```
-
-
-## 🎯 **Próximos Passos**
-
-### **Funcionalidades Planejadas**
-- [ ] Tela de Login / Gerenciamento de Estado (Gerencie o estado global (como login e dados de transações) usando Context API)
-- [ ] [Home Page] Exibir gráficos (Baseados nas transações do usuário)
-- [ ] [Home Page] Exibir análises financeiras (Baseados nas transações do usuário)
-- [ ] [Home Page] Implementar animações para transições entre seções do dashboard (Implementar animações para transições entre seções do dashboard utilizando Animated)
-avançados (por data, categoria, etc.) na lista de transações
-- [ ] [Adicionar/Editar Transação] Permitir adicionar e editar transações
-- [ ] [Adicionar/Editar Transação] Validação Avançada de campos, como o valor e a categoria da transação
-- [ ] [Adicionar/Editar Transação] Upload de Recibos: Permitir o upload de recibos ou documentos relacionados à transação, salvando-os no Firebase Storage
-- [ ] [Listagem de Transações] Incluir filtros
-avançados (por data, categoria, etc.) na lista de transações com Cloud Firestore para buscar as transações  (Baseados nas transações do usuário)
-- [ ] [Listagem de Transações] Implementar scroll infinito ou paginação
-
-
-### **Status REAL do Projeto**
-✅ **Configuração Base** - Código pronto e Firebase configurado  
-✅ **Firebase Integration** - Credenciais configuradas e testadas 
-✅ **Autenticação** - Testado  
-✅ **Navegação** - Testado navegação e proteção de rotas
-🔄 **Transações** - Interface pronta, aguardando dados reais  
-📋 **Próximo passo** - **IMPLEMENTAR SISTEMA DE TRANSAÇÕES**  
-⏳ **Adicionar Transações** - Próxima funcionalidade  
-⏳ **Listagem Transações** - Aguardando implementação  

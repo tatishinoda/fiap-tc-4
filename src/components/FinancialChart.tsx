@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { formatCurrency } from '../utils';
 
 interface ChartData {
   income: number;
@@ -10,21 +11,14 @@ interface ChartData {
 interface FinancialChartProps {
   data: ChartData;
   isLoading?: boolean;
+  showTitle?: boolean;
 }
 
 const { width } = Dimensions.get('window');
 const CHART_WIDTH = width - 80;
 const CHART_HEIGHT = 120;
 
-export function FinancialChart({ data, isLoading = false }: FinancialChartProps) {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value / 100);
-  };
+export function FinancialChart({ data, isLoading = false, showTitle = true }: FinancialChartProps) {
 
   if (isLoading) {
     return (
@@ -41,70 +35,85 @@ export function FinancialChart({ data, isLoading = false }: FinancialChartProps)
   const expensePercentage = total > 0 ? (data.expense / total) * 100 : 50;
 
   return (
-    <View style={styles.container}>
-      {total === 0 ? (
-        <View style={styles.emptyState}>
-          <Ionicons name="bar-chart-outline" size={48} color="#E0E0E0" />
-          <Text style={styles.emptyText}>Nenhum dado para exibir</Text>
-        </View>
-      ) : (
-        <View style={styles.chartContainer}>
-          {/* Progress Bar Chart */}
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressSegment,
-                { 
-                  width: `${incomePercentage}%`,
-                  backgroundColor: '#4CAF50'
-                }
-              ]} 
-            />
-            <View 
-              style={[
-                styles.progressSegment,
-                { 
-                  width: `${expensePercentage}%`,
-                  backgroundColor: '#F44336'
-                }
-              ]} 
-            />
+    <View style={styles.wrapper}>
+      {showTitle && (
+        <Text style={styles.sectionTitle}>Resumo</Text>
+      )}
+      
+      <View style={styles.container}>
+        {total === 0 ? (
+          <View style={styles.emptyState}>
+            <Ionicons name="bar-chart-outline" size={48} color="#E0E0E0" />
+            <Text style={styles.emptyText}>Nenhum dado para exibir</Text>
           </View>
-          
-          {/* Legend */}
-          <View style={styles.legend}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
-              <Text style={styles.legendLabel}>
-                Entradas ({incomePercentage.toFixed(0)}%)
-              </Text>
-              <Text style={styles.legendValue}>
-                {formatCurrency(data.income)}
-              </Text>
+        ) : (
+          <View style={styles.chartContainer}>
+            {/* Progress Bar Chart */}
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressSegment,
+                  { 
+                    width: `${incomePercentage}%`,
+                    backgroundColor: '#4CAF50'
+                  }
+                ]} 
+              />
+              <View 
+                style={[
+                  styles.progressSegment,
+                  { 
+                    width: `${expensePercentage}%`,
+                    backgroundColor: '#F44336'
+                  }
+                ]} 
+              />
             </View>
             
-            <View style={styles.legendItem}>
-              <View style={[styles.legendColor, { backgroundColor: '#F44336' }]} />
-              <Text style={styles.legendLabel}>
-                Saídas ({expensePercentage.toFixed(0)}%)
-              </Text>
-              <Text style={styles.legendValue}>
-                {formatCurrency(data.expense)}
-              </Text>
+            {/* Legend */}
+            <View style={styles.legend}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendColor, { backgroundColor: '#4CAF50' }]} />
+                <Text style={styles.legendLabel}>
+                  Entradas ({incomePercentage.toFixed(0)}%)
+                </Text>
+                <Text style={styles.legendValue}>
+                  {formatCurrency(data.income)}
+                </Text>
+              </View>
+              
+              <View style={styles.legendItem}>
+                <View style={[styles.legendColor, { backgroundColor: '#F44336' }]} />
+                <Text style={styles.legendLabel}>
+                  Saídas ({expensePercentage.toFixed(0)}%)
+                </Text>
+                <Text style={styles.legendValue}>
+                  {formatCurrency(data.expense)}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
-      )}
+        )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  wrapper: {
+    marginBottom: 28,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    letterSpacing: -0.3,
+    marginBottom: 16,
+  },
   container: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
-    marginBottom: 28,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,

@@ -2,22 +2,23 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
   RefreshControl,
   Alert,
-  TextInput,
   Modal,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../../hooks/useAuth';
-import { TransactionService } from '../../services/TransactionService';
+import { useColorScheme } from '../../hooks/useColorScheme';
+import { useTransactionContext } from '../../context';
 import { Transaction } from '../../types';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { RootStackParamList } from '../../types/navigation';
+import { formatAmount, getTransactionColor, getCategoryColor, getCategoryIcon } from '../../utils';
 
 type TransactionsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Transactions'>;
 
@@ -29,42 +30,33 @@ type FilterType = 'all' | 'income' | 'expense' | 'transfer';
 
 export default function TransactionsScreen({ navigation }: TransactionsScreenProps) {
   const { user } = useAuth();
-  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
+  const { transactions, loading, refreshTransactions } = useTransactionContext();
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [showFilterModal, setShowFilterModal] = useState(false);
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  useEffect(() => {
     applyFilters();
-  }, [allTransactions, searchQuery, selectedFilter]);
+  }, [transactions, searchQuery, selectedFilter]);
 
   const loadData = async () => {
-    if (!user) return;
-
-    try {
-      // Buscar TODAS as transações (sem limite)
-      const transactionsData = await TransactionService.getUserTransactions(user.id);
-      setAllTransactions(transactionsData);
-    } catch (error) {
-      Alert.alert('Erro', 'Erro ao carregar transações');
-    } finally {
-      setIsLoading(false);
-    }
+    await refreshTransactions();
   };
 
   const applyFilters = () => {
-    let filtered = [...allTransactions];
+    let filtered = [...transactions];
 
     // Filtro por tipo
     if (selectedFilter !== 'all') {
-      filtered = filtered.filter(t => t.type === selectedFilter);
+      if (selectedFilter === 'income') {
+        filtered = filtered.filter(t => t.type === 'DEPOSIT');
+      } else if (selectedFilter === 'expense') {
+        filtered = filtered.filter(t => t.type !== 'DEPOSIT');
+      } else if (selectedFilter === 'transfer') {
+        filtered = filtered.filter(t => t.type === 'TRANSFER');
+      }
     }
 
     // Filtro por busca
@@ -72,7 +64,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(t => 
         t.description.toLowerCase().includes(query) ||
-        t.category.toLowerCase().includes(query)
+        (t.category && t.category.toLowerCase().includes(query))
       );
     }
 
@@ -83,39 +75,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     setRefreshing(true);
     await loadData();
     setRefreshing(false);
-  };
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value / 100);
-  };
-
-  const getTransactionIcon = (type: string) => {
-    switch (type) {
-      case 'income':
-        return 'arrow-up-circle';
-      case 'expense':
-        return 'arrow-down-circle';
-      case 'transfer':
-        return 'swap-horizontal';
-      default:
-        return 'ellipse';
-    }
-  };
-
-  const getTransactionColor = (type: string) => {
-    switch (type) {
-      case 'income':
-        return '#4CAF50';
-      case 'expense':
-        return '#F44336';
-      case 'transfer':
-        return '#FF9800';
-      default:
-        return '#757575';
-    }
   };
 
   const getFilterLabel = (filter: FilterType) => {
@@ -132,7 +91,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       case 'income': return '#4CAF50';
       case 'expense': return '#F44336';
       case 'transfer': return '#FF9800';
-      default: return '#1A73E8';
+      default: return '#2d6073'; // forest
     }
   };
 
@@ -147,19 +106,19 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
           </Text>
         </View>
 
-        {/* Barra de busca */}
+        {/* Barra de busca clean */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
+          <Ionicons name="search" size={20} color="rgba(0, 0, 0, 0.4)" style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
             placeholder="Buscar transações..."
-            placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}
+            style={styles.searchInput}
+            placeholderTextColor="rgba(0, 0, 0, 0.4)"
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Ionicons name="close-circle" size={20} color="#999" />
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+              <Ionicons name="close-circle" size={20} color="rgba(0, 0, 0, 0.3)" />
             </TouchableOpacity>
           )}
         </View>
@@ -169,15 +128,14 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
           horizontal 
           showsHorizontalScrollIndicator={false}
           style={styles.filtersContainer}
+          contentContainerStyle={styles.filtersContent}
         >
           {(['all', 'income', 'expense', 'transfer'] as FilterType[]).map((filter) => (
             <TouchableOpacity
               key={filter}
               style={[
                 styles.filterChip,
-                selectedFilter === filter && {
-                  backgroundColor: getFilterColor(filter),
-                }
+                selectedFilter === filter && styles.filterChipActive
               ]}
               onPress={() => setSelectedFilter(filter)}
             >
@@ -195,67 +153,76 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       {/* Lista de transações */}
       <ScrollView
         style={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            tintColor="#4a9fb8"
+            colors={['#4a9fb8']}
+          />
+        }
         showsVerticalScrollIndicator={false}
       >
-        {isLoading ? (
-          <View style={styles.loadingState}>
+        {loading ? (
+          <View style={styles.centerState}>
             <Text style={styles.loadingText}>Carregando...</Text>
           </View>
         ) : filteredTransactions.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons 
-              name={searchQuery ? "search-outline" : "receipt-outline"} 
-              size={64} 
-              color="#E0E0E0" 
-            />
-            <Text style={styles.emptyText}>
-              {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhuma transação encontrada'}
-            </Text>
-            <Text style={styles.emptySubtext}>
-              {searchQuery 
-                ? 'Tente buscar por outro termo' 
-                : 'Comece adicionando sua primeira transação'}
-            </Text>
+          <View style={styles.centerState}>
+            <View style={styles.emptyCard}>
+              <Ionicons 
+                name={searchQuery ? "search-outline" : "receipt-outline"} 
+                size={64} 
+                color="rgba(0, 0, 0, 0.3)"
+              />
+              <Text style={styles.emptyTitle}>
+                {searchQuery ? 'Nenhum resultado encontrado' : 'Nenhuma transação encontrada'}
+              </Text>
+              <Text style={styles.emptySubtitle}>
+                {searchQuery 
+                  ? 'Tente buscar por outro termo' 
+                  : 'Comece adicionando sua primeira transação'}
+              </Text>
+            </View>
           </View>
         ) : (
           <View style={styles.transactionsList}>
             {filteredTransactions.map((transaction) => (
               <TouchableOpacity 
-                key={transaction.id} 
+                key={transaction.id}
                 style={styles.transactionItem}
                 activeOpacity={0.7}
               >
                 <View style={styles.transactionLeft}>
                   <View style={[
-                    styles.transactionIconContainer,
-                    { backgroundColor: `${getTransactionColor(transaction.type)}15` }
+                    styles.iconContainer,
+                    { backgroundColor: getCategoryColor(transaction.category) }
                   ]}>
                     <Ionicons 
-                      name={getTransactionIcon(transaction.type)} 
-                      size={24} 
-                      color={getTransactionColor(transaction.type)} 
+                      name={getCategoryIcon(transaction.category)} 
+                      size={22} 
+                      color="#FFFFFF" 
                     />
                   </View>
                   <View style={styles.transactionInfo}>
-                    <Text style={styles.transactionDescription}>
+                    <Text style={styles.transactionTitle}>
                       {transaction.description}
                     </Text>
                     <Text style={styles.transactionCategory}>
                       {transaction.category}
                     </Text>
-                    <Text style={styles.transactionDate}>
-                      {format(transaction.date, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
-                    </Text>
                   </View>
                 </View>
-                <Text style={[
-                  styles.transactionAmount,
-                  { color: getTransactionColor(transaction.type) }
-                ]}>
-                  {transaction.type === 'expense' ? '-' : '+'}
-                  {formatCurrency(Math.abs(transaction.amount))}
-                </Text>
+                <View style={styles.transactionRight}>
+                  <Text style={[
+                    styles.amount,
+                    { color: getTransactionColor(transaction.type) }
+                  ]}>
+                    {formatAmount(transaction.amount, transaction.type)}
+                  </Text>
+                  <Ionicons name="chevron-forward" size={18} color="#999999" />
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -268,15 +235,13 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#FFFFFF',
     paddingTop: 20,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    paddingBottom: 20,
+    paddingHorizontal: 24,
+    backgroundColor: '#FFFFFF',
   },
   headerTop: {
     marginBottom: 20,
@@ -284,67 +249,125 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 32,
     fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
+    color: '#1a1a1a',
     letterSpacing: -0.5,
   },
   headerSubtitle: {
-    fontSize: 15,
-    color: '#666',
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '400',
+    color: 'rgba(0, 0, 0, 0.5)',
+    marginTop: 4,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
+    backgroundColor: '#f5f5f5',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 0,
     marginBottom: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
+    height: 48,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#1a1a1a',
+    height: 48,
+    paddingVertical: 0,
+  },
+  clearButton: {
+    padding: 4,
+    marginLeft: 8,
   },
   filtersContainer: {
     marginBottom: 8,
   },
+  filtersContent: {
+    paddingRight: 24,
+  },
   filterChip: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F5F5F5',
     marginRight: 8,
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
+  },
+  filterChipActive: {
+    backgroundColor: '#4a9fb8',
+    borderColor: '#4a9fb8',
   },
   filterChipText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(0, 0, 0, 0.6)',
   },
   filterChipTextActive: {
     color: '#FFFFFF',
+    fontWeight: '600',
   },
   content: {
     flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
+  contentContainer: {
+    paddingBottom: 100,
+  },
+  centerState: {
+    flex: 1,
+    minHeight: 400,
+    paddingHorizontal: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    fontWeight: '400',
+    color: 'rgba(0, 0, 0, 0.5)',
+  },
+  emptyCard: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: 'rgba(0, 0, 0, 0.5)',
+    marginTop: 8,
+    textAlign: 'center',
   },
   transactionsList: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: 24,
+    gap: 12,
   },
   transactionItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
     shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
@@ -355,66 +378,36 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
-  transactionIconContainer: {
+  iconContainer: {
     width: 48,
     height: 48,
     borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   transactionInfo: {
     flex: 1,
   },
-  transactionDescription: {
-    fontSize: 16,
+  transactionTitle: {
+    fontSize: 15,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: '#1a1a1a',
     marginBottom: 4,
   },
   transactionCategory: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  transactionDate: {
     fontSize: 13,
-    color: '#999',
-    textTransform: 'capitalize',
+    fontWeight: '400',
+    color: '#666666',
   },
-  transactionAmount: {
-    fontSize: 18,
+  transactionRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  amount: {
+    fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.3,
-  },
-  loadingState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 60,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#999',
-    marginTop: 12,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 80,
-    paddingHorizontal: 40,
-  },
-  emptyText: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 24,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  emptySubtext: {
-    fontSize: 15,
-    color: '#999',
-    textAlign: 'center',
-    lineHeight: 22,
   },
 });

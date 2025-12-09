@@ -8,14 +8,16 @@ export interface User {
   updatedAt: Date;
 }
 
+export type TransactionType = 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | 'PAYMENT' | 'INVESTMENT';
+
 export interface Transaction {
   id: string;
   userId: string;
-  type: 'income' | 'expense' | 'transfer';
-  category: string;
+  type: TransactionType;
   amount: number;
-  description: string;
   date: Date;
+  description: string;
+  category?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,17 +28,6 @@ export interface Category {
   icon: string;
   color: string;
   type: 'income' | 'expense';
-}
-
-export interface Account {
-  id: string;
-  userId: string;
-  name: string;
-  type: 'checking' | 'savings' | 'credit';
-  balance: number;
-  currency: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface AuthContextType {

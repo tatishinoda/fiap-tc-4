@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { formatCurrency } from '../utils';
 
 interface FinancialOverviewProps {
   balance: number;
@@ -18,13 +19,6 @@ export function FinancialOverview({
 }: FinancialOverviewProps) {
   const [showBalance, setShowBalance] = useState(true);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value / 100);
-  };
-
   const toggleBalanceVisibility = () => {
     setShowBalance(!showBalance);
   };
@@ -33,7 +27,7 @@ export function FinancialOverview({
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={['#1A73E8', '#4285F4']}
+          colors={['#024D60', '#03607a', '#037a94']}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.gradientContainer}
@@ -49,7 +43,7 @@ export function FinancialOverview({
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['#1A1A1A', '#2D2D2D', '#1A1A1A']}
+        colors={['#024D60', '#03607a', '#037a94']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradientContainer}
@@ -57,8 +51,8 @@ export function FinancialOverview({
         {/* Header minimalista */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Text style={styles.headerTitle}>Saldo disponível</Text>
-            <Text style={styles.headerSubtitle}>Conta corrente</Text>
+            <Text style={styles.headerTitle}>Saldo</Text>
+            {/* <Text style={styles.headerSubtitle}>Conta corrente</Text> */}
           </View>
           <TouchableOpacity onPress={toggleBalanceVisibility} style={styles.eyeButton}>
             <Ionicons 
@@ -109,21 +103,24 @@ export function FinancialOverview({
 const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
+    marginHorizontal: -24,
+    marginTop: 0,
   },
   gradientContainer: {
-    borderRadius: 24,
-    padding: 28,
+    paddingHorizontal: 28,
+    paddingTop: 40,
+    paddingBottom: 45,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.03,
-    shadowRadius: 20,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 24,
+    marginBottom: 10,
   },
   headerLeft: {
     flex: 1,
@@ -134,18 +131,17 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginBottom: 2,
   },
-  headerSubtitle: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontWeight: '400',
-  },
+  // headerSubtitle: {
+  //   fontSize: 12,
+  //   color: 'rgba(255, 255, 255, 0.5)',
+  //   fontWeight: '400',
+  // },
   eyeButton: {
     padding: 8,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 12
   },
   balanceSection: {
-    marginBottom: 32,
+    marginBottom: 20,
   },
   balanceValue: {
     fontSize: 42,

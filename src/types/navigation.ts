@@ -1,3 +1,5 @@
+import { TransactionType } from './index';
+
 // Tipos de navegação para toda a aplicação
 export type RootStackParamList = {
   // Rotas de autenticação (públicas)
@@ -9,6 +11,9 @@ export type RootStackParamList = {
   Dashboard: undefined;
   Home: undefined;
   Transactions: undefined;
+  AddTransaction: {
+    type?: TransactionType;
+  } | undefined;
 };
 
 export type TabParamList = {

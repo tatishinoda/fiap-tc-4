@@ -1,17 +1,23 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
+import { Text } from './ui';
+import { colors, spacing } from '../theme';
 
+/**
+ * Loading Screen Component
+ */
 export default function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#1A73E8" />
+      <StatusBar style="light" backgroundColor={colors.brand.forest} />
       
       <View style={styles.content}>
         <Ionicons name="wallet-outline" size={80} color="#FFFFFF" />
-        <Text style={styles.title}>ByteBank</Text>
-        <Text style={styles.subtitle}>Carregando...</Text>
+        <Text variant="displayMedium" style={styles.title}>
+          ByteBank
+        </Text>
         
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#FFFFFF" />
@@ -24,7 +30,7 @@ export default function LoadingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A73E8',
+    backgroundColor: colors.brand.forest,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -32,18 +38,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
+    marginTop: spacing.lg,
+    marginBottom: spacing.xs,
     color: '#FFFFFF',
-    marginTop: 20,
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#E3F2FD',
-    marginBottom: 40,
+    fontWeight: 'bold',
   },
   loadingContainer: {
-    marginTop: 20,
+    marginTop: spacing.xl,
   },
 });

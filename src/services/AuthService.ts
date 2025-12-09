@@ -13,10 +13,12 @@ import * as SecureStore from 'expo-secure-store';
 export class AuthService {
   // Registrar novo usuário
   static async signUp(email: string, password: string, name: string): Promise<User> {
+    let firebaseUser: FirebaseUser | null = null;
+    
     try {
       // Criar usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const firebaseUser = userCredential.user;
+      firebaseUser = userCredential.user;
 
       // Criar perfil do usuário no Firestore
       const userData: Omit<User, 'id'> = {
@@ -37,6 +39,16 @@ export class AuthService {
       };
     } catch (error: any) {
       console.error('Erro ao registrar usuário:', error);
+      
+      // Se criou no Auth mas falhou no Firestore, remove do Auth
+      if (firebaseUser && error.code !== 'auth/email-already-in-use') {
+        try {
+          await firebaseUser.delete();
+        } catch (deleteError) {
+          console.error('Erro ao limpar usuário do Auth:', deleteError);
+        }
+      }
+      
       throw new Error(this.getErrorMessage(error.code));
     }
   }
@@ -51,7 +63,9 @@ export class AuthService {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       
       if (!userDoc.exists()) {
-        throw new Error('Dados do usuário não encontrados');
+        // Fazer logout do Firebase Auth se não encontrar dados no Firestore
+        await firebaseSignOut(auth);
+        throw new Error('Perfil de usuário não encontrado. Por favor, entre em contato com o suporte.');
       }
 
       const userData = userDoc.data() as Omit<User, 'id'>;
@@ -65,6 +79,10 @@ export class AuthService {
       };
     } catch (error: any) {
       console.error('Erro ao fazer login:', error);
+      // Se já é uma mensagem customizada, mantém ela
+      if (error.message && !error.code) {
+        throw error;
+      }
       throw new Error(this.getErrorMessage(error.code));
     }
   }

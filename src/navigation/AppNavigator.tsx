@@ -1,12 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '../hooks/useAuth';
 import { RootStackParamList, TabParamList } from '../types/navigation';
+import { GlobalNotification } from '../components/GlobalNotification';
+import { colors } from '../theme/colors';
 
 // Telas de autenticação
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -15,11 +17,12 @@ import SignUpScreen from '../screens/auth/SignUpScreen';
 // Telas protegidas
 import HomeScreen from '../screens/protected/HomeScreen';
 import TransactionsScreen from '../screens/protected/TransactionsScreen';
+import AddTransactionScreen from '../screens/protected/AddTransactionScreen';
 
 // Componente de loading
 import LoadingScreen from '../components/LoadingScreen';
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
 // Stack de autenticação
@@ -59,7 +62,7 @@ function ProtectedTabs() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" backgroundColor="#1A73E8" />
+      <StatusBar style="light" backgroundColor={colors.brand.forest} />
       
       {/* Header Fixo */}
       <View style={styles.header}>
@@ -89,7 +92,7 @@ function ProtectedTabs() {
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
-          tabBarActiveTintColor: '#1A73E8',
+          tabBarActiveTintColor: colors.brand.forest,
           tabBarInactiveTintColor: '#666',
           tabBarStyle: {
             backgroundColor: '#FFFFFF',
@@ -125,6 +128,22 @@ function ProtectedStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={ProtectedTabs} />
+      <Stack.Screen 
+        name="AddTransaction" 
+        component={AddTransactionScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Nova Transação',
+          headerStyle: {
+            backgroundColor: colors.brand.forest,
+          },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          presentation: 'modal',
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -139,6 +158,7 @@ export function AppNavigator() {
   return (
     <NavigationContainer>
       {isAuthenticated ? <ProtectedStack /> : <AuthStack />}
+      <GlobalNotification />
     </NavigationContainer>
   );
 }
@@ -149,8 +169,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   header: {
-    backgroundColor: '#1A73E8',
-    paddingTop: 50,
+    backgroundColor: colors.brand.forest,
+    paddingTop: 40,
     paddingBottom: 20,
     paddingHorizontal: 20,
   },
