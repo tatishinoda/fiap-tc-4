@@ -1,18 +1,10 @@
 import { Alert } from 'react-native';
 
-/**
- * Utilitários para validação de formulários
- * Centraliza lógica de validação repetida nas telas
- */
-
 export interface ValidationResult {
   isValid: boolean;
   error?: string;
 }
 
-/**
- * Valida email
- */
 export const validateEmail = (email: string): ValidationResult => {
   if (!email.trim()) {
     return { isValid: false, error: 'Email é obrigatório' };
@@ -26,9 +18,6 @@ export const validateEmail = (email: string): ValidationResult => {
   return { isValid: true };
 };
 
-/**
- * Valida senha
- */
 export const validatePassword = (password: string, minLength: number = 6): ValidationResult => {
   if (!password.trim()) {
     return { isValid: false, error: 'Senha é obrigatória' };
@@ -44,9 +33,6 @@ export const validatePassword = (password: string, minLength: number = 6): Valid
   return { isValid: true };
 };
 
-/**
- * Valida confirmação de senha
- */
 export const validatePasswordConfirmation = (
   password: string, 
   confirmPassword: string
@@ -62,9 +48,6 @@ export const validatePasswordConfirmation = (
   return { isValid: true };
 };
 
-/**
- * Valida nome
- */
 export const validateName = (name: string, minLength: number = 2): ValidationResult => {
   if (!name.trim()) {
     return { isValid: false, error: 'Nome é obrigatório' };
@@ -91,9 +74,7 @@ export const validateRequired = (value: string, fieldName: string): ValidationRe
   return { isValid: true };
 };
 
-/**
- * Valida múltiplos campos e exibe alerta se houver erro
- */
+// Valida múltiplos campos e exibe alerta com o primeiro erro encontrado
 export const validateFields = (validations: ValidationResult[]): boolean => {
   const firstError = validations.find(v => !v.isValid);
   
@@ -105,9 +86,6 @@ export const validateFields = (validations: ValidationResult[]): boolean => {
   return true;
 };
 
-/**
- * Valida formulário de login
- */
 export const validateLoginForm = (email: string, password: string): boolean => {
   return validateFields([
     validateEmail(email),
@@ -115,9 +93,6 @@ export const validateLoginForm = (email: string, password: string): boolean => {
   ]);
 };
 
-/**
- * Valida formulário de cadastro
- */
 export const validateSignUpForm = (
   name: string,
   email: string,
@@ -132,9 +107,6 @@ export const validateSignUpForm = (
   ]);
 };
 
-/**
- * Valida valor monetário
- */
 export const validateAmount = (amount: string): ValidationResult => {
   if (!amount.trim()) {
     return { isValid: false, error: 'Valor é obrigatório' };
@@ -148,9 +120,6 @@ export const validateAmount = (amount: string): ValidationResult => {
   return { isValid: true };
 };
 
-/**
- * Valida descrição de transação
- */
 export const validateDescription = (description: string, minLength: number = 3): ValidationResult => {
   if (!description.trim()) {
     return { isValid: false, error: 'Descrição é obrigatória' };
@@ -166,55 +135,6 @@ export const validateDescription = (description: string, minLength: number = 3):
   return { isValid: true };
 };
 
-/**
- * Valida CPF brasileiro
- */
-export const validateCPF = (cpf: string): ValidationResult => {
-  if (!cpf.trim()) {
-    return { isValid: false, error: 'CPF é obrigatório' };
-  }
-
-  // Remove caracteres não numéricos
-  const cleanCPF = cpf.replace(/\D/g, '');
-  
-  // Verifica se tem 11 dígitos
-  if (cleanCPF.length !== 11) {
-    return { isValid: false, error: 'CPF deve ter 11 dígitos' };
-  }
-  
-  // Verifica se não são todos iguais
-  if (/^(\d)\1+$/.test(cleanCPF)) {
-    return { isValid: false, error: 'CPF inválido' };
-  }
-  
-  // Validação do primeiro dígito verificador
-  let sum = 0;
-  for (let i = 0; i < 9; i++) {
-    sum += parseInt(cleanCPF.charAt(i)) * (10 - i);
-  }
-  let firstDigit = (sum * 10) % 11;
-  if (firstDigit === 10) firstDigit = 0;
-  if (firstDigit !== parseInt(cleanCPF.charAt(9))) {
-    return { isValid: false, error: 'CPF inválido' };
-  }
-  
-  // Validação do segundo dígito verificador
-  sum = 0;
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(cleanCPF.charAt(i)) * (11 - i);
-  }
-  let secondDigit = (sum * 10) % 11;
-  if (secondDigit === 10) secondDigit = 0;
-  if (secondDigit !== parseInt(cleanCPF.charAt(10))) {
-    return { isValid: false, error: 'CPF inválido' };
-  }
-  
-  return { isValid: true };
-};
-
-/**
- * Valida formulário de transação (com Alert)
- */
 export const validateTransactionForm = (
   amount: string,
   description: string
@@ -225,24 +145,127 @@ export const validateTransactionForm = (
   ]);
 };
 
-/**
- * Valida formulário de transação (retorna resultado sem Alert)
- */
+// Valida transação e retorna resultado detalhado (sem Alert)
 export const validateTransaction = (
   amount: string,
   description: string
 ): ValidationResult => {
-  // Valida amount primeiro
   const amountResult = validateAmount(amount);
   if (!amountResult.isValid) {
     return amountResult;
   }
 
-  // Valida description
   const descriptionResult = validateDescription(description);
   if (!descriptionResult.isValid) {
     return descriptionResult;
   }
 
   return { isValid: true };
+};
+
+// Valida integridade dos dados da transação antes de salvar
+export const validateTransactionData = (data: {
+  type: string;
+  amount: number;
+  description: string;
+  category?: string;
+  date: Date;
+  userId: string;
+}): ValidationResult => {
+  // Valida userId
+  if (!data.userId || data.userId.trim() === '') {
+    return { isValid: false, error: 'ID do usuário é obrigatório' };
+  }
+
+  // Valida tipo de transação
+  const validTypes = ['DEPOSIT', 'WITHDRAWAL', 'TRANSFER', 'PAYMENT', 'INVESTMENT'];
+  if (!validTypes.includes(data.type)) {
+    return { isValid: false, error: 'Tipo de transação inválido' };
+  }
+
+  // Valida valor
+  if (typeof data.amount !== 'number' || data.amount <= 0) {
+    return { isValid: false, error: 'Valor deve ser um número positivo' };
+  }
+
+  // Valida se o valor não é muito grande (limite de segurança)
+  if (data.amount > 999999999.99) {
+    return { isValid: false, error: 'Valor excede o limite permitido' };
+  }
+
+  // Valida descrição
+  if (!data.description || data.description.trim().length < 3) {
+    return { isValid: false, error: 'Descrição deve ter pelo menos 3 caracteres' };
+  }
+
+  if (data.description.trim().length > 200) {
+    return { isValid: false, error: 'Descrição deve ter no máximo 200 caracteres' };
+  }
+
+  if (data.category && data.category.trim().length > 50) {
+    return { isValid: false, error: 'Categoria deve ter no máximo 50 caracteres' };
+  }
+
+  if (!(data.date instanceof Date) || isNaN(data.date.getTime())) {
+    return { isValid: false, error: 'Data inválida' };
+  }
+
+  // Impede datas muito antigas (> 10 anos)
+  const tenYearsAgo = new Date();
+  tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+  if (data.date < tenYearsAgo) {
+    return { isValid: false, error: 'Data muito antiga (limite: 10 anos)' };
+  }
+
+  // Impede datas futuras (> 1 dia)
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  if (data.date > tomorrow) {
+    return { isValid: false, error: 'Data não pode ser no futuro' };
+  }
+
+  return { isValid: true };
+};
+
+// Remove caracteres perigosos da descrição (XSS prevention)
+export const sanitizeDescription = (description: string): string => {
+  return description
+    .trim()
+    .replace(/[<>]/g, '')
+    .slice(0, 200);
+};
+
+export const sanitizeCategory = (category?: string): string | undefined => {
+  if (!category) return undefined;
+  
+  return category
+    .trim()
+    .replace(/[<>]/g, '')
+    .slice(0, 50);
+};
+
+// Valida e sanitiza dados de transação em um único passo
+export const validateAndSanitizeTransaction = (data: {
+  type: string;
+  amount: number;
+  description: string;
+  category?: string;
+  date: Date;
+  userId: string;
+}): { isValid: boolean; error?: string; sanitizedData?: any } => {
+  const validationResult = validateTransactionData(data);
+  
+  if (!validationResult.isValid) {
+    return validationResult;
+  }
+
+  return {
+    isValid: true,
+    sanitizedData: {
+      ...data,
+      description: sanitizeDescription(data.description),
+      category: sanitizeCategory(data.category),
+      amount: Math.round(data.amount * 100) / 100, // Garante 2 casas decimais
+    }
+  };
 };
