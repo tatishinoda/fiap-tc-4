@@ -19,13 +19,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Integração com Zustand store
   const authStore = useAuthStore();
 
-  // Configura o token getter para o API client
   useEffect(() => {
     setTokenGetter(() => authStore.token);
   }, [authStore.token]);
 
   useEffect(() => {
-    // Listener para mudanças no estado de autenticação
     const unsubscribe = AuthService.onAuthStateChange(async (firebaseUser: FirebaseUser | null) => {
       setLoading(true);
       authStore.setLoading(true);
@@ -34,7 +32,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
           const userData = await AuthService.getCurrentUser();
           
-          // Se não encontrou dados do usuário, faz logout
           if (!userData) {
             console.error('Dados do usuário não encontrados no Firestore');
             await AuthService.signOut();
@@ -48,15 +45,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           const token = await firebaseUser.getIdToken();
           
-          // Atualiza Context
           setUser(userData);
           setIsAuthenticated(true);
-          
-          // Atualiza Zustand Store
           await authStore.login(userData as any, token);
         } catch (error) {
           console.error('Erro ao obter dados do usuário:', error);
-          // Faz logout em caso de erro
           await AuthService.signOut();
           setUser(null);
           setIsAuthenticated(false);
@@ -80,7 +73,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userData = await AuthService.signIn(email, password);
       
-      // Verifica se realmente obteve os dados do usuário
       if (!userData) {
         throw new Error('Dados do usuário não encontrados');
       }
@@ -88,7 +80,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(userData);
       setIsAuthenticated(true);
     } catch (error) {
-      // Garante que o estado está limpo em caso de erro
       setUser(null);
       setIsAuthenticated(false);
       throw error;
@@ -102,7 +93,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const userData = await AuthService.signUp(email, password, name);
       
-      // Verifica se realmente criou o usuário
       if (!userData) {
         throw new Error('Erro ao criar usuário');
       }
@@ -110,7 +100,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(userData);
       setIsAuthenticated(true);
     } catch (error) {
-      // Garante que o estado está limpo em caso de erro
       setUser(null);
       setIsAuthenticated(false);
       throw error;
@@ -123,7 +112,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setLoading(true);
     try {
       await AuthService.signOut();
-      await authStore.logout(); // Limpa Zustand store
+      await authStore.logout();
       setUser(null);
       setIsAuthenticated(false);
     } catch (error) {

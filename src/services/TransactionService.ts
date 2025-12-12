@@ -1,6 +1,6 @@
 /**
- * Transaction Service - Firebase Firestore
- * Gerencia todas as operações de transações no Firestore
+ * Transaction Service
+ * Gerencia operações CRUD de transações no Firestore
  */
 
 import {
@@ -33,9 +33,7 @@ export interface CreateTransactionData {
 
 export interface UpdateTransactionData extends Partial<Omit<CreateTransactionData, 'userId'>> {}
 
-/**
- * Converte um documento do Firestore para Transaction
- */
+// Converte documento do Firestore para objeto Transaction
 const firestoreToTransaction = (docId: string, data: any): Transaction => {
   return {
     id: docId,
@@ -50,9 +48,7 @@ const firestoreToTransaction = (docId: string, data: any): Transaction => {
   };
 };
 
-/**
- * Lista todas as transações do usuário
- */
+// Lista todas as transações do usuário ordenadas por data
 export const getAllTransactions = async (
   userId: string,
   limitCount?: number
@@ -84,9 +80,7 @@ export const getAllTransactions = async (
   }
 };
 
-/**
- * Cria uma nova transação
- */
+// Cria nova transação no Firestore
 export const createTransaction = async (
   data: CreateTransactionData
 ): Promise<Transaction> => {
@@ -101,7 +95,7 @@ export const createTransaction = async (
 
     const docRef = await addDoc(transactionsRef, transactionData);
 
-    // Retorna a transação criada
+    // Retorna transação criada com data normalizada
     const now = new Date();
     return {
       id: docRef.id,
@@ -120,9 +114,7 @@ export const createTransaction = async (
   }
 };
 
-/**
- * Atualiza uma transação existente
- */
+// Atualiza transação existente
 export const updateTransaction = async (
   transactionId: string,
   userId: string,
@@ -149,9 +141,7 @@ export const updateTransaction = async (
   }
 };
 
-/**
- * Deleta uma transação
- */
+// Remove transação do Firestore
 export const deleteTransaction = async (transactionId: string): Promise<void> => {
   try {
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
@@ -162,9 +152,7 @@ export const deleteTransaction = async (transactionId: string): Promise<void> =>
   }
 };
 
-/**
- * Calcula o resumo financeiro do usuário
- */
+// Calcula resumo financeiro baseado em todas as transações do usuário
 export const getFinancialSummary = async (userId: string) => {
   try {
     const transactions = await getAllTransactions(userId);

@@ -6,12 +6,15 @@ import './global.css';
 
 import { AppProviders } from './src/context';
 import { AppNavigator } from './src/navigation/AppNavigator';
+import { GlobalLoading } from './src/components/GlobalLoading';
+import { GlobalNotification } from './src/components/GlobalNotification';
 
-// Ignorar warnings específicos do Firebase + Hermes
+// Ignorar warnings específicos
 LogBox.ignoreLogs([
   'INTERNAL ASSERTION FAILED', // Firebase Auth + Hermes
   'Expected a class definition', // Firebase Auth + Hermes
-  'without providing AsyncStorage', // Firebase detecta AsyncStorage automaticamente
+  'without providing AsyncStorage', // Firebase Auth (já configurado com AsyncStorage)
+  'SafeAreaView has been deprecated', // Vem de bibliotecas de terceiros
 ]);
 
 // Manter a splash screen visível enquanto carregamos recursos
@@ -38,6 +41,8 @@ export default function App() {
   return (
     <AppProviders>
       <AppNavigator />
+      <GlobalNotification />
+      <GlobalLoading />
     </AppProviders>
   );
 }

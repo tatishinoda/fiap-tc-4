@@ -11,16 +11,13 @@ import { User } from '../types';
 import * as SecureStore from 'expo-secure-store';
 
 export class AuthService {
-  // Registrar novo usuário
   static async signUp(email: string, password: string, name: string): Promise<User> {
     let firebaseUser: FirebaseUser | null = null;
     
     try {
-      // Criar usuário no Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       firebaseUser = userCredential.user;
 
-      // Criar perfil do usuário no Firestore
       const userData: Omit<User, 'id'> = {
         email: firebaseUser.email!,
         name,
@@ -29,8 +26,6 @@ export class AuthService {
       };
 
       await setDoc(doc(db, 'users', firebaseUser.uid), userData);
-
-      // Salvar token de segurança
       await SecureStore.setItemAsync('userToken', firebaseUser.uid);
 
       return {
@@ -40,7 +35,7 @@ export class AuthService {
     } catch (error: any) {
       console.error('Erro ao registrar usuário:', error);
       
-      // Se criou no Auth mas falhou no Firestore, remove do Auth
+      // Rollback: remove do Auth se falhou no Firestore
       if (firebaseUser && error.code !== 'auth/email-already-in-use') {
         try {
           await firebaseUser.delete();
@@ -53,24 +48,19 @@ export class AuthService {
     }
   }
 
-  // Fazer login
   static async signIn(email: string, password: string): Promise<User> {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
 
-      // Buscar dados do usuário no Firestore
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       
       if (!userDoc.exists()) {
-        // Fazer logout do Firebase Auth se não encontrar dados no Firestore
         await firebaseSignOut(auth);
         throw new Error('Perfil de usuário não encontrado. Por favor, entre em contato com o suporte.');
       }
 
       const userData = userDoc.data() as Omit<User, 'id'>;
-      
-      // Salvar token de segurança
       await SecureStore.setItemAsync('userToken', firebaseUser.uid);
 
       return {
@@ -79,7 +69,6 @@ export class AuthService {
       };
     } catch (error: any) {
       console.error('Erro ao fazer login:', error);
-      // Se já é uma mensagem customizada, mantém ela
       if (error.message && !error.code) {
         throw error;
       }
@@ -87,7 +76,6 @@ export class AuthService {
     }
   }
 
-  // Fazer logout
   static async signOut(): Promise<void> {
     try {
       await firebaseSignOut(auth);
@@ -98,7 +86,6 @@ export class AuthService {
     }
   }
 
-  // Obter usuário atual
   static async getCurrentUser(): Promise<User | null> {
     try {
       const firebaseUser = auth.currentUser;
@@ -121,12 +108,11 @@ export class AuthService {
     }
   }
 
-  // Listener para mudanças no estado de autenticação
   static onAuthStateChange(callback: (user: FirebaseUser | null) => void) {
     return onAuthStateChanged(auth, callback);
   }
 
-  // Tradução de mensagens de erro
+  // Traduz códigos de erro do Firebase para mensagens em português
   private static getErrorMessage(errorCode: string): string {
     switch (errorCode) {
       case 'auth/user-not-found':
