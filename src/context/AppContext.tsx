@@ -10,7 +10,8 @@ export interface AppContextType {
   
   // Loading global
   isLoading: boolean;
-  setLoading: (loading: boolean) => void;
+  loadingMessage?: string;
+  setLoading: (loading: boolean, message?: string) => void;
   
   // Notificações
   showNotification: (message: string, type?: 'success' | 'error' | 'info') => void;
@@ -19,9 +20,7 @@ export interface AppContextType {
   
   // Configurações
   language: string;
-  setLanguage: (language: string) => void;
   currency: string;
-  setCurrency: (currency: string) => void;
   
   // Estado da aplicação
   isOnline: boolean;
@@ -64,10 +63,9 @@ export function AppProvider({ children }: AppProviderProps) {
     appStore.setColorScheme(theme);
   }, [appStore]);
 
-  const setLoading = useCallback((loading: boolean) => {
-    // TODO: Implementar loading global no store
-    console.log('Setting loading:', loading);
-  }, []);
+  const setLoading = useCallback((loading: boolean, message?: string) => {
+    appStore.setGlobalLoading(loading, message);
+  }, [appStore]);
 
   const showNotification = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setNotification({
@@ -81,16 +79,6 @@ export function AppProvider({ children }: AppProviderProps) {
     setNotification(null);
   }, []);
 
-  const setLanguage = useCallback((language: string) => {
-    // Implementar lógica de mudança de idioma
-    console.log('Mudando idioma para:', language);
-  }, []);
-
-  const setCurrency = useCallback((currency: string) => {
-    // Implementar lógica de mudança de moeda
-    console.log('Mudando moeda para:', currency);
-  }, []);
-
   const setOnlineStatus = useCallback((status: boolean) => {
     setIsOnline(status);
   }, []);
@@ -99,15 +87,14 @@ export function AppProvider({ children }: AppProviderProps) {
     theme: appStore.colorScheme,
     toggleTheme,
     setTheme,
-    isLoading: false, // TODO: Implementar loading global no store
+    isLoading: appStore.isGlobalLoading,
+    loadingMessage: appStore.loadingMessage,
     setLoading,
     showNotification,
     notification,
     clearNotification,
-    language: 'pt-BR', // TODO: Implementar persistência
-    setLanguage,
-    currency: 'BRL', // TODO: Implementar persistência
-    setCurrency,
+    language: 'pt-BR',
+    currency: 'BRL',
     isOnline,
     setOnlineStatus,
   };
