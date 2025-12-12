@@ -25,9 +25,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     const unsubscribe = AuthService.onAuthStateChange(async (firebaseUser: FirebaseUser | null) => {
-      setLoading(true);
-      authStore.setLoading(true);
-      
       if (firebaseUser) {
         try {
           const userData = await AuthService.getCurrentUser();
@@ -47,22 +44,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
           
           setUser(userData);
           setIsAuthenticated(true);
+          setLoading(false);
+          authStore.setLoading(false);
           await authStore.login(userData as any, token);
         } catch (error) {
           console.error('Erro ao obter dados do usuário:', error);
           await AuthService.signOut();
           setUser(null);
           setIsAuthenticated(false);
+          setLoading(false);
+          authStore.setLoading(false);
           await authStore.logout();
         }
       } else {
         setUser(null);
         setIsAuthenticated(false);
+        setLoading(false);
+        authStore.setLoading(false);
         await authStore.logout();
       }
-      
-      setLoading(false);
-      authStore.setLoading(false);
     });
 
     return unsubscribe;
