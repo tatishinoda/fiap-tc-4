@@ -69,56 +69,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const signIn = async (email: string, password: string): Promise<void> => {
-    setLoading(true);
     try {
-      const userData = await AuthService.signIn(email, password);
-      
-      if (!userData) {
-        throw new Error('Dados do usuário não encontrados');
-      }
-      
-      setUser(userData);
-      setIsAuthenticated(true);
+      await AuthService.signIn(email, password);
     } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   const signUp = async (email: string, password: string, name: string): Promise<void> => {
-    setLoading(true);
     try {
-      const userData = await AuthService.signUp(email, password, name);
-      
-      if (!userData) {
-        throw new Error('Erro ao criar usuário');
-      }
-      
-      setUser(userData);
-      setIsAuthenticated(true);
+      await AuthService.signUp(email, password, name);
     } catch (error) {
-      setUser(null);
-      setIsAuthenticated(false);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   const signOut = async (): Promise<void> => {
-    setLoading(true);
     try {
       await AuthService.signOut();
       await authStore.logout();
-      setUser(null);
-      setIsAuthenticated(false);
     } catch (error) {
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
