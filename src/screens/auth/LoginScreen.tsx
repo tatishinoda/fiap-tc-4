@@ -4,11 +4,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,11 +31,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const passwordRef = React.useRef<TextInput>(null);
 
   const { signIn } = useAuth();
 
   const handleLogin = async () => {
-    // Validação centralizada
     if (!validateLoginForm(email, password)) {
       return;
     }
@@ -49,84 +51,92 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <StatusBar style="light" backgroundColor={colors.brand.forest} />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Ionicons name="wallet-outline" size={60} color="#FFFFFF" />
-          <Text style={styles.title}>ByteBank</Text>
-        </View>
-
-        {/* Form */}
-        <View style={styles.form}>
-          <Text style={styles.formTitle}>Entrar na conta</Text>
-
-          <View style={styles.inputContainer}>
-            <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="E-mail"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              editable={!isLoading}
-            />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <StatusBar style="light" backgroundColor={colors.brand.forest} />
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Ionicons name="wallet-outline" size={60} color="#FFFFFF" />
+            <Text style={styles.title}>ByteBank</Text>
           </View>
 
-          <View style={styles.inputContainer}>
-            <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-              editable={!isLoading}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              style={styles.eyeIcon}
-            >
-              <Ionicons
-                name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                size={20}
-                color="#666"
+          {/* Form */}
+          <View style={styles.form}>
+            <Text style={styles.formTitle}>Entrar na conta</Text>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="E-mail"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                editable={!isLoading}
+                returnKeyType="next"
+                onSubmitEditing={() => passwordRef.current?.focus()}
+                blurOnSubmit={false}
               />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
+              <TextInput
+                ref={passwordRef}
+                style={styles.input}
+                placeholder="Senha"
+                placeholderTextColor="#999"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                editable={!isLoading}
+                returnKeyType="go"
+                onSubmitEditing={handleLogin}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={styles.eyeIcon}
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                  size={20}
+                  color="#666"
+                />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+              onPress={handleLogin}
+              disabled={isLoading}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Entrando...' : 'Entrar'}
+              </Text>
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity
-            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            <Text style={styles.loginButtonText}>
-              {isLoading ? 'Entrando...' : 'Entrar'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Não tem uma conta?</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('SignUp')}
-            disabled={isLoading}
-          >
-            <Text style={styles.registerLink}>Criar conta</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Footer */}
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Não tem uma conta?</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('SignUp')}
+              disabled={isLoading}
+            >
+              <Text style={styles.registerLink}>Criar conta</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 

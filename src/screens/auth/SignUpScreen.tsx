@@ -4,11 +4,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,11 +34,14 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const emailRef = React.useRef<TextInput>(null);
+  const passwordRef = React.useRef<TextInput>(null);
+  const confirmPasswordRef = React.useRef<TextInput>(null);
 
   const { signUp } = useAuth();
 
   const handleSignUp = async () => {
-    // Validação centralizada
     if (!validateSignUpForm(name, email, password, confirmPassword)) {
       return;
     }
@@ -52,10 +57,11 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
       <StatusBar style="light" backgroundColor={colors.brand.forest} />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Header */}
@@ -78,12 +84,16 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
               onChangeText={setName}
               autoCapitalize="words"
               editable={!isLoading}
+              returnKeyType="next"
+              onSubmitEditing={() => emailRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Ionicons name="mail-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
+              ref={emailRef}
               style={styles.input}
               placeholder="E-mail"
               placeholderTextColor="#999"
@@ -93,12 +103,16 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
               autoCapitalize="none"
               autoCorrect={false}
               editable={!isLoading}
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
+              ref={passwordRef}
               style={styles.input}
               placeholder="Senha"
               placeholderTextColor="#999"
@@ -107,6 +121,9 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
               secureTextEntry={!showPassword}
               autoCapitalize="none"
               editable={!isLoading}
+              returnKeyType="next"
+              onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+              blurOnSubmit={false}
             />
             <TouchableOpacity
               onPress={() => setShowPassword(!showPassword)}
@@ -123,6 +140,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
           <View style={styles.inputContainer}>
             <Ionicons name="lock-closed-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
+              ref={confirmPasswordRef}
               style={styles.input}
               placeholder="Confirmar senha"
               placeholderTextColor="#999"
@@ -131,6 +149,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
               secureTextEntry={!showConfirmPassword}
               autoCapitalize="none"
               editable={!isLoading}
+              returnKeyType="go"
+              onSubmitEditing={handleSignUp}
             />
             <TouchableOpacity
               onPress={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -167,6 +187,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
