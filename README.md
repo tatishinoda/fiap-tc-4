@@ -12,9 +12,9 @@ Aplicação de gestão financeira desenvolvida com React Native.
 - ☁️ **Sincronização em nuvem** - Dados armazenados no Firebase Firestore
 
 ## 📁 **Estrutura do Projeto**
-   
-```   
-bytebank-mobile/   
+
+```
+bytebank-mobile/
 ├── .env                   # Variáveis de ambiente (Firebase)
 ├── .env.example           # Template das variáveis
 ├── .gitignore             # Arquivos ignorados pelo Git
@@ -96,10 +96,10 @@ npm install
 
 ### **3. Configurar Firebase**
 
-#### **3.1. Criar arquivo de configuração**
+#### **3.1. Criar arquivo de variáveis de ambiente**
 ```bash
 # Copie o arquivo de exemplo
-cp src/config/firebase.example.ts src/config/firebase.ts
+cp .env.example .env
 ```
 
 #### **3.2. Adicionar credenciais do Firebase**
@@ -107,21 +107,21 @@ cp src/config/firebase.example.ts src/config/firebase.ts
 2. Crie um novo projeto ou use um existente
 3. Vá em **Configurações do Projeto** > **Seus aplicativos**
 4. Copie as credenciais do Firebase
-5. Cole no arquivo `src/config/firebase.ts`:
+5. Cole no arquivo `.env`:
 
-```typescript
-const firebaseConfig = {
-  apiKey: "sua-api-key",
-  authDomain: "seu-projeto.firebaseapp.com",
-  projectId: "seu-projeto-id",
-  storageBucket: "seu-storage-bucket",
-  messagingSenderId: "seu-messaging-id",
-  appId: "seu-app-id",
-  measurementId: "seu-measurement-id"
-};
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=sua-api-key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=seu-projeto-id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu-storage-bucket.firebasestorage.app
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu-messaging-id
+EXPO_PUBLIC_FIREBASE_APP_ID=seu-app-id
+EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu-measurement-id
 ```
 
-> ⚠️ **Importante**: Não compartilhe suas credenciais! O arquivo `firebase.ts` está no `.gitignore`
+> ⚠️ **Importante**: Não compartilhe suas credenciais! O arquivo `.env` está no `.gitignore` e nunca será versionado.
+
+> 💡 **Dica**: Se você não tem acesso ao Firebase Console, solicite os valores das variáveis de ambiente à equipe de desenvolvimento.
 
 #### **3.3. Configurar Firestore e Storage**
 No Firebase Console:

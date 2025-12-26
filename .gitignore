@@ -6,8 +6,8 @@ node_modules/
 dist/
 web-build/
 
-# Firebase credentials
-src/config/firebase.ts
+# Environment variables
+.env
 
 # Native
 .kotlin/
