@@ -16,6 +16,8 @@ import {
   limit,
   Timestamp,
   serverTimestamp,
+  startAfter,
+  DocumentSnapshot,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Transaction, TransactionType } from '../types';
@@ -76,6 +78,50 @@ export const getAllTransactions = async (
     return transactions;
   } catch (error) {
     console.error('Erro ao buscar transações:', error);
+    throw new Error('Erro ao buscar transações do Firestore');
+  }
+};
+
+// Lista transações com paginação (para infinite scroll)
+export const getTransactionsPaginated = async (
+  userId: string,
+  pageSize: number = 10,
+  lastDoc?: DocumentSnapshot
+): Promise<{ transactions: Transaction[]; lastDoc: DocumentSnapshot | null }> => {
+  try {
+    const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
+
+    // Build query with conditional startAfter
+    const q = lastDoc
+      ? query(
+          transactionsRef,
+          where('userId', '==', userId),
+          orderBy('date', 'desc'),
+          startAfter(lastDoc),
+          limit(pageSize)
+        )
+      : query(
+          transactionsRef,
+          where('userId', '==', userId),
+          orderBy('date', 'desc'),
+          limit(pageSize)
+        );
+
+    const querySnapshot = await getDocs(q);
+    const transactions: Transaction[] = [];
+    let newLastDoc: DocumentSnapshot | null = null;
+
+    querySnapshot.forEach((doc) => {
+      transactions.push(firestoreToTransaction(doc.id, doc.data()));
+      newLastDoc = doc; // Guarda o último documento para próxima página
+    });
+
+    return {
+      transactions,
+      lastDoc: querySnapshot.docs.length === pageSize ? newLastDoc : null
+    };
+  } catch (error) {
+    console.error('Erro ao buscar transações paginadas:', error);
     throw new Error('Erro ao buscar transações do Firestore');
   }
 };
