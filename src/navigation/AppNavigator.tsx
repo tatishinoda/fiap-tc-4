@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/useAuth';
 import { RootStackParamList, TabParamList } from '../types/navigation';
 import { GlobalNotification } from '../components/GlobalNotification';
@@ -38,6 +39,7 @@ function AuthStack() {
 // Tab Navigator para telas protegidas
 function ProtectedTabs() {
   const { user, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const handleLogout = async () => {
     Alert.alert(
@@ -63,7 +65,7 @@ function ProtectedTabs() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" backgroundColor={colors.brand.forest} />
-      
+
       {/* Header Fixo */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
@@ -98,9 +100,9 @@ function ProtectedTabs() {
             backgroundColor: '#FFFFFF',
             borderTopWidth: 1,
             borderTopColor: '#E0E0E0',
-            paddingBottom: 8,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
             paddingTop: 8,
-            height: 64,
+            height: 64 + (insets.bottom > 0 ? insets.bottom : 0),
           },
           tabBarLabelStyle: {
             fontSize: 12,
@@ -108,13 +110,13 @@ function ProtectedTabs() {
           },
         })}
       >
-        <Tab.Screen 
-          name="Home" 
+        <Tab.Screen
+          name="Home"
           component={HomeScreen}
           options={{ tabBarLabel: 'Início' }}
         />
-        <Tab.Screen 
-          name="Transactions" 
+        <Tab.Screen
+          name="Transactions"
           component={TransactionsScreen}
           options={{ tabBarLabel: 'Transações' }}
         />
@@ -128,8 +130,8 @@ function ProtectedStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={ProtectedTabs} />
-      <Stack.Screen 
-        name="AddTransaction" 
+      <Stack.Screen
+        name="AddTransaction"
         component={AddTransactionScreen}
         options={{
           headerShown: true,
