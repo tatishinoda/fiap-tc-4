@@ -55,7 +55,7 @@ export const getAllTransactions = async (
 ): Promise<Transaction[]> => {
   try {
     const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-    
+
     let q = query(
       transactionsRef,
       where('userId', '==', userId),
@@ -86,12 +86,20 @@ export const createTransaction = async (
 ): Promise<Transaction> => {
   try {
     const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-    
-    const transactionData = {
-      ...data,
+
+    const transactionData: any = {
+      userId: data.userId,
+      type: data.type,
+      amount: data.amount,
+      description: data.description,
       date: data.date instanceof Date ? Timestamp.fromDate(data.date) : Timestamp.fromDate(new Date(data.date)),
       createdAt: serverTimestamp(),
     };
+
+    // Só adiciona category se não for undefined
+    if (data.category) {
+      transactionData.category = data.category;
+    }
 
     const docRef = await addDoc(transactionsRef, transactionData);
 
@@ -122,15 +130,15 @@ export const updateTransaction = async (
 ): Promise<void> => {
   try {
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
-    
-    const updateData: any = { 
+
+    const updateData: any = {
       ...data,
       updatedAt: serverTimestamp(),
     };
-    
+
     if (data.date) {
-      updateData.date = data.date instanceof Date 
-        ? Timestamp.fromDate(data.date) 
+      updateData.date = data.date instanceof Date
+        ? Timestamp.fromDate(data.date)
         : Timestamp.fromDate(new Date(data.date));
     }
 
@@ -156,7 +164,7 @@ export const deleteTransaction = async (transactionId: string): Promise<void> =>
 export const getFinancialSummary = async (userId: string) => {
   try {
     const transactions = await getAllTransactions(userId);
-    
+
     let totalIncome = 0;
     let totalExpense = 0;
 
@@ -180,5 +188,3 @@ export const getFinancialSummary = async (userId: string) => {
     throw new Error('Erro ao calcular resumo financeiro');
   }
 };
-
-

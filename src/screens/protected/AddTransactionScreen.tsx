@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  StyleSheet, 
-  ScrollView, 
-  TouchableOpacity, 
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
   TextInput,
   Text,
   KeyboardAvoidingView,
@@ -18,7 +18,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
 import { colors } from '../../theme';
-import { TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, getSuggestedCategories, validateTransaction } from '../../utils';
+import { TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, getSuggestedCategories, validateTransaction, formatCurrencyInput } from '../../utils';
 
 type AddTransactionScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction'>;
 type AddTransactionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction'>;
@@ -42,6 +42,12 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
 
   // Pega categorias sugeridas baseado no tipo
   const suggestedCategories = getSuggestedCategories(type);
+
+  // Handler para mudança no valor com máscara de moeda
+  const handleAmountChange = (text: string) => {
+    const formatted = formatCurrencyInput(text);
+    setAmount(formatted);
+  };
 
   const handleSubmit = async () => {
     // Validação centralizada
@@ -94,7 +100,7 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
@@ -129,9 +135,9 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
                 </View>
                 <Text style={[
                   styles.typeLabel,
-                  type === transactionType && { 
-                    color: config.color, 
-                    fontWeight: '600' 
+                  type === transactionType && {
+                    color: config.color,
+                    fontWeight: '600'
                   }
                 ]}>
                   {config.label}
@@ -143,13 +149,14 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
           {/* Valor */}
           <View style={styles.inputContainer}>
             <Ionicons name="cash-outline" size={20} color="#666" style={styles.inputIcon} />
+            <Text style={styles.currencyPrefix}>R$</Text>
             <TextInput
-              style={styles.input}
-              placeholder="Valor (R$)"
+              style={[styles.input, styles.inputWithPrefix]}
+              placeholder="0,00"
               placeholderTextColor="#999"
               value={amount}
-              onChangeText={setAmount}
-              keyboardType="decimal-pad"
+              onChangeText={handleAmountChange}
+              keyboardType="numeric"
             />
           </View>
 
@@ -267,11 +274,20 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginRight: 12,
   },
+  currencyPrefix: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginRight: 8,
+  },
   input: {
     flex: 1,
     paddingVertical: 16,
     fontSize: 16,
     color: '#333',
+  },
+  inputWithPrefix: {
+    paddingLeft: 0,
   },
   submitButton: {
     backgroundColor: colors.brand.forest,
