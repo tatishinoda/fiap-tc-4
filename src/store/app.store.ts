@@ -8,25 +8,35 @@ interface AppState {
   colorScheme: ColorScheme;
   isSystemTheme: boolean;
   
+  // Loading global
+  isGlobalLoading: boolean;
+  loadingMessage?: string;
+  
   // Actions
   setColorScheme: (scheme: ColorScheme) => void;
   toggleColorScheme: () => void;
   setSystemTheme: (useSystem: boolean) => void;
+  setGlobalLoading: (loading: boolean, message?: string) => void;
 }
 
 export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
-      // Initial state - Fixed to light theme
       colorScheme: 'light',
       isSystemTheme: false,
+      isGlobalLoading: false,
+      loadingMessage: undefined,
 
-      // Actions (kept for compatibility)
       setColorScheme: (scheme) => set({ colorScheme: 'light' }),
       
       toggleColorScheme: () => set({ colorScheme: 'light' }),
 
       setSystemTheme: (useSystem) => set({ isSystemTheme: false }),
+      
+      setGlobalLoading: (loading, message) => set({ 
+        isGlobalLoading: loading,
+        loadingMessage: message 
+      }),
     }),
     {
       name: 'bytebank-app-storage',

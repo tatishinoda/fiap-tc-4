@@ -1,6 +1,6 @@
 /**
- * Transaction Service - Firebase Firestore
- * Gerencia todas as operações de transações no Firestore
+ * Transaction Service
+ * Gerencia operações CRUD de transações no Firestore
  */
 
 import {
@@ -16,6 +16,8 @@ import {
   limit,
   Timestamp,
   serverTimestamp,
+  startAfter,
+  DocumentSnapshot,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { Transaction, TransactionType } from '../types';
@@ -33,9 +35,7 @@ export interface CreateTransactionData {
 
 export interface UpdateTransactionData extends Partial<Omit<CreateTransactionData, 'userId'>> {}
 
-/**
- * Converte um documento do Firestore para Transaction
- */
+// Converte documento do Firestore para objeto Transaction
 const firestoreToTransaction = (docId: string, data: any): Transaction => {
   return {
     id: docId,
@@ -50,16 +50,14 @@ const firestoreToTransaction = (docId: string, data: any): Transaction => {
   };
 };
 
-/**
- * Lista todas as transações do usuário
- */
+// Lista todas as transações do usuário ordenadas por data
 export const getAllTransactions = async (
   userId: string,
   limitCount?: number
 ): Promise<Transaction[]> => {
   try {
     const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-    
+
     let q = query(
       transactionsRef,
       where('userId', '==', userId),
@@ -84,24 +82,74 @@ export const getAllTransactions = async (
   }
 };
 
-/**
- * Cria uma nova transação
- */
+// Lista transações com paginação (para infinite scroll)
+export const getTransactionsPaginated = async (
+  userId: string,
+  pageSize: number = 10,
+  lastDoc?: DocumentSnapshot
+): Promise<{ transactions: Transaction[]; lastDoc: DocumentSnapshot | null }> => {
+  try {
+    const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
+
+    // Build query with conditional startAfter
+    const q = lastDoc
+      ? query(
+          transactionsRef,
+          where('userId', '==', userId),
+          orderBy('date', 'desc'),
+          startAfter(lastDoc),
+          limit(pageSize)
+        )
+      : query(
+          transactionsRef,
+          where('userId', '==', userId),
+          orderBy('date', 'desc'),
+          limit(pageSize)
+        );
+
+    const querySnapshot = await getDocs(q);
+    const transactions: Transaction[] = [];
+    let newLastDoc: DocumentSnapshot | null = null;
+
+    querySnapshot.forEach((doc) => {
+      transactions.push(firestoreToTransaction(doc.id, doc.data()));
+      newLastDoc = doc; // Guarda o último documento para próxima página
+    });
+
+    return {
+      transactions,
+      lastDoc: querySnapshot.docs.length === pageSize ? newLastDoc : null
+    };
+  } catch (error) {
+    console.error('Erro ao buscar transações paginadas:', error);
+    throw new Error('Erro ao buscar transações do Firestore');
+  }
+};
+
+// Cria nova transação no Firestore
 export const createTransaction = async (
   data: CreateTransactionData
 ): Promise<Transaction> => {
   try {
     const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-    
-    const transactionData = {
-      ...data,
+
+    const transactionData: any = {
+      userId: data.userId,
+      type: data.type,
+      amount: data.amount,
+      description: data.description,
       date: data.date instanceof Date ? Timestamp.fromDate(data.date) : Timestamp.fromDate(new Date(data.date)),
       createdAt: serverTimestamp(),
     };
 
+    // Só adiciona category se não for undefined
+    if (data.category) {
+      transactionData.category = data.category;
+    }
+
     const docRef = await addDoc(transactionsRef, transactionData);
 
-    // Retorna a transação criada
+    // Retorna transação criada com data normalizada
     const now = new Date();
     return {
       id: docRef.id,
@@ -120,9 +168,7 @@ export const createTransaction = async (
   }
 };
 
-/**
- * Atualiza uma transação existente
- */
+// Atualiza transação existente
 export const updateTransaction = async (
   transactionId: string,
   userId: string,
@@ -130,15 +176,15 @@ export const updateTransaction = async (
 ): Promise<void> => {
   try {
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
-    
-    const updateData: any = { 
+
+    const updateData: any = {
       ...data,
       updatedAt: serverTimestamp(),
     };
-    
+
     if (data.date) {
-      updateData.date = data.date instanceof Date 
-        ? Timestamp.fromDate(data.date) 
+      updateData.date = data.date instanceof Date
+        ? Timestamp.fromDate(data.date)
         : Timestamp.fromDate(new Date(data.date));
     }
 
@@ -149,9 +195,7 @@ export const updateTransaction = async (
   }
 };
 
-/**
- * Deleta uma transação
- */
+// Remove transação do Firestore
 export const deleteTransaction = async (transactionId: string): Promise<void> => {
   try {
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
@@ -162,13 +206,11 @@ export const deleteTransaction = async (transactionId: string): Promise<void> =>
   }
 };
 
-/**
- * Calcula o resumo financeiro do usuário
- */
+// Calcula resumo financeiro baseado em todas as transações do usuário
 export const getFinancialSummary = async (userId: string) => {
   try {
     const transactions = await getAllTransactions(userId);
-    
+
     let totalIncome = 0;
     let totalExpense = 0;
 
@@ -192,5 +234,3 @@ export const getFinancialSummary = async (userId: string) => {
     throw new Error('Erro ao calcular resumo financeiro');
   }
 };
-
-
