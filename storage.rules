@@ -4,18 +4,6 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Regra para uploads de usuários - apenas usuários autenticados podem fazer upload em suas próprias pastas
-    match /users/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Regra para imagens de perfil
-    match /profile-pictures/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && 
-        request.auth.uid == userId &&
-        resource.size < 5 * 1024 * 1024; // Limite de 5MB
-    }
-    
     // Regra para comprovantes de transação
     match /transaction-receipts/{userId}/{allPaths=**} {
       allow read, write: if request.auth != null && 
