@@ -62,3 +62,20 @@ export const formatCurrencyCompact = (value: number): string => {
 export const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
 };
+
+/**
+ * Formata entrada de texto como moeda enquanto o usuário digita
+ * Remove caracteres não numéricos e formata com 2 casas decimais
+ * @param value - Texto digitado pelo usuário
+ * @returns String formatada (ex: "1.234,56")
+ */
+export const formatCurrencyInput = (value: string): string => {
+  // Remove tudo que não é dígito
+  const digits = value.replace(/\D/g, '');
+
+  if (!digits) return '';
+
+  // Converte para centavos e reutiliza a função existente
+  const valueInCents = parseInt(digits);
+  return formatCurrencyValue(valueInCents);
+};

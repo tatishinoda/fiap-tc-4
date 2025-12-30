@@ -24,9 +24,9 @@ export const validatePassword = (password: string, minLength: number = 6): Valid
   }
 
   if (password.length < minLength) {
-    return { 
-      isValid: false, 
-      error: `A senha deve ter pelo menos ${minLength} caracteres` 
+    return {
+      isValid: false,
+      error: `A senha deve ter pelo menos ${minLength} caracteres`
     };
   }
 
@@ -34,7 +34,7 @@ export const validatePassword = (password: string, minLength: number = 6): Valid
 };
 
 export const validatePasswordConfirmation = (
-  password: string, 
+  password: string,
   confirmPassword: string
 ): ValidationResult => {
   if (!confirmPassword.trim()) {
@@ -54,9 +54,9 @@ export const validateName = (name: string, minLength: number = 2): ValidationRes
   }
 
   if (name.trim().length < minLength) {
-    return { 
-      isValid: false, 
-      error: `O nome deve ter pelo menos ${minLength} caracteres` 
+    return {
+      isValid: false,
+      error: `O nome deve ter pelo menos ${minLength} caracteres`
     };
   }
 
@@ -77,7 +77,7 @@ export const validateRequired = (value: string, fieldName: string): ValidationRe
 // Valida múltiplos campos e exibe alerta com o primeiro erro encontrado
 export const validateFields = (validations: ValidationResult[]): boolean => {
   const firstError = validations.find(v => !v.isValid);
-  
+
   if (firstError) {
     Alert.alert('Erro de Validação', firstError.error);
     return false;
@@ -112,7 +112,10 @@ export const validateAmount = (amount: string): ValidationResult => {
     return { isValid: false, error: 'Valor é obrigatório' };
   }
 
-  const numAmount = parseFloat(amount);
+  // Remove formatação: troca vírgula por ponto e remove pontos de milhar
+  const cleanAmount = amount.replace(/\./g, '').replace(',', '.');
+  const numAmount = parseFloat(cleanAmount);
+
   if (isNaN(numAmount) || numAmount <= 0) {
     return { isValid: false, error: 'Valor inválido' };
   }
@@ -126,9 +129,9 @@ export const validateDescription = (description: string, minLength: number = 3):
   }
 
   if (description.trim().length < minLength) {
-    return { 
-      isValid: false, 
-      error: `A descrição deve ter pelo menos ${minLength} caracteres` 
+    return {
+      isValid: false,
+      error: `A descrição deve ter pelo menos ${minLength} caracteres`
     };
   }
 
@@ -237,7 +240,7 @@ export const sanitizeDescription = (description: string): string => {
 
 export const sanitizeCategory = (category?: string): string | undefined => {
   if (!category) return undefined;
-  
+
   return category
     .trim()
     .replace(/[<>]/g, '')
@@ -254,7 +257,7 @@ export const validateAndSanitizeTransaction = (data: {
   userId: string;
 }): { isValid: boolean; error?: string; sanitizedData?: any } => {
   const validationResult = validateTransactionData(data);
-  
+
   if (!validationResult.isValid) {
     return validationResult;
   }
