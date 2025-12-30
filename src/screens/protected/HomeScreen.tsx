@@ -2,20 +2,20 @@ import { RecentTransactions } from '@/components/RecentTransactions';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { CategoryAnalysis } from '../../components/CategoryAnalysis';
 import { FinancialChart } from '../../components/FinancialChart';
-import { FinancialInsights } from '../../components/FinancialInsights';
 import { FinancialOverview } from '../../components/FinancialOverview';
-import { FinancialPieChart } from '../../components/FinancialPieChart';
 import { QuickActions } from '../../components/QuickActions';
-import { Alert } from '../../components/ui';
-import { useTransactionContext } from '../../context';
+import { FinancialInsights } from '../../components/FinancialInsights';
+import { CategoryAnalysis } from '../../components/CategoryAnalysis';
+import { FinancialPieChart } from '../../components/FinancialPieChart';
+import { Text, Alert } from '../../components/ui';
 import { useAlert } from '../../hooks/useAlert';
 import { useAuth } from '../../hooks/useAuth';
 import { colors, spacing } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
 import { TRANSACTION_TYPE_CONFIG } from '../../utils';
+import { useTransactionContext } from '@/context';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -69,7 +69,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <View style={styles.container}>
-      <ScrollView
+      <ScrollView 
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -101,6 +101,14 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           transactions={transactions}
           refreshing={refreshing}
         />
+
+        {/* Gráfico de Pizza - Distribuição Financeira */}
+        <FinancialPieChart
+          transactions={transactions}
+        />
+
+        {/* Gastos por Categoria */}
+        <CategoryAnalysis transactions={transactions} />
 
         {/* Transações Recentes */}
         <RecentTransactions
