@@ -12,7 +12,6 @@ export interface TransactionContextType {
   income: number;
   expenses: number;
   
-  // Ações
   fetchTransactions: () => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt'>) => Promise<void>;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>;
@@ -33,7 +32,6 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch transactions on mount and when user changes
   useEffect(() => {
     if (user?.id) {
       fetchTransactions();
@@ -109,7 +107,6 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
       };
       
       await TransactionService.updateTransaction(id, user.id, updateData);
-      // Recarrega as transações após atualizar
       await fetchTransactions();
     } catch (err: any) {
       const errorMessage = err?.message || 'Erro ao atualizar transação';
@@ -150,7 +147,6 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     setError(null);
   }, []);
 
-  // Calcula saldo
   const balance = transactionStore.transactions.reduce((acc, t) => 
     acc + (t.type === 'DEPOSIT' ? t.amount : -t.amount), 0
   );
@@ -185,7 +181,6 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
   );
 }
 
-// Hook personalizado para usar o TransactionContext
 export function useTransactionContext() {
   const context = useContext(TransactionContext);
   
