@@ -6,8 +6,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import { secureStorage } from '../utils/storage';
 
 interface User {
   id: string;
@@ -56,13 +55,8 @@ export const useAuthStore = create<AuthState>()(
       // Login - Salva token no SecureStore e user no state
       login: async (user, token) => {
         try {
-          // Salva token de forma segura (apenas em plataformas nativas)
-          if (Platform.OS !== 'web') {
-            await SecureStore.setItemAsync('userToken', token);
-          } else {
-            // No web, usa AsyncStorage como fallback
-            await AsyncStorage.setItem('userToken', token);
-          }
+          // Salva token de forma segura (cross-platform)
+          await secureStorage.setItem('userToken', token);
 
           // Atualiza state
           set({
@@ -81,13 +75,8 @@ export const useAuthStore = create<AuthState>()(
       // Logout - Remove token e limpa state
       logout: async () => {
         try {
-          // Remove token seguro (apenas em plataformas nativas)
-          if (Platform.OS !== 'web') {
-            await SecureStore.deleteItemAsync('userToken');
-          } else {
-            // No web, remove do AsyncStorage
-            await AsyncStorage.removeItem('userToken');
-          }
+          // Remove token seguro (cross-platform)
+          await secureStorage.removeItem('userToken');
 
           // Limpa state
           set({
