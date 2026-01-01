@@ -14,6 +14,9 @@ export type RootStackParamList = {
   AddTransaction: {
     type?: TransactionType;
   } | undefined;
+  EditTransaction: {
+    transactionId: string;
+  };
 };
 
 export type TabParamList = {

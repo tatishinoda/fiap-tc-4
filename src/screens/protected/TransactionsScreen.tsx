@@ -184,6 +184,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     <TouchableOpacity
       style={styles.transactionItem}
       activeOpacity={0.7}
+      onPress={() => navigation.navigate('EditTransaction', { transactionId: item.id })}
     >
       <View style={styles.transactionLeft}>
         <View style={[
