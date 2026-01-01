@@ -31,6 +31,7 @@ export interface CreateTransactionData {
   date: Date | string;
   description: string;
   category?: string;
+  receiptUrl?: string;
 }
 
 export interface UpdateTransactionData extends Partial<Omit<CreateTransactionData, 'userId'>> {}
@@ -142,9 +143,13 @@ export const createTransaction = async (
       createdAt: serverTimestamp(),
     };
 
-    // Só adiciona category se não for undefined
+    // Só adiciona campos opcionais se não forem undefined
     if (data.category) {
       transactionData.category = data.category;
+    }
+
+    if (data.receiptUrl) {
+      transactionData.receiptUrl = data.receiptUrl;
     }
 
     const docRef = await addDoc(transactionsRef, transactionData);
@@ -178,9 +183,15 @@ export const updateTransaction = async (
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
 
     const updateData: any = {
-      ...data,
       updatedAt: serverTimestamp(),
     };
+
+    // Adiciona apenas campos definidos
+    if (data.type !== undefined) updateData.type = data.type;
+    if (data.amount !== undefined) updateData.amount = data.amount;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.category !== undefined) updateData.category = data.category;
+    if (data.receiptUrl !== undefined) updateData.receiptUrl = data.receiptUrl;
 
     if (data.date) {
       updateData.date = data.date instanceof Date
@@ -188,6 +199,7 @@ export const updateTransaction = async (
         : Timestamp.fromDate(new Date(data.date));
     }
 
+    console.log('Dados que serão enviados ao Firestore:', updateData);
     await updateDoc(transactionRef, updateData);
   } catch (error) {
     console.error('Erro ao atualizar transação:', error);

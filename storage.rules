@@ -1,18 +1,46 @@
-// Regras de segurança Firebase Storage - ByteBank Mobile
-// Para aplicar essas regras: Firebase Console > Storage > Rules
-
 rules_version = '2';
-service firebase.storage {
-  match /b/{bucket}/o {
-    // Regra para comprovantes de transação
-    match /transaction-receipts/{userId}/{allPaths=**} {
-      allow read, write: if request.auth != null && 
-        request.auth.uid == userId &&
-        resource.size < 10 * 1024 * 1024; // Limite de 10MB
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Regra para usuários - apenas usuários autenticados podem acessar seus próprios dados
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Bloquear acesso a qualquer outro arquivo
-    match /{allPaths=**} {
+    // Regra para transações - cada usuário acessa apenas suas próprias transações
+    match /transactions/{transactionId} {
+      // Criar: apenas se autenticado e userId corresponder
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Ler, atualizar, deletar: apenas suas próprias transações
+      allow read, update, delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // Regra para comprovantes de transação
+    match /transaction-receipts/{userId}/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null && 
+        request.auth.uid == userId &&
+        request.resource.size < 10 * 1024 * 1024 && // Limite de 10MB
+        request.resource.contentType.matches('image/.*'); // Apenas imagens
+    }
+    
+    // Regra para investimentos - cada usuário acessa apenas seus próprios investimentos
+    match /investments/{investmentId} {
+      // Criar: apenas se autenticado e userId corresponder
+      allow create: if request.auth != null && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Ler, atualizar, deletar: apenas seus próprios investimentos
+      allow read, update, delete: if request.auth != null && 
+        resource.data.userId == request.auth.uid;
+    }
+    
+    // Bloquear acesso a qualquer outro documento
+    match /{document=**} {
       allow read, write: if false;
     }
   }

@@ -49,6 +49,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     navigation.navigate('Transactions');
   };
 
+  const handleTransactionPress = (transaction: any) => {
+    navigation.navigate('EditTransaction', { transactionId: transaction.id });
+  };
+
   // Ações rápidas usando configuração centralizada
   const quickActions = (['DEPOSIT', 'TRANSFER', 'WITHDRAWAL'] as TransactionType[]).map((type, index) => {
     const config = TRANSACTION_TYPE_CONFIG[type];
@@ -111,6 +115,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           transactions={recentTransactions}
           isLoading={loading}
           onSeeAll={handleSeeAllTransactions}
+          onTransactionPress={handleTransactionPress}
           showTitle={true}
         />
       

@@ -74,9 +74,18 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         amount: transaction.amount,
         date: transaction.date,
         description: transaction.description,
-        category: transaction.category
       };
       
+      // Adiciona campos opcionais apenas se definidos
+      if (transaction.category) {
+        transactionData.category = transaction.category;
+      }
+      
+      if ((transaction as any).receiptUrl) {
+        transactionData.receiptUrl = (transaction as any).receiptUrl;
+      }
+      
+      console.log('Dados sendo enviados ao service:', transactionData);
       const newTransaction = await TransactionService.createTransaction(transactionData);
       transactionStore.addTransaction(newTransaction);
     } catch (err: any) {
@@ -94,20 +103,27 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
       throw new Error('Usuário não autenticado');
     }
 
+    console.log('TransactionContext.updateTransaction:', { id, transaction, userId: user.id });
+
     setLoading(true);
     setError(null);
     
     try {
-      const updateData: TransactionService.UpdateTransactionData = {
-        type: transaction.type,
-        amount: transaction.amount,
-        description: transaction.description,
-        category: transaction.category,
-        date: transaction.date,
-      };
+      // Remove campos undefined para evitar erro do Firestore
+      const updateData: TransactionService.UpdateTransactionData = {};
       
+      if (transaction.type !== undefined) updateData.type = transaction.type;
+      if (transaction.amount !== undefined) updateData.amount = transaction.amount;
+      if (transaction.description !== undefined) updateData.description = transaction.description;
+      if (transaction.category !== undefined) updateData.category = transaction.category;
+      if (transaction.date !== undefined) updateData.date = transaction.date;
+      if ((transaction as any).receiptUrl !== undefined) updateData.receiptUrl = (transaction as any).receiptUrl;
+      
+      console.log('Chamando TransactionService.updateTransaction com:', { id, updateData });
       await TransactionService.updateTransaction(id, user.id, updateData);
+      console.log('Transação atualizada, buscando lista atualizada');
       await fetchTransactions();
+      console.log('Lista de transações atualizada');
     } catch (err: any) {
       const errorMessage = err?.message || 'Erro ao atualizar transação';
       setError(errorMessage);
