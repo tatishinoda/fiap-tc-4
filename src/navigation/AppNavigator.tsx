@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/useAuth';
 import { RootStackParamList, TabParamList } from '../types/navigation';
 import { GlobalNotification } from '../components/GlobalNotification';
+import { ConfirmModal } from '../components/ConfirmModal';
 import { colors } from '../theme/colors';
 
 // Telas de autenticação
@@ -40,26 +41,24 @@ function AuthStack() {
 function ProtectedTabs() {
   const { user, signOut } = useAuth();
   const insets = useSafeAreaInsets();
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
 
-  const handleLogout = async () => {
-    Alert.alert(
-      'Sair',
-      'Tem certeza que deseja sair da sua conta?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Sair',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await signOut();
-            } catch (error) {
-              Alert.alert('Erro', 'Erro ao fazer logout');
-            }
-          },
-        },
-      ]
-    );
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    setShowLogoutModal(false);
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('❌ Logout error:', error);
+      Alert.alert('Erro', 'Erro ao fazer logout');
+    }
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   return (
@@ -70,7 +69,11 @@ function ProtectedTabs() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.welcomeText}>Olá, {user?.name?.split(' ')[0]}!</Text>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={styles.logoutButton}
+            activeOpacity={0.7}
+          >
             <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
@@ -100,14 +103,19 @@ function ProtectedTabs() {
             backgroundColor: '#FFFFFF',
             borderTopWidth: 1,
             borderTopColor: '#E0E0E0',
-            paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
-            paddingTop: 8,
-            height: 64 + (insets.bottom > 0 ? insets.bottom : 0),
+            paddingBottom: Platform.OS === 'web' ? 16 : (insets.bottom > 0 ? insets.bottom : 12),
+            paddingTop: Platform.OS === 'web' ? 8 : 8,
+            height: Platform.OS === 'web' ? 'auto' : 70 + (insets.bottom > 0 ? insets.bottom : 0),
+            minHeight: Platform.OS === 'web' ? 80 : undefined,
           },
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: 'bold',
+            marginTop: 4,
           },
+          tabBarItemStyle: Platform.OS === 'web' ? {
+            paddingVertical: 12,
+          } : undefined,
         })}
       >
         <Tab.Screen
@@ -121,6 +129,17 @@ function ProtectedTabs() {
           options={{ tabBarLabel: 'Transações' }}
         />
       </Tab.Navigator>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal
+        visible={showLogoutModal}
+        title="Sair"
+        message="Tem certeza que deseja sair da sua conta?"
+        confirmText="Sair"
+        cancelText="Cancelar"
+        onConfirm={confirmLogout}
+        onCancel={cancelLogout}
+      />
     </View>
   );
 }
