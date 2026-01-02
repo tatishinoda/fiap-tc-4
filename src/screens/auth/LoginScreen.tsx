@@ -4,13 +4,11 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   StyleSheet,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Keyboard,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,13 +49,15 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <StatusBar style="light" backgroundColor={colors.brand.forest} />
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
       >
-        <StatusBar style="light" backgroundColor={colors.brand.forest} />
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
           {/* Header */}
           <View style={styles.header}>
             <Ionicons name="wallet-outline" size={60} color="#FFFFFF" />
@@ -136,7 +136,6 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
   );
 }
 

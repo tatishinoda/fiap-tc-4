@@ -9,6 +9,9 @@ export * from './format';
 // Cores
 export * from './colors';
 
+// Storage
+export * from './storage';
+
 // Ícones
 export * from './icons';
 
