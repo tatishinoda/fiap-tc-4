@@ -57,7 +57,8 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
       return;
     }
 
-    const amountValue = parseFloat(amount.replace(',', '.'));
+    // Remove pontos (separador de milhares) e substitui vírgula por ponto (separador decimal)
+    const amountValue = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
 
     try {
       // Converte para centavos
