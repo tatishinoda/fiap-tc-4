@@ -18,6 +18,9 @@ export * from './icons';
 // Constantes
 export * from './constants';
 
+// Transaction filtering utilities
+export * from './transactionFilters';
+
 // Validações e outras funções auxiliares
 export * from './helpers';
 

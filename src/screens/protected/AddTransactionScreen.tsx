@@ -18,7 +18,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
 import { colors } from '../../theme';
-import { TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, getSuggestedCategories, validateTransaction, formatCurrencyInput } from '../../utils';
+import { TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, getSuggestedCategories, validateTransaction } from '../../utils';
+import { CurrencyInput } from '../../components/ui';
 
 type AddTransactionScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction'>;
 type AddTransactionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction'>;
@@ -43,12 +44,6 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
   // Pega categorias sugeridas baseado no tipo
   const suggestedCategories = getSuggestedCategories(type);
 
-  // Handler para mudança no valor com máscara de moeda
-  const handleAmountChange = (text: string) => {
-    const formatted = formatCurrencyInput(text);
-    setAmount(formatted);
-  };
-
   const handleSubmit = async () => {
     // Validação centralizada
     const validation = validateTransaction(amount, description);
@@ -62,7 +57,8 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
       return;
     }
 
-    const amountValue = parseFloat(amount.replace(',', '.'));
+    // Remove pontos (separador de milhares) e substitui vírgula por ponto (separador decimal)
+    const amountValue = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
 
     try {
       // Converte para centavos
@@ -147,18 +143,11 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
           </View>
 
           {/* Valor */}
-          <View style={styles.inputContainer}>
-            <Ionicons name="cash-outline" size={20} color="#666" style={styles.inputIcon} />
-            <Text style={styles.currencyPrefix}>R$</Text>
-            <TextInput
-              style={[styles.input, styles.inputWithPrefix]}
-              placeholder="0,00"
-              placeholderTextColor="#999"
-              value={amount}
-              onChangeText={handleAmountChange}
-              keyboardType="numeric"
-            />
-          </View>
+          <CurrencyInput
+            value={amount}
+            onChangeValue={setAmount}
+            showIcon={true}
+          />
 
           {/* Descrição */}
           <View style={styles.inputContainer}>
@@ -173,15 +162,44 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
           </View>
 
           {/* Categoria */}
-          <View style={styles.inputContainer}>
-            <Ionicons name="pricetag-outline" size={20} color="#666" style={styles.inputIcon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Categoria (opcional)"
-              placeholderTextColor="#999"
-              value={category}
-              onChangeText={setCategory}
-            />
+          <View style={styles.categorySection}>
+            <View style={styles.inputContainer}>
+              <Ionicons name="pricetag-outline" size={20} color="#666" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Categoria (opcional)"
+                placeholderTextColor="#999"
+                value={category}
+                onChangeText={setCategory}
+              />
+            </View>
+
+            {/* Suggested Categories */}
+            {suggestedCategories.length > 0 && (
+              <View style={styles.suggestedCategories}>
+                <Text style={styles.suggestedLabel}>Sugestões:</Text>
+                <View style={styles.categoryChips}>
+                  {suggestedCategories.map((suggestedCategory) => (
+                    <TouchableOpacity
+                      key={suggestedCategory}
+                      style={[
+                        styles.categoryChip,
+                        category === suggestedCategory && styles.categoryChipActive
+                      ]}
+                      onPress={() => setCategory(suggestedCategory)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.categoryChipText,
+                        category === suggestedCategory && styles.categoryChipTextActive
+                      ]}>
+                        {suggestedCategory}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            )}
           </View>
 
           {/* Botões */}
@@ -274,20 +292,48 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginRight: 12,
   },
-  currencyPrefix: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 8,
+  categorySection: {
+    marginBottom: 16,
+  },
+  suggestedCategories: {
+    marginTop: 12,
+  },
+  suggestedLabel: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#666',
+    marginBottom: 8,
+  },
+  categoryChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  categoryChip: {
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  categoryChipActive: {
+    backgroundColor: colors.brand.forest,
+    borderColor: colors.brand.forest,
+  },
+  categoryChipText: {
+    fontSize: 13,
+    color: '#666',
+    fontWeight: '500',
+  },
+  categoryChipTextActive: {
+    color: '#FFFFFF',
   },
   input: {
     flex: 1,
     paddingVertical: 16,
     fontSize: 16,
     color: '#333',
-  },
-  inputWithPrefix: {
-    paddingLeft: 0,
   },
   submitButton: {
     backgroundColor: colors.brand.forest,
