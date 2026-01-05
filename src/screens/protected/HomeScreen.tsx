@@ -8,6 +8,9 @@ import { FinancialChart } from '../../components/FinancialChart';
 import { FinancialOverview } from '../../components/FinancialOverview';
 import { RecentTransactions } from '../../components/RecentTransactions';
 import { QuickActions } from '../../components/QuickActions';
+import { FinancialInsights } from '../../components/FinancialInsights';
+import { CategoryAnalysis } from '../../components/CategoryAnalysis';
+import { FinancialPieChart } from '../../components/FinancialPieChart';
 import { Text, Alert } from '../../components/ui';
 import { colors, typography, layout, spacing } from '../../theme';
 import { useAlert } from '../../hooks/useAlert';
@@ -46,6 +49,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     navigation.navigate('Transactions');
   };
 
+  const handleTransactionPress = (transaction: any) => {
+    navigation.navigate('EditTransaction', { transactionId: transaction.id });
+  };
+
   // Ações rápidas usando configuração centralizada
   const quickActions = (['DEPOSIT', 'TRANSFER', 'WITHDRAWAL'] as TransactionType[]).map((type, index) => {
     const config = TRANSACTION_TYPE_CONFIG[type];
@@ -63,8 +70,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <View style={styles.container}>
       <ScrollView 
-        style={styles.content} 
+        style={styles.content}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled={true}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 
@@ -84,11 +93,29 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         {/* Ações Rápidas */}
         <QuickActions actions={quickActions} />
 
+        {/* Análises Financeiras */}
+        <FinancialInsights
+          totalIncome={income}
+          totalExpense={expenses}
+          balance={balance}
+          transactions={transactions}
+          refreshing={refreshing}
+        />
+
+        {/* Gráfico de Pizza - Distribuição Financeira */}
+        <FinancialPieChart
+          transactions={transactions}
+        />
+
+        {/* Gastos por Categoria */}
+        <CategoryAnalysis transactions={transactions} />
+
         {/* Transações Recentes */}
         <RecentTransactions 
           transactions={recentTransactions}
           isLoading={loading}
           onSeeAll={handleSeeAllTransactions}
+          onTransactionPress={handleTransactionPress}
           showTitle={true}
         />
       
@@ -118,6 +145,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: spacing.lg,
     paddingTop: 0,
+  },
+  scrollContent: {
+    paddingBottom: spacing.xl * 2,
+    flexGrow: 1,
   },
   header: {
     marginBottom: spacing.xl,

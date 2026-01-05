@@ -67,7 +67,7 @@ export const formatPercentage = (value: number): string => {
  * Formata entrada de texto como moeda enquanto o usuário digita
  * Remove caracteres não numéricos e formata com 2 casas decimais
  * @param value - Texto digitado pelo usuário
- * @returns String formatada (ex: "1.234,56")
+ * @returns String formatada (ex: "1234" -> "12,34")
  */
 export const formatCurrencyInput = (value: string): string => {
   // Remove tudo que não é dígito
@@ -75,7 +75,13 @@ export const formatCurrencyInput = (value: string): string => {
 
   if (!digits) return '';
 
-  // Converte para centavos e reutiliza a função existente
+  // Trata os dígitos como centavos (últimos 2 dígitos são decimais)
+  // Ex: "1234" -> "12,34" | "200000" -> "2.000,00"
   const valueInCents = parseInt(digits);
-  return formatCurrencyValue(valueInCents);
+  
+  // Formata sem dividir por 100, pois já estamos tratando como centavos
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(valueInCents / 100);
 };
