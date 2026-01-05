@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { RecentTransactions } from '@/components/RecentTransactions';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useAuth } from '../../hooks/useAuth';
-import { useTransactionContext } from '../../context';
-import { RootStackParamList } from '../../types/navigation';
-import { FinancialChart } from '../../components/FinancialChart';
-import { FinancialOverview } from '../../components/FinancialOverview';
-import { RecentTransactions } from '../../components/RecentTransactions';
-import { QuickActions } from '../../components/QuickActions';
-import { FinancialInsights } from '../../components/FinancialInsights';
+import React, { useState } from 'react';
+import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { CategoryAnalysis } from '../../components/CategoryAnalysis';
+import { FinancialChart } from '../../components/FinancialChart';
+import { FinancialInsights } from '../../components/FinancialInsights';
+import { FinancialOverview } from '../../components/FinancialOverview';
 import { FinancialPieChart } from '../../components/FinancialPieChart';
-import { Text, Alert } from '../../components/ui';
-import { colors, typography, layout, spacing } from '../../theme';
+import { QuickActions } from '../../components/QuickActions';
+import { Alert } from '../../components/ui';
+import { useTransactionContext } from '../../context';
 import { useAlert } from '../../hooks/useAlert';
-import { TRANSACTION_TYPE_CONFIG } from '../../utils';
+import { useAuth } from '../../hooks/useAuth';
+import { colors, spacing } from '../../theme';
 import { TransactionType } from '../../types';
+import { RootStackParamList } from '../../types/navigation';
+import { TRANSACTION_TYPE_CONFIG } from '../../utils';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -34,7 +34,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     refreshTransactions,
   } = useTransactionContext();
   const { alert, showInfo } = useAlert();
-  
+
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -69,21 +69,21 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         nestedScrollEnabled={true}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
+          <RefreshControl
+            refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor={colors.brand.forest}
           />
         }
       >
         {/* Visão Financeira Geral */}
-        <FinancialOverview 
+        <FinancialOverview
           balance={balance}
           totalIncome={income}
           totalExpense={expenses}
@@ -102,6 +102,15 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           refreshing={refreshing}
         />
 
+        {/* Transações Recentes */}
+        <RecentTransactions
+          transactions={recentTransactions}
+          isLoading={loading}
+          onSeeAll={handleSeeAllTransactions}
+          onTransactionPress={handleTransactionPress}
+          showTitle={true}
+        />
+
         {/* Gráfico de Pizza - Distribuição Financeira */}
         <FinancialPieChart
           transactions={transactions}
@@ -110,17 +119,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         {/* Gastos por Categoria */}
         <CategoryAnalysis transactions={transactions} />
 
-        {/* Transações Recentes */}
-        <RecentTransactions 
-          transactions={recentTransactions}
-          isLoading={loading}
-          onSeeAll={handleSeeAllTransactions}
-          onTransactionPress={handleTransactionPress}
-          showTitle={true}
-        />
-      
         {/* Resumo Financeiro */}
-        <FinancialChart 
+        <FinancialChart
           data={{
             income: income,
             expense: expenses

@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  ActivityIndicator,
-  Alert
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useTransactionContext } from '../../context';
-import { useAppContext } from '../../context';
+import * as ImagePicker from 'expo-image-picker';
+import React, { useEffect, useState } from 'react';
+import {
+    ActivityIndicator,
+    Alert,
+    Image,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
+} from 'react-native';
+import { CategoryChips } from '../../components/CategoryChips';
+import { useAppContext, useTransactionContext } from '../../context';
 import { useAuth } from '../../hooks/useAuth';
+import { colors } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
-import { colors } from '../../theme';
-import { TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, getSuggestedCategories, validateTransaction, formatCurrencyInput } from '../../utils';
+import { formatCurrencyInput, getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
 import { uploadReceipt } from '../../utils/storage';
 
 type AddTransactionScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
@@ -45,11 +45,11 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
 
   // Debug
   useEffect(() => {
-    console.log('AddTransactionScreen montado:', { 
-      isEditing, 
-      transactionId, 
+    console.log('AddTransactionScreen montado:', {
+      isEditing,
+      transactionId,
       hasExisting: !!existingTransaction,
-      routeParams: route.params 
+      routeParams: route.params
     });
   }, []);
 
@@ -90,14 +90,14 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
     try {
       // Verificar permissão atual
       const permission = await ImagePicker.getMediaLibraryPermissionsAsync();
-      
+
       // Se não tiver permissão e puder pedir novamente
       if (!permission.granted) {
         if (!permission.canAskAgain) {
           showNotification('Permissão negada. Ative nas configurações do dispositivo', 'error');
           return;
         }
-        
+
         const newPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!newPermission.granted) {
           return; // Usuário negou, não mostra mensagem para permitir tentar novamente
@@ -124,14 +124,14 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
     try {
       // Verificar permissão atual
       const permission = await ImagePicker.getCameraPermissionsAsync();
-      
+
       // Se não tiver permissão e puder pedir novamente
       if (!permission.granted) {
         if (!permission.canAskAgain) {
           showNotification('Permissão negada. Ative nas configurações do dispositivo', 'error');
           return;
         }
-        
+
         const newPermission = await ImagePicker.requestCameraPermissionsAsync();
         if (!newPermission.granted) {
           return; // Usuário negou, não mostra mensagem para permitir tentar novamente
@@ -221,7 +221,7 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
       }
 
       setUploadingReceipt(true);
-      
+
       // Converte para centavos
       const amountInCents = Math.round(amountValue * 100);
 
@@ -246,7 +246,7 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
       if (isEditing && transactionId) {
         // Atualiza transação existente
         console.log('Atualizando transação:', transactionId);
-        
+
         // Prepara dados para atualização (não incluir userId e updatedAt que são tratados no service)
         const updateData: any = {
           type,
@@ -272,7 +272,7 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
       } else {
         // Adiciona nova transação
         console.log('Adicionando nova transação');
-        
+
         // Prepara dados (userId e outros campos são tratados no Context)
         const newTransactionData: any = {
           type,
@@ -403,10 +403,21 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
             />
           </View>
 
+          {/* Sugestões de Categorias */}
+          {suggestedCategories.length > 0 && (
+            <CategoryChips
+              categories={suggestedCategories}
+              selectedCategories={category ? [category] : []}
+              onCategoryPress={(selectedCategory) => setCategory(selectedCategory)}
+              showLabel={true}
+              labelText="Sugestões:"
+            />
+          )}
+
           {/* Upload de Recibo */}
           <View style={styles.receiptSection}>
             <Text style={styles.sectionLabel}>Recibo (opcional)</Text>
-            
+
             {receiptUri ? (
               <View style={styles.receiptPreviewContainer}>
                 <Image source={{ uri: receiptUri }} style={styles.receiptPreview} />
@@ -426,7 +437,7 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
                   <Ionicons name="images-outline" size={24} color="#666" />
                   <Text style={styles.receiptButtonText}>Galeria</Text>
                 </TouchableOpacity>
-                
+
                 <TouchableOpacity
                   style={styles.receiptButton}
                   onPress={handleTakePhoto}
