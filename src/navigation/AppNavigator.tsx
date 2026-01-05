@@ -165,6 +165,22 @@ function ProtectedStack() {
           presentation: 'modal',
         }}
       />
+      <Stack.Screen
+        name="EditTransaction"
+        component={AddTransactionScreen}
+        options={{
+          headerShown: true,
+          headerTitle: 'Editar Transação',
+          headerStyle: {
+            backgroundColor: colors.brand.forest,
+          },
+          headerTintColor: '#FFFFFF',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+          presentation: 'modal',
+        }}
+      />
     </Stack.Navigator>
   );
 }

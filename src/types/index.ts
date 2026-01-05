@@ -16,6 +16,7 @@ export interface Transaction {
   date: Date;
   description: string;
   category?: string;
+  receiptUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
