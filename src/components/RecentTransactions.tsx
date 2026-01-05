@@ -9,13 +9,15 @@ interface RecentTransactionsProps {
   isLoading?: boolean;
   onSeeAll: () => void;
   showTitle?: boolean;
+  onTransactionPress?: (transaction: Transaction) => void;
 }
 
 export function RecentTransactions({ 
   transactions, 
   isLoading = false, 
   onSeeAll,
-  showTitle = false
+  showTitle = false,
+  onTransactionPress
 }: RecentTransactionsProps) {
 
   if (isLoading) {
@@ -57,6 +59,7 @@ export function RecentTransactions({
               key={transaction.id} 
               style={styles.transactionItem}
               activeOpacity={0.7}
+              onPress={() => onTransactionPress?.(transaction)}
             >
               <View style={styles.transactionLeft}>
                 <View style={[

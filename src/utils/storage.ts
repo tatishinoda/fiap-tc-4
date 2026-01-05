@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 /**
  * Cross-platform secure storage utility
@@ -50,3 +51,32 @@ export const secureStorage = {
     // Items must be removed individually on native platforms
   },
 };
+
+/**
+ * Upload receipt image to Firebase Storage
+ */
+export async function uploadReceipt(
+  uri: string,
+  userId: string,
+  transactionId: string
+): Promise<string> {
+  try {
+    const storage = getStorage();
+    const filename = `receipts/${userId}/${transactionId}_${Date.now()}.jpg`;
+    const storageRef = ref(storage, filename);
+
+    // Fetch the image as a blob
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    // Upload to Firebase Storage
+    await uploadBytes(storageRef, blob);
+
+    // Get download URL
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  } catch (error: any) {
+    console.error('Error uploading receipt:', error);
+    throw new Error('Falha ao fazer upload do recibo');
+  }
+}
