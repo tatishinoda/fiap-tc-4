@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../theme/colors';
 
 interface CategoryChipsProps {
@@ -54,6 +54,7 @@ export function CategoryChips({
 const styles = StyleSheet.create({
   container: {
     marginTop: 12,
+    marginBottom: 12,
   },
   label: {
     fontSize: 12,
