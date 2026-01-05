@@ -1,19 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  Platform,
-} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import React, { useEffect, useState } from 'react';
+import {
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
+import { colors } from '../theme/colors';
 import { TransactionType } from '../types';
 import { SUGGESTED_CATEGORIES, TRANSACTION_TYPE_CONFIG } from '../utils/constants';
-import { colors } from '../theme/colors';
 import { CurrencyInput } from './CurrencyInput';
 
 export interface FilterOptions {
@@ -315,63 +314,6 @@ export function AdvancedFiltersModal({
               </View>
             )}
 
-            {/* Categories Section */}
-            <TouchableOpacity
-              style={styles.section}
-              onPress={() => toggleSection('categories')}
-              activeOpacity={0.7}
-            >
-              <View style={styles.sectionHeader}>
-                <View style={styles.sectionTitleRow}>
-                  <Ionicons name="pricetags-outline" size={20} color={colors.brand.forest} />
-                  <Text style={styles.sectionTitle}>Categorias</Text>
-                  {filters.categories.length > 0 && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>{filters.categories.length}</Text>
-                    </View>
-                  )}
-                </View>
-                <Ionicons
-                  name={expandedSection === 'categories' ? 'chevron-up' : 'chevron-down'}
-                  size={20}
-                  color="#666"
-                />
-              </View>
-            </TouchableOpacity>
-
-            {expandedSection === 'categories' && (
-              <View style={styles.sectionContent}>
-                <View style={styles.categoriesGrid}>
-                  {allCategories.map(category => (
-                    <TouchableOpacity
-                      key={category}
-                      style={[
-                        styles.categoryChip,
-                        filters.categories.includes(category) && styles.categoryChipActive
-                      ]}
-                      onPress={() => toggleCategory(category)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={[
-                        styles.categoryChipText,
-                        filters.categories.includes(category) && styles.categoryChipTextActive
-                      ]}>
-                        {category}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                {filters.categories.length > 0 && (
-                  <TouchableOpacity
-                    style={styles.clearButton}
-                    onPress={() => setFilters(prev => ({ ...prev, categories: [] }))}
-                  >
-                    <Text style={styles.clearButtonText}>Limpar categorias</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-
             {/* Amount Range Section */}
             <TouchableOpacity
               style={styles.section}
@@ -468,6 +410,63 @@ export function AdvancedFiltersModal({
                     <Ionicons name={option.icon as any} size={16} color="#666" />
                   </TouchableOpacity>
                 ))}
+              </View>
+            )}
+
+                        {/* Categories Section */}
+            <TouchableOpacity
+              style={styles.section}
+              onPress={() => toggleSection('categories')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleRow}>
+                  <Ionicons name="pricetags-outline" size={20} color={colors.brand.forest} />
+                  <Text style={styles.sectionTitle}>Categorias</Text>
+                  {filters.categories.length > 0 && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>{filters.categories.length}</Text>
+                    </View>
+                  )}
+                </View>
+                <Ionicons
+                  name={expandedSection === 'categories' ? 'chevron-up' : 'chevron-down'}
+                  size={20}
+                  color="#666"
+                />
+              </View>
+            </TouchableOpacity>
+
+            {expandedSection === 'categories' && (
+              <View style={styles.sectionContent}>
+                <View style={styles.categoriesGrid}>
+                  {allCategories.map(category => (
+                    <TouchableOpacity
+                      key={category}
+                      style={[
+                        styles.categoryChip,
+                        filters.categories.includes(category) && styles.categoryChipActive
+                      ]}
+                      onPress={() => toggleCategory(category)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={[
+                        styles.categoryChipText,
+                        filters.categories.includes(category) && styles.categoryChipTextActive
+                      ]}>
+                        {category}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {filters.categories.length > 0 && (
+                  <TouchableOpacity
+                    style={styles.clearButton}
+                    onPress={() => setFilters(prev => ({ ...prev, categories: [] }))}
+                  >
+                    <Text style={styles.clearButtonText}>Limpar categorias</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
           </ScrollView>

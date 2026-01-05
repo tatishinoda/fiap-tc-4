@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
 } from 'react-native-reanimated';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import { Transaction, TransactionType } from '../types';
@@ -25,7 +25,7 @@ interface FinancialPieChartProps {
 export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
   // Agrupar transações por tipo
   const typeMap = new Map<TransactionType, number>();
-  
+
   transactions.forEach(transaction => {
     const current = typeMap.get(transaction.type) || 0;
     typeMap.set(transaction.type, current + transaction.amount);
@@ -46,7 +46,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
     .sort((a, b) => b.amount - a.amount);
 
   const totalAmount = typeData.reduce((sum, item) => sum + item.amount, 0);
-  
+
   // Calcular percentuais
   typeData.forEach(item => {
     item.percentage = totalAmount > 0 ? item.amount / totalAmount : 0;
@@ -54,10 +54,10 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
 
   // Calcular saldo (receitas - despesas)
   const incomeTransactions = transactions.filter(t => t.type === 'DEPOSIT');
-  const expenseTransactions = transactions.filter(t => 
+  const expenseTransactions = transactions.filter(t =>
     t.type === 'WITHDRAWAL' || t.type === 'PAYMENT' || t.type === 'TRANSFER' || t.type === 'INVESTMENT'
   );
-  
+
   const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0) / 100;
   const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0) / 100;
   const balance = totalIncome - totalExpense;
@@ -87,8 +87,8 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(Number(value));
   };
 
@@ -107,7 +107,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Distribuição por Tipo de Transação</Text>
-      
+
       <View style={styles.card}>
         <Animated.View style={[styles.chartContainer, animatedStyle]}>
           <Svg width={size} height={size}>
@@ -148,7 +148,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
                 );
               })}
             </G>
-            
+
             {/* Texto central */}
             <SvgText
               x={center}
