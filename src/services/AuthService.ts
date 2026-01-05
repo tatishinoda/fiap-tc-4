@@ -8,12 +8,12 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 import { User } from '../types';
-import * as SecureStore from 'expo-secure-store';
+import { secureStorage } from '../utils/storage';
 
 export class AuthService {
   static async signUp(email: string, password: string, name: string): Promise<User> {
     let firebaseUser: FirebaseUser | null = null;
-    
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       firebaseUser = userCredential.user;
@@ -26,7 +26,7 @@ export class AuthService {
       };
 
       await setDoc(doc(db, 'users', firebaseUser.uid), userData);
-      await SecureStore.setItemAsync('userToken', firebaseUser.uid);
+      await secureStorage.setItem('userToken', firebaseUser.uid);
 
       return {
         id: firebaseUser.uid,
@@ -34,7 +34,7 @@ export class AuthService {
       };
     } catch (error: any) {
       console.error('Erro ao registrar usuário:', error);
-      
+
       // Rollback: remove do Auth se falhou no Firestore
       if (firebaseUser && error.code !== 'auth/email-already-in-use') {
         try {
@@ -43,7 +43,7 @@ export class AuthService {
           console.error('Erro ao limpar usuário do Auth:', deleteError);
         }
       }
-      
+
       throw new Error(this.getErrorMessage(error.code));
     }
   }
@@ -54,14 +54,14 @@ export class AuthService {
       const firebaseUser = userCredential.user;
 
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-      
+
       if (!userDoc.exists()) {
         await firebaseSignOut(auth);
         throw new Error('Perfil de usuário não encontrado. Por favor, entre em contato com o suporte.');
       }
 
       const userData = userDoc.data() as Omit<User, 'id'>;
-      await SecureStore.setItemAsync('userToken', firebaseUser.uid);
+      await secureStorage.setItem('userToken', firebaseUser.uid);
 
       return {
         id: firebaseUser.uid,
@@ -79,7 +79,7 @@ export class AuthService {
   static async signOut(): Promise<void> {
     try {
       await firebaseSignOut(auth);
-      await SecureStore.deleteItemAsync('userToken');
+      await secureStorage.removeItem('userToken');
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
       throw new Error('Erro ao sair da conta');
@@ -89,15 +89,15 @@ export class AuthService {
   static async getCurrentUser(): Promise<User | null> {
     try {
       const firebaseUser = auth.currentUser;
-      
+
       if (!firebaseUser) return null;
 
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-      
+
       if (!userDoc.exists()) return null;
 
       const userData = userDoc.data() as Omit<User, 'id'>;
-      
+
       return {
         id: firebaseUser.uid,
         ...userData,
