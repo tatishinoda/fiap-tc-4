@@ -1,46 +1,23 @@
 rules_version = '2';
 
-service cloud.firestore {
-  match /databases/{database}/documents {
-    
-    // Regra para usuários - apenas usuários autenticados podem acessar seus próprios dados
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Regra para transações - cada usuário acessa apenas suas próprias transações
-    match /transactions/{transactionId} {
-      // Criar: apenas se autenticado e userId corresponder
-      allow create: if request.auth != null && 
-        request.resource.data.userId == request.auth.uid;
-      
-      // Ler, atualizar, deletar: apenas suas próprias transações
-      allow read, update, delete: if request.auth != null && 
-        resource.data.userId == request.auth.uid;
-    }
-    
-    // Regra para comprovantes de transação
-    match /transaction-receipts/{userId}/{allPaths=**} {
+// Firebase Storage Rules
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Regra para comprovantes de recibos - cada usuário acessa apenas seus próprios recibos
+    match /receipts/{userId}/{allPaths=**} {
+      // Permitir leitura apenas para o próprio usuário
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && 
+
+      // Permitir escrita apenas para o próprio usuário com validações
+      allow write: if request.auth != null &&
         request.auth.uid == userId &&
         request.resource.size < 10 * 1024 * 1024 && // Limite de 10MB
         request.resource.contentType.matches('image/.*'); // Apenas imagens
     }
-    
-    // Regra para investimentos - cada usuário acessa apenas seus próprios investimentos
-    match /investments/{investmentId} {
-      // Criar: apenas se autenticado e userId corresponder
-      allow create: if request.auth != null && 
-        request.resource.data.userId == request.auth.uid;
-      
-      // Ler, atualizar, deletar: apenas seus próprios investimentos
-      allow read, update, delete: if request.auth != null && 
-        resource.data.userId == request.auth.uid;
-    }
-    
-    // Bloquear acesso a qualquer outro documento
-    match /{document=**} {
+
+    // Bloquear acesso a qualquer outro arquivo
+    match /{allPaths=**} {
       allow read, write: if false;
     }
   }
