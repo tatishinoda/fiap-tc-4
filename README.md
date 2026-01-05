@@ -130,6 +130,29 @@ No Firebase Console:
 3. Habilite **Storage** (opcional, para uploads)
 4. Configure as regras de segurança (veja `firestore.rules` e `storage.rules`)
 
+#### **3.4. Implantar regras de segurança Firebase**
+Para implantar as regras de segurança do Firestore e Storage:
+
+```bash
+# Instalar Firebase CLI (apenas uma vez)
+npm install -g firebase-tools
+
+# Fazer login no Firebase
+firebase login
+
+# Selecionar o projeto (se necessário)
+firebase use bytebank-mobile
+
+# Implantar todas as regras
+firebase deploy --only firestore,storage
+
+# Ou implantar individualmente
+firebase deploy --only firestore  # Apenas Firestore
+firebase deploy --only storage     # Apenas Storage
+```
+
+> ⚠️ **Importante**: Sempre implante as regras após modificá-las para garantir a segurança do aplicativo.
+
 > 📚 Para mais detalhes, consulte [FIREBASE.md](FIREBASE.md)
 
 ### **4. Executar o projeto**
