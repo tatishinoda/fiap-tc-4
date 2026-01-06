@@ -22,7 +22,7 @@ import { colors } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
 import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
-import { uploadReceipt } from '../../utils/storage';
+import { uploadReceipt, deleteReceipt } from '../../utils/storage';
 import { CategoryChips, CurrencyInput } from '../../components/ui';
 
 type TransactionFormScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
@@ -143,14 +143,36 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   };
 
   // Handler para remover imagem
-  const handleRemoveImage = () => {
-    setReceiptUri(null);
+  const handleRemoveImage = async () => {
+    Alert.alert(
+      'Remover Recibo',
+      'Deseja remover o recibo desta transação?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Remover',
+          style: 'destructive',
+          onPress: async () => {
+            // Se for uma URL do Firebase Storage (começa com http), deleta do Storage
+            if (receiptUri && receiptUri.startsWith('http')) {
+              try {
+                await deleteReceipt(receiptUri);
+              } catch (error) {
+                // Continua mesmo se falhar, pois a referência será removida
+              }
+            }
+            
+            setReceiptUri(null);
+            showNotification('Recibo removido', 'success');
+          },
+        },
+      ]
+    );
   };
 
   // Handler para deletar transação
   const handleDelete = async () => {
     if (!isEditing || !transactionId) {
-      console.warn('Tentou deletar sem transactionId');
       return;
     }
 
@@ -168,7 +190,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
               showNotification('Transação deletada com sucesso!', 'success');
               navigation.goBack();
             } catch (error: any) {
-              console.error('Erro ao deletar:', error);
               showNotification(
                 error.message || 'Erro ao deletar transação',
                 'error'
@@ -216,7 +237,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           const tempId = isEditing ? transactionId : `temp_${Date.now()}`;
           receiptUrl = await uploadReceipt(receiptUri, user.id, tempId || '');
         } catch (uploadError: any) {
-          console.error('Erro no upload:', uploadError);
           showNotification(uploadError.message || 'Erro ao fazer upload do recibo', 'error');
           setUploadingReceipt(false);
           return;
@@ -241,9 +261,12 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           updateData.category = category;
         }
 
-        // Adiciona receiptUrl apenas se tiver valor
-        if (receiptUrl) {
-          updateData.receiptUrl = receiptUrl;
+        // Adiciona receiptUrl - pode ser uma URL, null (removido) ou undefined (sem mudança)
+        if (receiptUrl !== undefined) {
+          updateData.receiptUrl = receiptUrl || null;
+        } else if (receiptUri === null && existingTransaction?.receiptUrl) {
+          // Se o usuário removeu o recibo que existia, envia null explicitamente
+          updateData.receiptUrl = null;
         }
 
         await updateTransaction(transactionId, updateData);
@@ -284,7 +307,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       setUploadingReceipt(false);
       navigation.goBack();
     } catch (error: any) {
-      console.error('Erro no handleSubmit:', error);
       setUploadingReceipt(false);
       showNotification(
         error.message || (isEditing ? 'Erro ao atualizar transação' : 'Erro ao adicionar transação'),

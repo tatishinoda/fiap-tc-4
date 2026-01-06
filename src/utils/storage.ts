@@ -5,7 +5,7 @@
 
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 // ============================================================================
 // STORAGE SEGURO CROSS-PLATFORM
@@ -79,7 +79,31 @@ export async function uploadReceipt(
     const downloadURL = await getDownloadURL(storageRef);
     return downloadURL;
   } catch (error: any) {
-    console.error('Error uploading receipt:', error);
     throw new Error('Falha ao fazer upload do recibo');
+  }
+}
+
+/**
+ * Delete receipt image from Firebase Storage
+ */
+export async function deleteReceipt(receiptUrl: string): Promise<void> {
+  try {
+    const storage = getStorage();
+    
+    // Extrai o caminho do arquivo da URL
+    // URL format: https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{path}?alt=media&token={token}
+    const urlParts = receiptUrl.split('/o/');
+    if (urlParts.length < 2) {
+      throw new Error('URL de recibo inválida');
+    }
+    
+    const pathWithParams = urlParts[1];
+    const path = decodeURIComponent(pathWithParams.split('?')[0]);
+    
+    const storageRef = ref(storage, path);
+    await deleteObject(storageRef);
+  } catch (error: any) {
+    // Não lança erro para não bloquear a remoção do recibo no Firestore
+    // Mesmo que falhe a deleção no Storage, a referência será removida
   }
 }
