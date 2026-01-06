@@ -11,6 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Transaction } from '../types';
 import { formatCurrency } from '../utils';
+import { INSIGHT_ICONS } from '../utils/icons';
 
 interface FinancialInsightsProps {
   totalIncome: number;
@@ -41,7 +42,6 @@ export function FinancialInsights({
   const savingsRate = incomeValue > 0 ? ((incomeValue - expenseValue) / incomeValue) * 100 : 0;
   const avgExpense = expenseTransactions.length > 0 ? expenseValue / expenseTransactions.length : 0;
   const financialHealth = balanceValue > 0 ? 'Positivo' : 'Atenção';
-  const healthColor = balanceValue > 0 ? '#4CAF50' : '#FF9800';
 
   // Animações para cada card
   const card1TranslateY = useSharedValue(50);
@@ -112,7 +112,7 @@ export function FinancialInsights({
             style={styles.gradient}
           >
             <View style={styles.iconContainer}>
-              <Ionicons name="trending-up" size={24} color="#FFF" />
+              <Ionicons name={INSIGHT_ICONS.savingsRate} size={24} color="#FFF" />
             </View>
             <Text style={styles.insightLabel}>Taxa de Economia</Text>
             <Text style={styles.insightValue}>{savingsRate.toFixed(1)}%</Text>
@@ -131,7 +131,7 @@ export function FinancialInsights({
             style={styles.gradient}
           >
             <View style={styles.iconContainer}>
-              <Ionicons name="heart" size={24} color="#FFF" />
+              <Ionicons name={INSIGHT_ICONS.financialHealth} size={24} color="#FFF" />
             </View>
             <Text style={styles.insightLabel}>Saúde Financeira</Text>
             <Text style={styles.insightValue}>{financialHealth}</Text>
@@ -150,7 +150,7 @@ export function FinancialInsights({
             style={styles.gradient}
           >
             <View style={styles.iconContainer}>
-              <Ionicons name="analytics" size={24} color="#FFF" />
+              <Ionicons name={INSIGHT_ICONS.avgExpense} size={24} color="#FFF" />
             </View>
             <Text style={styles.insightLabel}>Gasto Médio</Text>
             <Text style={styles.insightValue}>{formatCurrency(avgExpense)}</Text>
@@ -167,7 +167,7 @@ export function FinancialInsights({
             style={styles.gradient}
           >
             <View style={styles.iconContainer}>
-              <Ionicons name="receipt" size={24} color="#FFF" />
+              <Ionicons name={INSIGHT_ICONS.totalTransactions} size={24} color="#FFF" />
             </View>
             <Text style={styles.insightLabel}>Transações</Text>
             <Text style={styles.insightValue}>{transactions.length}</Text>

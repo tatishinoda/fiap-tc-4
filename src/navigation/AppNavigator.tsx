@@ -11,6 +11,7 @@ import { RootStackParamList, TabParamList } from '../types/navigation';
 import { GlobalNotification } from '../components/GlobalNotification';
 import { ConfirmModal } from '../components/ConfirmModal';
 import { colors } from '../theme/colors';
+import { getNavigationIcon, ACTION_ICONS } from '../utils/icons';
 
 // Telas de autenticação
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -74,7 +75,7 @@ function ProtectedTabs() {
             style={styles.logoutButton}
             activeOpacity={0.7}
           >
-            <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
+            <Ionicons name={ACTION_ICONS.logout} size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -84,15 +85,17 @@ function ProtectedTabs() {
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap = 'help-outline';
+            let iconName: keyof typeof Ionicons.glyphMap;
 
             switch (route.name) {
               case 'Home':
-                iconName = focused ? 'home' : 'home-outline';
+                iconName = getNavigationIcon('home', focused);
                 break;
               case 'Transactions':
-                iconName = focused ? 'list' : 'list-outline';
+                iconName = getNavigationIcon('transactions', focused);
                 break;
+              default:
+                iconName = 'help-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;

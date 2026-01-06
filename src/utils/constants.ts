@@ -1,56 +1,62 @@
 /**
  * Constantes e configurações da aplicação
- * Define tipos de transação, categorias sugeridas e configurações relacionadas
+ * Define tipos de transação e categorias sugeridas
  */
 
 import { Ionicons } from '@expo/vector-icons';
 import { TransactionType } from '../types';
+import { TRANSACTION_ICONS } from './icons';
+import { TRANSACTION_COLORS } from './colors';
 
 // ============================================================================
-// CONFIGURAÇÃO DE TIPOS DE TRANSAÇÃO
+// TIPOS DE TRANSAÇÃO
 // ============================================================================
 
-/** Configuração completa dos tipos de transação (label, ícone, cor, descrição) */
-export const TRANSACTION_TYPE_CONFIG: Record<
-  TransactionType,
-  {
-    label: string;
-    icon: keyof typeof Ionicons.glyphMap;
-    color: string;
-    description: string;
-  }
-> = {
-  DEPOSIT: {
-    label: 'Depósito',
-    icon: 'arrow-down-circle',
-    color: '#00D4AA',
-    description: 'Receitas e entradas',
-  },
-  WITHDRAWAL: {
-    label: 'Saque',
-    icon: 'cash-outline',
-    color: '#FF8C42',
-    description: 'Retiradas em dinheiro',
-  },
-  TRANSFER: {
-    label: 'Transferência',
-    icon: 'swap-horizontal',
-    color: '#4A90E2',
-    description: 'Transferências e PIX',
-  },
-  PAYMENT: {
-    label: 'Pagamento',
-    icon: 'card-outline',
-    color: '#FF6B6B',
-    description: 'Contas e pagamentos',
-  },
-  INVESTMENT: {
-    label: 'Investimento',
-    icon: 'trending-up',
-    color: '#9B59B6',
-    description: 'Aplicações financeiras',
-  },
+/** Lista de todos os tipos de transação disponíveis */
+export const TRANSACTION_TYPES: TransactionType[] = [
+  'DEPOSIT',
+  'WITHDRAWAL',
+  'TRANSFER',
+  'PAYMENT',
+  'INVESTMENT',
+];
+
+/** Labels amigáveis para cada tipo de transação */
+export const TRANSACTION_LABELS: Record<TransactionType, string> = {
+  DEPOSIT: 'Depósito',
+  WITHDRAWAL: 'Saque',
+  TRANSFER: 'Transferência',
+  PAYMENT: 'Pagamento',
+  INVESTMENT: 'Investimento',
 };
+
+/** Descrições para cada tipo de transação */
+export const TRANSACTION_DESCRIPTIONS: Record<TransactionType, string> = {
+  DEPOSIT: 'Receitas e entradas',
+  WITHDRAWAL: 'Retiradas em dinheiro',
+  TRANSFER: 'Transferências e PIX',
+  PAYMENT: 'Contas e pagamentos',
+  INVESTMENT: 'Aplicações financeiras',
+};
+
+/**
+ * Configuração completa dos tipos de transação
+ * Objeto gerado dinamicamente combinando ícones, cores, labels e descrições
+ */
+export const TRANSACTION_TYPE_CONFIG = TRANSACTION_TYPES.reduce((config, type) => {
+  config[type] = {
+    label: TRANSACTION_LABELS[type],
+    icon: TRANSACTION_ICONS[type],
+    color: TRANSACTION_COLORS[type],
+    description: TRANSACTION_DESCRIPTIONS[type],
+  };
+  return config;
+}, {} as Record<TransactionType, {
+  label: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  color: string;
+  description: string;
+}>);
 
 // ============================================================================
 // CATEGORIAS SUGERIDAS
@@ -104,15 +110,27 @@ export const SUGGESTED_CATEGORIES: Record<TransactionType, string[]> = {
 // FUNÇÕES AUXILIARES
 // ============================================================================
 
-/** Lista de todos os tipos de transação disponíveis */
-export const TRANSACTION_TYPES = Object.keys(TRANSACTION_TYPE_CONFIG) as TransactionType[];
-
-// Obtém a configuração completa de um tipo de transação
-export const getTransactionTypeConfig = (type: TransactionType) => {
+// Retorna a configuração completa de um tipo de transação
+export function getTransactionConfig(type: TransactionType) {
   return TRANSACTION_TYPE_CONFIG[type];
-};
+}
 
-// Obtém categorias sugeridas para um tipo específico de transação
-export const getSuggestedCategories = (type: TransactionType): string[] => {
+// Verifica se uma string é um tipo de transação válido
+export function isValidTransactionType(value: unknown): value is TransactionType {
+  return typeof value === 'string' && TRANSACTION_TYPES.includes(value as TransactionType);
+}
+
+// Retorna a label de um tipo de transação
+export function getTransactionLabel(type: TransactionType): string {
+  return TRANSACTION_LABELS[type] || type;
+}
+
+// Retorna a descrição de um tipo de transação
+export function getTransactionDescription(type: TransactionType): string {
+  return TRANSACTION_DESCRIPTIONS[type] || '';
+}
+
+// Retorna categorias sugeridas para um tipo específico de transação
+export function getSuggestedCategories(type: TransactionType): string[] {
   return SUGGESTED_CATEGORIES[type] || [];
-};
+}
