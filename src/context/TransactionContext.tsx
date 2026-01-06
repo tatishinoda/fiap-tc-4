@@ -11,7 +11,7 @@ export interface TransactionContextType {
   balance: number;
   income: number;
   expenses: number;
-  
+
   fetchTransactions: () => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt'>) => Promise<void>;
   updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>;
@@ -40,13 +40,12 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
   const fetchTransactions = useCallback(async () => {
     if (!user?.id) {
-      console.log('Usuário não autenticado, não é possível buscar transações');
       return;
     }
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const transactions = await TransactionService.getAllTransactions(user.id);
       transactionStore.setTransactions(transactions);
@@ -66,7 +65,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       const transactionData: TransactionService.CreateTransactionData = {
         userId: user.id,
@@ -75,17 +74,16 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
         date: transaction.date,
         description: transaction.description,
       };
-      
+
       // Adiciona campos opcionais apenas se definidos
       if (transaction.category) {
         transactionData.category = transaction.category;
       }
-      
+
       if ((transaction as any).receiptUrl) {
         transactionData.receiptUrl = (transaction as any).receiptUrl;
       }
-      
-      console.log('Dados sendo enviados ao service:', transactionData);
+
       const newTransaction = await TransactionService.createTransaction(transactionData);
       transactionStore.addTransaction(newTransaction);
     } catch (err: any) {
@@ -103,27 +101,22 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
       throw new Error('Usuário não autenticado');
     }
 
-    console.log('TransactionContext.updateTransaction:', { id, transaction, userId: user.id });
-
     setLoading(true);
     setError(null);
-    
+
     try {
       // Remove campos undefined para evitar erro do Firestore
       const updateData: TransactionService.UpdateTransactionData = {};
-      
+
       if (transaction.type !== undefined) updateData.type = transaction.type;
       if (transaction.amount !== undefined) updateData.amount = transaction.amount;
       if (transaction.description !== undefined) updateData.description = transaction.description;
       if (transaction.category !== undefined) updateData.category = transaction.category;
       if (transaction.date !== undefined) updateData.date = transaction.date;
       if ((transaction as any).receiptUrl !== undefined) updateData.receiptUrl = (transaction as any).receiptUrl;
-      
-      console.log('Chamando TransactionService.updateTransaction com:', { id, updateData });
+
       await TransactionService.updateTransaction(id, user.id, updateData);
-      console.log('Transação atualizada, buscando lista atualizada');
       await fetchTransactions();
-      console.log('Lista de transações atualizada');
     } catch (err: any) {
       const errorMessage = err?.message || 'Erro ao atualizar transação';
       setError(errorMessage);
@@ -141,7 +134,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
     setLoading(true);
     setError(null);
-    
+
     try {
       await TransactionService.deleteTransaction(id);
       transactionStore.removeTransaction(id);
@@ -163,7 +156,7 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
     setError(null);
   }, []);
 
-  const balance = transactionStore.transactions.reduce((acc, t) => 
+  const balance = transactionStore.transactions.reduce((acc, t) =>
     acc + (t.type === 'DEPOSIT' ? t.amount : -t.amount), 0
   );
 
@@ -199,10 +192,10 @@ export function TransactionProvider({ children }: TransactionProviderProps) {
 
 export function useTransactionContext() {
   const context = useContext(TransactionContext);
-  
+
   if (context === undefined) {
     throw new Error('useTransactionContext deve ser usado dentro de um TransactionProvider');
   }
-  
+
   return context;
 }
