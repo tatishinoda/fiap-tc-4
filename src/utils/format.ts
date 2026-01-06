@@ -52,7 +52,7 @@ export const formatAmount = (value: number, type: TransactionType): string => {
     return `${type === 'DEPOSIT' ? '+' : '-'}${CURRENCY_FORMATTER.format(0)}`;
   }
   const sign = type === 'DEPOSIT' ? '+' : '-';
-  return `${sign}${formatCurrency(Math.abs(value))}`;
+  return `${sign} ${formatCurrency(Math.abs(value))}`;
 };
 
 // Formata valores grandes de forma compacta (ex: "R$ 1.2K", "R$ 2.5M")
