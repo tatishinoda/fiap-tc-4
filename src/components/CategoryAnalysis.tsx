@@ -10,7 +10,7 @@ interface CategoryAnalysisProps {
 
 interface CategoryData {
   category: string;
-  total: number;
+  total: number; // Em centavos
   count: number;
   percentage: number;
 }
@@ -46,7 +46,7 @@ export function CategoryAnalysis({ transactions }: CategoryAnalysisProps) {
     .map(cat => ({
       ...cat,
       percentage: totalExpenses > 0 ? (cat.total / totalExpenses) * 100 : 0,
-      total: cat.total / 100, // Converter de centavos
+      total: cat.total,
     }))
     .sort((a, b) => b.total - a.total)
     .slice(0, 5); // Top 5 categorias
