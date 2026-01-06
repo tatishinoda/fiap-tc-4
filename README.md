@@ -1,18 +1,28 @@
-# 🏦 ByteBank Mobile
+# Tech Challenge - Fase 3 - Grupo 9 - 4FRNT
 
-Aplicação de gestão financeira desenvolvida com React Native.
+ByteBank: Aplicação Mobile, utilizando React Native (Expo), Firebase Storage e Cloud Firestore.
 
-## 📱 Funcionalidades Principais
+[![Expo](https://img.shields.io/badge/Expo-%7E54.0.13-000000?style=flat&logo=expo&logoColor=white)](https://expo.dev/)
+[![React Native](https://img.shields.io/badge/React_Native-0.81.4-61DAFB?style=flat&logo=react&logoColor=white)](https://reactnative.dev/)
+[![Firebase Storage](https://img.shields.io/badge/Firebase_Storage-Storage-FFA611?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/products/storage)
+[![Cloud Firestore](https://img.shields.io/badge/Cloud_Firestore-Database-FFA611?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/products/firestore)
 
-- 🔐 **Autenticação completa** - Login, cadastro e gerenciamento de sessão com Firebase
-- 💰 **Gestão financeira** - Adicionar, editar e excluir transações (depósitos, saques, transferências, pagamentos, investimentos)
-- � **Upload de recibos** - Anexe fotos de comprovantes usando câmera ou galeria
-- �📊 **Dashboard interativo** - Visão geral do saldo, gráficos de entradas vs saídas, análise por categoria
-- 📋 **Listagem de transações** - Busca avançada e filtros por tipo, categoria, valor e data
-- 🎨 **Design moderno** - Interface responsiva com componentes reutilizáveis e animações
-- ☁️ **Sincronização em nuvem** - Dados armazenados no Firebase Firestore e Storage
+## O que é o ByteBank?
 
-## 📁 **Estrutura do Projeto**
+O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvimento Mobile do Tech Challenge, Fase 3, do curso de pós-graduação em Front-End Engineering da FIAP.
+
+## Contexto do Projeto
+
+- 🔗 [Repositório Fase 1](https://github.com/karenkramek/bytebank-fiap)
+- 🔗 [Repositório Fase 2](https://github.com/karenkramek/fiap-tech-challenge-2)
+
+## Gestão de Projeto
+
+- 📊 [Trello (Fase 3)](https://trello.com/b/YkdMifCT/fase-3)
+- 🎨 Figma (Fase 3): TBD
+- 📹 Vídeo de Apresentação (Fase 3): TBD
+
+## Estrutura do Projeto
 
 ```
 bytebank-mobile/
@@ -43,59 +53,26 @@ bytebank-mobile/
 └── README.md              # Documentação principal
 ```
 
-## 🛠️ **Tecnologias Utilizadas**
-
-### **Core**
-- **React** 19.1.0
-- **React Native** 0.81.5
-- **Expo** SDK 54
-- **TypeScript** 5.x
-
-### **Firebase & Backend**
-- **Firebase** 10.7.1
-- **Firebase Auth** - Autenticação
-- **Cloud Firestore** - Banco de dados NoSQL
-- **Firebase Storage** - Armazenamento de arquivos
-
-### **Navegação & Estado**
-- **React Navigation** 7.x (Stack + Bottom Tabs)
-- **Zustand** 5.0.9 - Gerenciamento de estado
-- **React Hook Form** 7.66.0 - Formulários
-- **AsyncStorage** 2.2.0 - Persistência local
-
-### **UI & Estilização**
-- **NativeWind** 4.2.1 - Tailwind CSS para React Native
-- **Expo Vector Icons** 15.0.3 - Ícones
-- **React Native Reanimated** 4.1.1 - Animações
-- **React Native Gesture Handler** 2.28.0 - Gestos
-- **React Native SVG** 15.12.1 - Gráficos vetoriais
-- **Expo Linear Gradient** 15.0.0 - Gradientes
-
-### **Utilitários & Ferramentas**
-- **Date-fns** 3.0.0 - Manipulação de datas
-- **UUID** 11.1.0 - Geração de IDs únicos
-- **Expo SecureStore** 15.0.0 - Armazenamento seguro
-- **Expo Image Picker** 17.0.10 - Seleção de imagens
-- **React Native DateTimePicker** 8.4.4 - Seletor de data/hora
-- **Expo Crypto** 15.0.0 - Criptografia
-
-## 🚀 **Como Executar**
+## Como Executar
 
 ### **Pré-requisitos**
 - Node.js 18+ (recomendado)
 - npm ou yarn
-- Expo CLI: `npm install -g expo-cli`
+- Expo CLI: `npm install -g expo-cli` (opcional, usamos `npx expo`)
 - Conta no Firebase (gratuita)
+- Se for testar via USB, instale o Android Platform Tools (ADB)
 
 ### **1. Clone o projeto**
 ```bash
-git clone <seu-repositorio>
+git clone https://github.com/camp0sfer/bytebank-mobile.git
 cd bytebank-mobile
 ```
 
 ### **2. Instalar dependências**
 ```bash
 npm install
+# ou
+yarn
 ```
 
 ### **3. Configurar Firebase**
@@ -158,15 +135,38 @@ firebase deploy --only storage     # Apenas Storage
 > ⚠️ **Importante**: Sempre implante as regras após modificá-las para garantir a segurança do aplicativo.
 
 ### **4. Executar o projeto**
+
+Após configurar o Firebase, inicie o servidor de desenvolvimento:
+
 ```bash
 npm start
 ```
 
-### **4. Testar no dispositivo**
-- Instale o **Expo Go** no seu celular
-- Escaneie o QR Code gerado
+### **5. Testar no dispositivo**
 
-## 🔧 **Configurações de Desenvolvimento**
+#### **Testar no Android com Expo Go**:
+- Instale `Expo Go` no celular (Google Play)
+- Certifique-se que computador e celular estão na mesma rede Wi‑Fi
+- No painel do Expo escolha `LAN` para melhor desempenho. Se não for possível, escolha `Tunnel`
+- No painel do Expo (ou no terminal) haverá um QR Code — abra `Expo Go` → `Scan QR Code` e aponte a câmera
+
+#### **Testar via USB/adb**:
+- Ative a depuração USB no Android e conecte o cabo
+- Verifique o dispositivo com `adb devices`
+- Execute no terminal:
+
+```bash
+npm run android
+# ou, após `npx expo start`, pressione `a` no terminal para abrir no dispositivo/emulador
+```
+
+#### **Rodar no navegador** (opcional):
+
+```bash
+npm run web
+```
+
+## Configurações de Desenvolvimento
 
 ### **Scripts Disponíveis**
 ```bash
@@ -176,3 +176,18 @@ npm run ios        # Executar no iOS
 npm run web        # Executar na web
 npm run build      # Build de produção
 ```
+
+## Troubleshooting
+
+- **QR Code não é lido**: Altere para `Tunnel` no Expo Dev Tools
+- **App não atualiza**: Feche e reabra `Expo Go` ou limpe o cache com `npx expo start -c`
+- **`adb devices` não lista o aparelho**: Verifique permissões/cabo e as ferramentas do Android
+
+## **Integrantes do Grupo**
+
+| Nome | Email | RM |
+|------|-------|------|
+| Fernanda Raquel Campos Jiacinto | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com) | RM366526 |
+| Kaique Kenichi Furukawa Endo | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com) | RM366448 |
+| Karen Cristina Kramek | [kakakramek@gmail.com](mailto:kakakramek@gmail.com) | RM361140 |
+| Tatiane Gabrielle Marçal Rodrigues da Costa | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | RM365215 |
