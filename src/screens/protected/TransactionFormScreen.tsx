@@ -158,7 +158,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
               try {
                 await deleteReceipt(receiptUri);
               } catch (error) {
-                console.error('Erro ao deletar recibo do Storage:', error);
                 // Continua mesmo se falhar, pois a referência será removida
               }
             }
@@ -174,7 +173,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   // Handler para deletar transação
   const handleDelete = async () => {
     if (!isEditing || !transactionId) {
-      console.warn('Tentou deletar sem transactionId');
       return;
     }
 
@@ -192,7 +190,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
               showNotification('Transação deletada com sucesso!', 'success');
               navigation.goBack();
             } catch (error: any) {
-              console.error('Erro ao deletar:', error);
               showNotification(
                 error.message || 'Erro ao deletar transação',
                 'error'
@@ -240,7 +237,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           const tempId = isEditing ? transactionId : `temp_${Date.now()}`;
           receiptUrl = await uploadReceipt(receiptUri, user.id, tempId || '');
         } catch (uploadError: any) {
-          console.error('Erro no upload:', uploadError);
           showNotification(uploadError.message || 'Erro ao fazer upload do recibo', 'error');
           setUploadingReceipt(false);
           return;
@@ -311,7 +307,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       setUploadingReceipt(false);
       navigation.goBack();
     } catch (error: any) {
-      console.error('Erro no handleSubmit:', error);
       setUploadingReceipt(false);
       showNotification(
         error.message || (isEditing ? 'Erro ao atualizar transação' : 'Erro ao adicionar transação'),
