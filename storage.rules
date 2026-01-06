@@ -9,11 +9,14 @@ service firebase.storage {
       // Permitir leitura apenas para o próprio usuário
       allow read: if request.auth != null && request.auth.uid == userId;
 
-      // Permitir escrita apenas para o próprio usuário com validações
-      allow write: if request.auth != null &&
+      // Permitir criação/atualização apenas para o próprio usuário com validações
+      allow create, update: if request.auth != null &&
         request.auth.uid == userId &&
         request.resource.size < 10 * 1024 * 1024 && // Limite de 10MB
         request.resource.contentType.matches('image/.*'); // Apenas imagens
+      
+      // Permitir deleção apenas para o próprio usuário
+      allow delete: if request.auth != null && request.auth.uid == userId;
     }
 
     // Bloquear acesso a qualquer outro arquivo

@@ -46,6 +46,7 @@ const firestoreToTransaction = (docId: string, data: any): Transaction => {
     date: data.date instanceof Timestamp ? data.date.toDate() : new Date(data.date),
     description: data.description,
     category: data.category,
+    receiptUrl: data.receiptUrl,
     createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(data.createdAt || Date.now()),
     updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate() : new Date(data.updatedAt || Date.now()),
   };
@@ -164,6 +165,7 @@ export const createTransaction = async (
       date: data.date instanceof Date ? data.date : new Date(data.date),
       description: data.description,
       category: data.category,
+      receiptUrl: data.receiptUrl,
       createdAt: now,
       updatedAt: now,
     };
@@ -182,7 +184,7 @@ export const updateTransaction = async (
   try {
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
 
-    // Remove valores undefined e converte data, se presente
+    // Remove apenas valores undefined (null é válido para remover campos)
     const definedFields = Object.fromEntries(
       Object.entries(data).filter(([_, value]) => value !== undefined)
     );
