@@ -22,7 +22,7 @@ import { colors } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
 import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
-import { uploadReceipt } from '../../utils/storage';
+import { uploadReceipt, deleteReceipt } from '../../utils/storage';
 import { CategoryChips, CurrencyInput } from '../../components/ui';
 
 type TransactionFormScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
@@ -143,8 +143,32 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   };
 
   // Handler para remover imagem
-  const handleRemoveImage = () => {
-    setReceiptUri(null);
+  const handleRemoveImage = async () => {
+    Alert.alert(
+      'Remover Recibo',
+      'Deseja remover o recibo desta transação?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Remover',
+          style: 'destructive',
+          onPress: async () => {
+            // Se for uma URL do Firebase Storage (começa com http), deleta do Storage
+            if (receiptUri && receiptUri.startsWith('http')) {
+              try {
+                await deleteReceipt(receiptUri);
+              } catch (error) {
+                console.error('Erro ao deletar recibo do Storage:', error);
+                // Continua mesmo se falhar, pois a referência será removida
+              }
+            }
+            
+            setReceiptUri(null);
+            showNotification('Recibo removido', 'success');
+          },
+        },
+      ]
+    );
   };
 
   // Handler para deletar transação
@@ -241,9 +265,12 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           updateData.category = category;
         }
 
-        // Adiciona receiptUrl apenas se tiver valor
-        if (receiptUrl) {
-          updateData.receiptUrl = receiptUrl;
+        // Adiciona receiptUrl - pode ser uma URL, null (removido) ou undefined (sem mudança)
+        if (receiptUrl !== undefined) {
+          updateData.receiptUrl = receiptUrl || null;
+        } else if (receiptUri === null && existingTransaction?.receiptUrl) {
+          // Se o usuário removeu o recibo que existia, envia null explicitamente
+          updateData.receiptUrl = null;
         }
 
         await updateTransaction(transactionId, updateData);
