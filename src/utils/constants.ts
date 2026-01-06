@@ -1,9 +1,16 @@
+/**
+ * Constantes e configurações da aplicação
+ * Define tipos de transação, categorias sugeridas e configurações relacionadas
+ */
+
 import { Ionicons } from '@expo/vector-icons';
 import { TransactionType } from '../types';
 
-/**
- * Configuração completa dos tipos de transação
- */
+// ============================================================================
+// CONFIGURAÇÃO DE TIPOS DE TRANSAÇÃO
+// ============================================================================
+
+/** Configuração completa dos tipos de transação (label, ícone, cor, descrição) */
 export const TRANSACTION_TYPE_CONFIG: Record<
   TransactionType,
   {
@@ -45,9 +52,11 @@ export const TRANSACTION_TYPE_CONFIG: Record<
   },
 };
 
-/**
- * Categorias sugeridas por tipo de transação
- */
+// ============================================================================
+// CATEGORIAS SUGERIDAS
+// ============================================================================
+
+/** Categorias sugeridas por tipo de transação */
 export const SUGGESTED_CATEGORIES: Record<TransactionType, string[]> = {
   DEPOSIT: [
     'Salário',
@@ -91,21 +100,19 @@ export const SUGGESTED_CATEGORIES: Record<TransactionType, string[]> = {
   ],
 };
 
-/**
- * Lista de todos os tipos de transação
- */
+// ============================================================================
+// FUNÇÕES AUXILIARES
+// ============================================================================
+
+/** Lista de todos os tipos de transação disponíveis */
 export const TRANSACTION_TYPES = Object.keys(TRANSACTION_TYPE_CONFIG) as TransactionType[];
 
-/**
- * Obtém configuração de um tipo de transação
- */
+// Obtém a configuração completa de um tipo de transação
 export const getTransactionTypeConfig = (type: TransactionType) => {
   return TRANSACTION_TYPE_CONFIG[type];
 };
 
-/**
- * Obtém categorias sugeridas para um tipo de transação
- */
+// Obtém categorias sugeridas para um tipo específico de transação
 export const getSuggestedCategories = (type: TransactionType): string[] => {
   return SUGGESTED_CATEGORIES[type] || [];
 };

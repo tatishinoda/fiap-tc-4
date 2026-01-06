@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Transaction } from '../types';
+import { formatCurrency } from '../utils';
 
 interface CategoryAnalysisProps {
   transactions: Transaction[];
@@ -49,13 +50,6 @@ export function CategoryAnalysis({ transactions }: CategoryAnalysisProps) {
     }))
     .sort((a, b) => b.total - a.total)
     .slice(0, 5); // Top 5 categorias
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
 
   if (categories.length === 0) {
     return null;

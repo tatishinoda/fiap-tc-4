@@ -1,5 +1,14 @@
+/**
+ * Utilitários de filtragem e ordenação de transações
+ * Fornece filtros avançados, ordenação e extração de dados
+ */
+
 import { Transaction, TransactionType } from '../types';
 import { FilterOptions } from '../components/AdvancedFiltersModal';
+
+// ============================================================================
+// TIPOS E INTERFACES
+// ============================================================================
 
 export type QuickFilterType = 'all' | 'income' | 'expense' | 'transfer';
 
@@ -10,9 +19,11 @@ interface FilterTransactionsParams {
   searchQuery?: string;
 }
 
-/**
- * Apply all filters to a list of transactions
- */
+// ============================================================================
+// FILTRAGEM DE TRANSAÇÕES
+// ============================================================================
+
+// Aplica todos os filtros configurados em uma lista de transações
 export function filterTransactions({
   transactions,
   advancedFilters,
@@ -91,9 +102,11 @@ export function filterTransactions({
   return filtered;
 }
 
-/**
- * Sort transactions based on sort criteria
- */
+// ============================================================================
+// ORDENAÇÃO DE TRANSAÇÕES
+// ============================================================================
+
+// Ordena transações baseado no critério especificado
 export function sortTransactions(
   transactions: Transaction[],
   sortBy: FilterOptions['sortBy']
@@ -126,9 +139,11 @@ export function sortTransactions(
   return sorted;
 }
 
-/**
- * Check if any advanced filters are active
- */
+// ============================================================================
+// UTILITÁRIOS DE FILTROS
+// ============================================================================
+
+// Verifica se há filtros avançados ativos
 export function hasActiveFilters(filters: FilterOptions): boolean {
   return (
     filters.dateFrom !== null ||
@@ -141,9 +156,7 @@ export function hasActiveFilters(filters: FilterOptions): boolean {
   );
 }
 
-/**
- * Extract unique categories from transactions
- */
+// Extrai categorias únicas de uma lista de transações
 export function extractCategories(transactions: Transaction[]): string[] {
   const categories = transactions
     .map(t => t.category)
@@ -151,9 +164,11 @@ export function extractCategories(transactions: Transaction[]): string[] {
   return Array.from(new Set(categories)).sort();
 }
 
-/**
- * Parse formatted currency string to number (cents)
- */
+// ============================================================================
+// CONVERSÃO DE VALORES
+// ============================================================================
+
+// Converte string de moeda formatada para número em centavos
 function parseCurrencyToNumber(formattedValue: string): number {
   const cleanValue = formattedValue.replace(/\D/g, '');
   return cleanValue ? parseInt(cleanValue) : 0;

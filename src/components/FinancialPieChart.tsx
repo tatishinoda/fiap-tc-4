@@ -9,6 +9,7 @@ import Animated, {
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import { Transaction, TransactionType } from '../types';
 import { TRANSACTION_TYPE_CONFIG } from '../utils/constants';
+import { formatCurrency } from '../utils';
 
 interface TypeData {
   type: string;
@@ -82,15 +83,6 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(Number(value));
-  };
 
   if (totalAmount === 0 || typeData.length === 0) {
     return (

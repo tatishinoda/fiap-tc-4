@@ -5,48 +5,42 @@ Aplicação de gestão financeira desenvolvida com React Native.
 ## 📱 Funcionalidades Principais
 
 - 🔐 **Autenticação completa** - Login, cadastro e gerenciamento de sessão com Firebase
-- 💰 **Gestão financeira** - Adicionar transações (depósitos, saques, transferências, pagamentos, investimentos)
-- 📊 **Dashboard interativo** - Visão geral do saldo, gráfico de entradas vs saídas
-- 📋 **Listagem de transações** - Busca e filtros por tipo
-- 🎨 **Design moderno** - Interface responsiva com componentes reutilizáveis
-- ☁️ **Sincronização em nuvem** - Dados armazenados no Firebase Firestore
+- 💰 **Gestão financeira** - Adicionar, editar e excluir transações (depósitos, saques, transferências, pagamentos, investimentos)
+- � **Upload de recibos** - Anexe fotos de comprovantes usando câmera ou galeria
+- �📊 **Dashboard interativo** - Visão geral do saldo, gráficos de entradas vs saídas, análise por categoria
+- 📋 **Listagem de transações** - Busca avançada e filtros por tipo, categoria, valor e data
+- 🎨 **Design moderno** - Interface responsiva com componentes reutilizáveis e animações
+- ☁️ **Sincronização em nuvem** - Dados armazenados no Firebase Firestore e Storage
 
 ## 📁 **Estrutura do Projeto**
 
 ```
 bytebank-mobile/
+├── assets/                # Recursos estáticos (ícones, splash)
+├── src/
+│   ├── components/        # Componentes reutilizáveis e UI
+│   ├── config/            # Configurações
+│   │   └── firebase.ts    # Configuração Firebase
+│   ├── context/           # Contextos React (estado global)
+│   ├── hooks/             # Custom hooks
+│   ├── navigation/        # Rotas e navegação
+│   ├── screens/           # Telas da aplicação
+│   │   ├── auth/          # Telas de autenticação (Login, SignUp)
+│   │   └── protected/     # Telas protegidas (Home, Transactions, etc)
+│   ├── services/          # Lógica de negócio e APIs
+│   ├── store/             # Gerenciamento de estado (Zustand)
+│   ├── theme/             # Tema, cores e estilos
+│   ├── types/             # Definições TypeScript
+│   └── utils/             # Funções utilitárias
+├── App.tsx                # Componente raiz
+├── package.json           # Dependências do projeto
+├── firebase.json          # Configuração Firebase
 ├── .env                   # Variáveis de ambiente (Firebase)
 ├── .env.example           # Template das variáveis
-├── .gitignore             # Arquivos ignorados pelo Git
-├── app.json               # Configuração do Expo
-├── App.tsx                # Componente principal da aplicação
-├── index.ts               # Ponto de entrada
-├── package.json           # Dependências e scripts
-├── tsconfig.json          # Configuração TypeScript
 ├── firestore.rules        # Regras de segurança Firestore
 ├── storage.rules          # Regras de segurança Storage
 ├── firebase.json          # Configuração Firebase CLI
-├── README.md              # Documentação principal
-├── FIREBASE_STORAGE_SETUP.md  # Guia de Storage e edição de transações
-├── assets/                # Recursos estáticos (ícones, splash)
-└── src/                   # Código fonte
-    ├── api/               # Configuração de cliente HTTP (Axios)
-    ├── components/        # Componentes reutilizáveis
-    │   └── ui/            # Componentes de UI (Button, Input, etc)
-    ├── config/            # Configurações
-    │   └── firebase.ts    # Configuração Firebase
-    ├── context/           # Contextos React (estado global)
-    ├── hooks/             # Custom hooks
-    ├── navigation/        # Sistema de navegação
-    ├── screens/           # Telas da aplicação
-    │   ├── auth/          # Telas de autenticação
-    │   └── protected/     # Telas protegidas (requer login)
-    ├── services/          # Lógica de negócio/APIs
-    ├── store/             # Estado global com Zustand
-    ├── styles/            # Estilos globais
-    ├── theme/             # Tema (cores, estilos)
-    ├── types/             # Definições TypeScript
-    └── utils/             # Funções utilitárias
+└── README.md              # Documentação principal
 ```
 
 ## 🛠️ **Tecnologias Utilizadas**
@@ -60,26 +54,30 @@ bytebank-mobile/
 ### **Firebase & Backend**
 - **Firebase** 10.7.1
 - **Firebase Auth** - Autenticação
-- **Cloud Firestore** - Banco de dados
-- **Firebase Storage** - Armazenamento
+- **Cloud Firestore** - Banco de dados NoSQL
+- **Firebase Storage** - Armazenamento de arquivos
 
 ### **Navegação & Estado**
-- **React Navigation** 7.x
-- **React Hook Form** 7.66.0
-- **AsyncStorage** 2.2.0
-- **Zustand** 5.0.9
+- **React Navigation** 7.x (Stack + Bottom Tabs)
+- **Zustand** 5.0.9 - Gerenciamento de estado
+- **React Hook Form** 7.66.0 - Formulários
+- **AsyncStorage** 2.2.0 - Persistência local
 
-### **UI & Animações**
-- **Expo Vector Icons** 15.0.3
-- **React Native Reanimated** 4.1.1
-- **React Native Gesture Handler** 2.28.0
-- **NativeWind** 4.2.1
+### **UI & Estilização**
+- **NativeWind** 4.2.1 - Tailwind CSS para React Native
+- **Expo Vector Icons** 15.0.3 - Ícones
+- **React Native Reanimated** 4.1.1 - Animações
+- **React Native Gesture Handler** 2.28.0 - Gestos
+- **React Native SVG** 15.12.1 - Gráficos vetoriais
+- **Expo Linear Gradient** 15.0.0 - Gradientes
 
-### **Utilitários**
-- **Axios** 1.13.2
-- **Date-fns** 3.0.0
-- **UUID** 11.1.0
-- **Expo SecureStore** 15.0.0
+### **Utilitários & Ferramentas**
+- **Date-fns** 3.0.0 - Manipulação de datas
+- **UUID** 11.1.0 - Geração de IDs únicos
+- **Expo SecureStore** 15.0.0 - Armazenamento seguro
+- **Expo Image Picker** 17.0.10 - Seleção de imagens
+- **React Native DateTimePicker** 8.4.4 - Seletor de data/hora
+- **Expo Crypto** 15.0.0 - Criptografia
 
 ## 🚀 **Como Executar**
 
@@ -133,7 +131,7 @@ EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu-measurement-id
 No Firebase Console:
 1. Habilite **Authentication** > **Email/Password**
 2. Crie um banco **Firestore Database** (modo teste)
-3. Habilite **Storage** (opcional, para uploads)
+3. Habilite **Storage** (para upload de recibos)
 4. Configure as regras de segurança (veja `firestore.rules` e `storage.rules`)
 
 #### **3.4. Implantar regras de segurança Firebase**
@@ -158,8 +156,6 @@ firebase deploy --only storage     # Apenas Storage
 ```
 
 > ⚠️ **Importante**: Sempre implante as regras após modificá-las para garantir a segurança do aplicativo.
-
-> 📚 Para mais detalhes sobre Storage e upload de recibos, consulte [FIREBASE_STORAGE_SETUP.md](FIREBASE_STORAGE_SETUP.md)
 
 ### **4. Executar o projeto**
 ```bash
