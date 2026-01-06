@@ -3,7 +3,6 @@ import { User as FirebaseUser } from 'firebase/auth';
 import { AuthService } from '../services/AuthService';
 import { AuthContextType, User } from '../types';
 import { useAuthStore } from '../store/auth.store';
-import { setTokenGetter } from '../api/client';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -18,10 +17,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   // Integração com Zustand store
   const authStore = useAuthStore();
-
-  useEffect(() => {
-    setTokenGetter(() => authStore.token);
-  }, [authStore.token]);
 
   useEffect(() => {
     const unsubscribe = AuthService.onAuthStateChange(async (firebaseUser: FirebaseUser | null) => {
