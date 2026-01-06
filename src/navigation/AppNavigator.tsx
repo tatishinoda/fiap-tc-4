@@ -19,7 +19,7 @@ import SignUpScreen from '../screens/auth/SignUpScreen';
 // Telas protegidas
 import HomeScreen from '../screens/protected/HomeScreen';
 import TransactionsScreen from '../screens/protected/TransactionsScreen';
-import AddTransactionScreen from '../screens/protected/AddTransactionScreen';
+import TransactionFormScreen from '../screens/protected/TransactionFormScreen';
 
 // Componente de loading
 import LoadingScreen from '../components/LoadingScreen';
@@ -151,7 +151,7 @@ function ProtectedStack() {
       <Stack.Screen name="MainTabs" component={ProtectedTabs} />
       <Stack.Screen
         name="AddTransaction"
-        component={AddTransactionScreen}
+        component={TransactionFormScreen}
         options={{
           headerShown: true,
           headerTitle: 'Nova Transação',
@@ -167,7 +167,7 @@ function ProtectedStack() {
       />
       <Stack.Screen
         name="EditTransaction"
-        component={AddTransactionScreen}
+        component={TransactionFormScreen}
         options={{
           headerShown: true,
           headerTitle: 'Editar Transação',
