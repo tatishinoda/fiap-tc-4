@@ -1,10 +1,24 @@
+/**
+ * Utilitários de validação de formulários e dados
+ * Fornece validações para autenticação, transações e sanitização de dados
+ */
+
 import { Alert } from 'react-native';
+
+// ============================================================================
+// TIPOS E INTERFACES
+// ============================================================================
 
 export interface ValidationResult {
   isValid: boolean;
   error?: string;
 }
 
+// ============================================================================
+// VALIDAÇÃO DE AUTENTICAÇÃO
+// ============================================================================
+
+// Valida formato de email
 export const validateEmail = (email: string): ValidationResult => {
   if (!email.trim()) {
     return { isValid: false, error: 'Email é obrigatório' };
@@ -18,6 +32,7 @@ export const validateEmail = (email: string): ValidationResult => {
   return { isValid: true };
 };
 
+// Valida senha com tamanho mínimo
 export const validatePassword = (password: string, minLength: number = 6): ValidationResult => {
   if (!password.trim()) {
     return { isValid: false, error: 'Senha é obrigatória' };
@@ -33,6 +48,7 @@ export const validatePassword = (password: string, minLength: number = 6): Valid
   return { isValid: true };
 };
 
+// Valida se senhas conferem
 export const validatePasswordConfirmation = (
   password: string,
   confirmPassword: string
@@ -48,6 +64,7 @@ export const validatePasswordConfirmation = (
   return { isValid: true };
 };
 
+// Valida nome com tamanho mínimo
 export const validateName = (name: string, minLength: number = 2): ValidationResult => {
   if (!name.trim()) {
     return { isValid: false, error: 'Nome é obrigatório' };
@@ -63,9 +80,11 @@ export const validateName = (name: string, minLength: number = 2): ValidationRes
   return { isValid: true };
 };
 
-/**
- * Valida campos obrigatórios
- */
+// ============================================================================
+// VALIDAÇÃO DE CAMPOS GENÉRICOS
+// ============================================================================
+
+// Valida campos obrigatórios
 export const validateRequired = (value: string, fieldName: string): ValidationResult => {
   if (!value.trim()) {
     return { isValid: false, error: `${fieldName} é obrigatório` };
@@ -74,7 +93,11 @@ export const validateRequired = (value: string, fieldName: string): ValidationRe
   return { isValid: true };
 };
 
-// Valida múltiplos campos e exibe alerta com o primeiro erro encontrado
+// ============================================================================
+// VALIDAÇÃO DE FORMULÁRIOS COMPLETOS
+// ============================================================================
+
+// Valida múltiplos campos e exibe alerta com o primeiro erro
 export const validateFields = (validations: ValidationResult[]): boolean => {
   const firstError = validations.find(v => !v.isValid);
 
@@ -86,6 +109,7 @@ export const validateFields = (validations: ValidationResult[]): boolean => {
   return true;
 };
 
+// Valida formulário de login
 export const validateLoginForm = (email: string, password: string): boolean => {
   return validateFields([
     validateEmail(email),
@@ -93,6 +117,7 @@ export const validateLoginForm = (email: string, password: string): boolean => {
   ]);
 };
 
+// Valida formulário de cadastro
 export const validateSignUpForm = (
   name: string,
   email: string,
@@ -107,6 +132,11 @@ export const validateSignUpForm = (
   ]);
 };
 
+// ============================================================================
+// VALIDAÇÃO DE TRANSAÇÕES
+// ============================================================================
+
+// Valida valor monetário
 export const validateAmount = (amount: string): ValidationResult => {
   if (!amount.trim()) {
     return { isValid: false, error: 'Valor é obrigatório' };
@@ -123,6 +153,7 @@ export const validateAmount = (amount: string): ValidationResult => {
   return { isValid: true };
 };
 
+// Valida descrição de transação
 export const validateDescription = (description: string, minLength: number = 3): ValidationResult => {
   if (!description.trim()) {
     return { isValid: false, error: 'Descrição é obrigatória' };
@@ -138,6 +169,7 @@ export const validateDescription = (description: string, minLength: number = 3):
   return { isValid: true };
 };
 
+// Valida formulário de transação (com Alert)
 export const validateTransactionForm = (
   amount: string,
   description: string
@@ -166,7 +198,11 @@ export const validateTransaction = (
   return { isValid: true };
 };
 
-// Valida integridade dos dados da transação antes de salvar
+// ============================================================================
+// VALIDAÇÃO DE INTEGRIDADE DE DADOS
+// ============================================================================
+
+// Valida integridade completa dos dados da transação antes de salvar
 export const validateTransactionData = (data: {
   type: string;
   amount: number;
@@ -230,7 +266,11 @@ export const validateTransactionData = (data: {
   return { isValid: true };
 };
 
-// Remove caracteres perigosos da descrição (XSS prevention)
+// ============================================================================
+// SANITIZAÇÃO DE DADOS
+// ============================================================================
+
+// Remove caracteres perigosos da descrição (prevenção XSS)
 export const sanitizeDescription = (description: string): string => {
   return description
     .trim()
@@ -238,6 +278,7 @@ export const sanitizeDescription = (description: string): string => {
     .slice(0, 200);
 };
 
+// Remove caracteres perigosos da categoria (prevenção XSS)
 export const sanitizeCategory = (category?: string): string | undefined => {
   if (!category) return undefined;
 
@@ -246,6 +287,10 @@ export const sanitizeCategory = (category?: string): string | undefined => {
     .replace(/[<>]/g, '')
     .slice(0, 50);
 };
+
+// ============================================================================
+// VALIDAÇÃO E SANITIZAÇÃO COMBINADAS
+// ============================================================================
 
 // Valida e sanitiza dados de transação em um único passo
 export const validateAndSanitizeTransaction = (data: {

@@ -1,9 +1,16 @@
+/**
+ * Utilitários de ícones para transações e categorias
+ * Mapeia tipos e categorias para ícones do Ionicons
+ */
+
 import { Ionicons } from '@expo/vector-icons';
 import { TransactionType } from '../types';
 
-/**
- * Ícones por tipo de transação
- */
+// ============================================================================
+// CONSTANTES DE ÍCONES
+// ============================================================================
+
+/** Ícones por tipo de transação */
 export const TRANSACTION_ICONS = {
   DEPOSIT: 'arrow-down-circle',
   WITHDRAWAL: 'cash-outline',
@@ -12,9 +19,7 @@ export const TRANSACTION_ICONS = {
   INVESTMENT: 'trending-up',
 } as const;
 
-/**
- * Ícones por categoria
- */
+/** Ícones por categoria (mapeamento de palavras-chave) */
 export const CATEGORY_ICONS = {
   // Alimentação
   'alimentação': 'restaurant',
@@ -70,16 +75,16 @@ export const CATEGORY_ICONS = {
   'default': 'ellipse',
 } as const;
 
-/**
- * Retorna o ícone baseado no tipo de transação
- */
+// ============================================================================
+// FUNÇÕES AUXILIARES DE ÍCONES
+// ============================================================================
+
+// Retorna o ícone baseado no tipo de transação
 export const getTransactionIcon = (type: TransactionType): keyof typeof Ionicons.glyphMap => {
   return TRANSACTION_ICONS[type] || 'ellipse';
 };
 
-/**
- * Retorna o ícone apropriado baseado na categoria
- */
+// Retorna o ícone baseado na categoria (busca exata ou por palavras-chave)
 export const getCategoryIcon = (category?: string): keyof typeof Ionicons.glyphMap => {
   if (!category) return CATEGORY_ICONS.default;
   
