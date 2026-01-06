@@ -30,9 +30,9 @@ service firebase.storage {
   match /b/{bucket}/o {
     match /transaction-receipts/{userId}/{allPaths=**} {
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if request.auth != null && 
+      allow write: if request.auth != null &&
         request.auth.uid == userId &&
-        request.resource.size < 10 * 1024 * 1024 && 
+        request.resource.size < 10 * 1024 * 1024 &&
         request.resource.contentType.matches('image/.*');
     }
     match /{allPaths=**} {
@@ -85,7 +85,7 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu-projeto.appspot.com
 
 ### Arquivos Modificados:
 - ✅ [navigation.ts](src/types/navigation.ts) - Rota `EditTransaction`
-- ✅ [AddTransactionScreen.tsx](src/screens/protected/AddTransactionScreen.tsx) - Modo edição
+- ✅ [TransactionFormScreen.tsx](src/screens/protected/TransactionFormScreen.tsx) - Modo edição e criação
 - ✅ [RecentTransactions.tsx](src/components/RecentTransactions.tsx) - onPress
 - ✅ [HomeScreen.tsx](src/screens/protected/HomeScreen.tsx) - Navegação para edição
 - ✅ [TransactionsScreen.tsx](src/screens/protected/TransactionsScreen.tsx) - Navegação para edição

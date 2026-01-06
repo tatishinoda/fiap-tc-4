@@ -92,7 +92,7 @@ export const getTransactionsPaginated = async (
   try {
     const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
 
-    // Build query with conditional startAfter
+    // Constrói query com startAfter condicional
     const q = lastDoc
       ? query(
           transactionsRef,
@@ -143,7 +143,7 @@ export const createTransaction = async (
       createdAt: serverTimestamp(),
     };
 
-    // Só adiciona campos opcionais se não forem undefined
+    // Só adiciona campos opcionais, se não forem undefined
     if (data.category) {
       transactionData.category = data.category;
     }
@@ -182,24 +182,23 @@ export const updateTransaction = async (
   try {
     const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
 
+    // Remove valores undefined e converte data, se presente
+    const definedFields = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== undefined)
+    );
+
     const updateData: any = {
       updatedAt: serverTimestamp(),
+      ...definedFields,
     };
 
-    // Adiciona apenas campos definidos
-    if (data.type !== undefined) updateData.type = data.type;
-    if (data.amount !== undefined) updateData.amount = data.amount;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.category !== undefined) updateData.category = data.category;
-    if (data.receiptUrl !== undefined) updateData.receiptUrl = data.receiptUrl;
-
+    // Converte data para Timestamp, se presente
     if (data.date) {
       updateData.date = data.date instanceof Date
         ? Timestamp.fromDate(data.date)
         : Timestamp.fromDate(new Date(data.date));
     }
 
-    console.log('Dados que serão enviados ao Firestore:', updateData);
     await updateDoc(transactionRef, updateData);
   } catch (error) {
     console.error('Erro ao atualizar transação:', error);

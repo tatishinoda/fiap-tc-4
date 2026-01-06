@@ -16,24 +16,24 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { CategoryChips } from '../../components/CategoryChips';
 import { useAppContext, useTransactionContext } from '../../context';
 import { useAuth } from '../../hooks/useAuth';
 import { colors } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
-import { formatCurrencyInput, getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
+import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
 import { uploadReceipt } from '../../utils/storage';
+import { CategoryChips, CurrencyInput } from '../../components/ui';
 
-type AddTransactionScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
-type AddTransactionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
+type TransactionFormScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
+type TransactionFormScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
 
-interface AddTransactionScreenProps {
-  route: AddTransactionScreenRouteProp;
-  navigation: AddTransactionScreenNavigationProp;
+interface TransactionFormScreenProps {
+  route: TransactionFormScreenRouteProp;
+  navigation: TransactionFormScreenNavigationProp;
 }
 
-export default function AddTransactionScreen({ route, navigation }: AddTransactionScreenProps) {
+export default function TransactionFormScreen({ route, navigation }: TransactionFormScreenProps) {
   const { addTransaction, updateTransaction, deleteTransaction, transactions, loading } = useTransactionContext();
   const { showNotification } = useAppContext();
   const { user } = useAuth();
@@ -42,16 +42,6 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
   const transactionId = (route.params as any)?.transactionId;
   const isEditing = !!transactionId;
   const existingTransaction = isEditing ? transactions.find(t => t.id === transactionId) : null;
-
-  // Debug
-  useEffect(() => {
-    console.log('AddTransactionScreen montado:', {
-      isEditing,
-      transactionId,
-      hasExisting: !!existingTransaction,
-      routeParams: route.params
-    });
-  }, []);
 
   const preSelectedType = !isEditing ? (route.params as any)?.type : existingTransaction?.type;
 
@@ -174,7 +164,6 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
           style: 'destructive',
           onPress: async () => {
             try {
-              console.log('Deletando transação:', transactionId);
               await deleteTransaction(transactionId);
               showNotification('Transação deletada com sucesso!', 'success');
               navigation.goBack();
@@ -189,12 +178,6 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
         },
       ]
     );
-  };
-
-  // Handler para mudança no valor com máscara de moeda
-  const handleAmountChange = (text: string) => {
-    const formatted = formatCurrencyInput(text);
-    setAmount(formatted);
   };
 
   const handleSubmit = async () => {
@@ -245,8 +228,6 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
 
       if (isEditing && transactionId) {
         // Atualiza transação existente
-        console.log('Atualizando transação:', transactionId);
-
         // Prepara dados para atualização (não incluir userId e updatedAt que são tratados no service)
         const updateData: any = {
           type,
@@ -271,8 +252,6 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
         showNotification(`${typeLabel} atualizada com sucesso!`, 'success');
       } else {
         // Adiciona nova transação
-        console.log('Adicionando nova transação');
-
         // Prepara dados (userId e outros campos são tratados no Context)
         const newTransactionData: any = {
           type,
@@ -366,18 +345,11 @@ export default function AddTransactionScreen({ route, navigation }: AddTransacti
           </View>
 
           {/* Valor */}
-          <View style={styles.inputContainer}>
-            <Ionicons name="cash-outline" size={20} color="#666" style={styles.inputIcon} />
-            <Text style={styles.currencyPrefix}>R$</Text>
-            <TextInput
-              style={[styles.input, styles.inputWithPrefix]}
-              placeholder="0,00"
-              placeholderTextColor="#999"
-              value={amount}
-              onChangeText={handleAmountChange}
-              keyboardType="numeric"
-            />
-          </View>
+          <CurrencyInput
+            value={amount}
+            onChangeValue={setAmount}
+            showIcon={true}
+          />
 
           {/* Descrição */}
           <View style={styles.inputContainer}>
@@ -562,20 +534,11 @@ const styles = StyleSheet.create({
   inputIcon: {
     marginRight: 12,
   },
-  currencyPrefix: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginRight: 8,
-  },
   input: {
     flex: 1,
     paddingVertical: 16,
     fontSize: 16,
     color: '#333',
-  },
-  inputWithPrefix: {
-    paddingLeft: 0,
   },
   submitButton: {
     backgroundColor: colors.brand.forest,

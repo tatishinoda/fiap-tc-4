@@ -25,11 +25,14 @@ bytebank-mobile/
 ├── tsconfig.json          # Configuração TypeScript
 ├── firestore.rules        # Regras de segurança Firestore
 ├── storage.rules          # Regras de segurança Storage
+├── firebase.json          # Configuração Firebase CLI
 ├── README.md              # Documentação principal
-├── FIREBASE.md            # Guia do Firebase
+├── FIREBASE_STORAGE_SETUP.md  # Guia de Storage e edição de transações
 ├── assets/                # Recursos estáticos (ícones, splash)
 └── src/                   # Código fonte
+    ├── api/               # Configuração de cliente HTTP (Axios)
     ├── components/        # Componentes reutilizáveis
+    │   └── ui/            # Componentes de UI (Button, Input, etc)
     ├── config/            # Configurações
     │   └── firebase.ts    # Configuração Firebase
     ├── context/           # Contextos React (estado global)
@@ -39,6 +42,9 @@ bytebank-mobile/
     │   ├── auth/          # Telas de autenticação
     │   └── protected/     # Telas protegidas (requer login)
     ├── services/          # Lógica de negócio/APIs
+    ├── store/             # Estado global com Zustand
+    ├── styles/            # Estilos globais
+    ├── theme/             # Tema (cores, estilos)
     ├── types/             # Definições TypeScript
     └── utils/             # Funções utilitárias
 ```
@@ -153,7 +159,7 @@ firebase deploy --only storage     # Apenas Storage
 
 > ⚠️ **Importante**: Sempre implante as regras após modificá-las para garantir a segurança do aplicativo.
 
-> 📚 Para mais detalhes, consulte [FIREBASE.md](FIREBASE.md)
+> 📚 Para mais detalhes sobre Storage e upload de recibos, consulte [FIREBASE_STORAGE_SETUP.md](FIREBASE_STORAGE_SETUP.md)
 
 ### **4. Executar o projeto**
 ```bash
