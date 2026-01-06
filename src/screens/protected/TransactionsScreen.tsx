@@ -19,7 +19,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useTransactionContext } from '../../context';
 import { Transaction } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
-import { formatAmount, getTransactionColor, getCategoryColor, getCategoryIcon } from '../../utils';
+import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon } from '../../utils';
 import * as TransactionService from '../../services/TransactionService';
 import { AdvancedFiltersModal, FilterOptions } from '../../components/AdvancedFiltersModal';
 
@@ -301,28 +301,28 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       <View style={styles.transactionLeft}>
         <View style={[
           styles.iconContainer,
-          { backgroundColor: getCategoryColor(item.category) }
+          { backgroundColor: getTransactionColor(item.type) }
         ]}>
           <Ionicons
-            name={getCategoryIcon(item.category)}
+            name={getTransactionIcon(item.type)}
             size={22}
             color="#FFFFFF"
           />
         </View>
         <View style={styles.transactionInfo}>
-          <Text style={styles.transactionTitle}>
+          <Text style={styles.transactionTitle} numberOfLines={1}>
             {item.description}
           </Text>
-          <Text style={styles.transactionCategory}>
+          <Text style={styles.transactionCategory} numberOfLines={1}>
             {item.category}
+          </Text>
+          <Text style={styles.transactionDate}>
+            {formatDateRelative(item.date)}
           </Text>
         </View>
       </View>
       <View style={styles.transactionRight}>
-        <Text style={[
-          styles.amount,
-          { color: getTransactionColor(item.type) }
-        ]}>
+        <Text style={[styles.amount]} numberOfLines={1}>
           {formatAmount(item.amount, item.type)}
         </Text>
         <Ionicons name="chevron-forward" size={18} color="#999999" />
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    padding: 18,
+    padding: 14,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: '#e8e8e8',
@@ -668,38 +668,64 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: 12,
+    marginRight: 8,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 14,
+    marginRight: 10,
   },
   transactionInfo: {
     flex: 1,
+    minWidth: 0,
+    justifyContent: 'center',
   },
   transactionTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1a1a1a',
-    marginBottom: 4,
+    marginBottom: 3,
+    lineHeight: 18,
+  },
+  transactionMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    minWidth: 0,
+    flex: 1,
   },
   transactionCategory: {
-    fontSize: 13,
-    fontWeight: '400',
+    fontSize: 11,
+    fontWeight: '500',
     color: '#666666',
+    marginBottom: 2,
+    lineHeight: 14,
+  },
+  dateSeparator: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: '#999999',
+  },
+  transactionDate: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: '#999999',
+    lineHeight: 13,
   },
   transactionRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 4,
+    flexShrink: 0,
   },
   amount: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     letterSpacing: -0.3,
+    flexShrink: 0,
   },
 });

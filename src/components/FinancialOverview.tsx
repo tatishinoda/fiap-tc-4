@@ -131,11 +131,6 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     marginBottom: 2,
   },
-  // headerSubtitle: {
-  //   fontSize: 12,
-  //   color: 'rgba(255, 255, 255, 0.5)',
-  //   fontWeight: '400',
-  // },
   eyeButton: {
     padding: 8,
     borderRadius: 12
