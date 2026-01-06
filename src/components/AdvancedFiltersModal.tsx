@@ -13,6 +13,7 @@ import {
 import { colors } from '../theme/colors';
 import { TransactionType } from '../types';
 import { SUGGESTED_CATEGORIES, TRANSACTION_TYPE_CONFIG } from '../utils/constants';
+import { CategoryChips } from './CategoryChips';
 import { CurrencyInput } from './CurrencyInput';
 
 export interface FilterOptions {
@@ -439,26 +440,12 @@ export function AdvancedFiltersModal({
 
             {expandedSection === 'categories' && (
               <View style={styles.sectionContent}>
-                <View style={styles.categoriesGrid}>
-                  {allCategories.map(category => (
-                    <TouchableOpacity
-                      key={category}
-                      style={[
-                        styles.categoryChip,
-                        filters.categories.includes(category) && styles.categoryChipActive
-                      ]}
-                      onPress={() => toggleCategory(category)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={[
-                        styles.categoryChipText,
-                        filters.categories.includes(category) && styles.categoryChipTextActive
-                      ]}>
-                        {category}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                <CategoryChips
+                  categories={allCategories}
+                  selectedCategories={filters.categories}
+                  onCategoryPress={toggleCategory}
+                  multiSelect={true}
+                />
                 {filters.categories.length > 0 && (
                   <TouchableOpacity
                     style={styles.clearButton}
@@ -655,31 +642,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#999',
     marginTop: 2,
-  },
-  categoriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  categoryChip: {
-    backgroundColor: '#F5F5F5',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  categoryChipActive: {
-    backgroundColor: colors.brand.forest,
-    borderColor: colors.brand.forest,
-  },
-  categoryChipText: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-  },
-  categoryChipTextActive: {
-    color: '#FFFFFF',
   },
   amountRow: {
     flexDirection: 'row',
