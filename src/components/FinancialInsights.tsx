@@ -7,10 +7,10 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withDelay,
-  Easing,
-  withTiming,
+   withTiming
 } from 'react-native-reanimated';
 import { Transaction } from '../types';
+import { formatCurrency } from '../utils';
 
 interface FinancialInsightsProps {
   totalIncome: number;
@@ -97,13 +97,6 @@ export function FinancialInsights({
     transform: [{ translateY: card4TranslateY.value }],
     opacity: card4Opacity.value,
   }));
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
 
   return (
     <View style={styles.container}>

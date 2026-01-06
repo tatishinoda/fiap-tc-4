@@ -1,13 +1,17 @@
 import { useState, useCallback } from 'react';
 import { AlertType } from '../components/ui/Alert';
 
-interface AlertButton {
+// ============================================================================
+// TIPOS E INTERFACES
+// ============================================================================
+
+export interface AlertButton {
   text: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
 }
 
-interface AlertConfig {
+export interface AlertConfig {
   type?: AlertType;
   title: string;
   message?: string;
@@ -15,23 +19,15 @@ interface AlertConfig {
   closeOnBackdropPress?: boolean;
 }
 
-/**
- * Hook para gerenciar o estado e ações do Alert customizado
- * 
- * Uso:
- * ```tsx
- * const { alert, showAlert, hideAlert } = useAlert();
- * 
- * showAlert({
- *   type: 'success',
- *   title: 'Sucesso!',
- *   message: 'Operação realizada com sucesso'
- * });
- * 
- * return <Alert {...alert} />;
- * ```
- */
+// ============================================================================
+// HOOK PRINCIPAL
+// ============================================================================
+
 export function useAlert() {
+  // --------------------------------------------------------------------------
+  // Estado
+  // --------------------------------------------------------------------------
+
   const [alertConfig, setAlertConfig] = useState<AlertConfig & { visible: boolean }>({
     visible: false,
     type: 'info',
@@ -41,6 +37,11 @@ export function useAlert() {
     closeOnBackdropPress: true,
   });
 
+  // --------------------------------------------------------------------------
+  // Controles Básicos
+  // --------------------------------------------------------------------------
+
+  // Exibe alert com configuração customizada
   const showAlert = useCallback((config: AlertConfig) => {
     setAlertConfig({
       ...config,
@@ -48,6 +49,7 @@ export function useAlert() {
     });
   }, []);
 
+  // Oculta o alert atual
   const hideAlert = useCallback(() => {
     setAlertConfig((prev) => ({
       ...prev,
@@ -55,7 +57,11 @@ export function useAlert() {
     }));
   }, []);
 
-  // Atalhos para tipos comuns de alert
+  // --------------------------------------------------------------------------
+  // Atalhos por Tipo
+  // --------------------------------------------------------------------------
+
+  // Exibe alert de sucesso
   const showSuccess = useCallback(
     (title: string, message?: string, buttons?: AlertButton[]) => {
       showAlert({ type: 'success', title, message, buttons });
@@ -63,6 +69,7 @@ export function useAlert() {
     [showAlert]
   );
 
+  // Exibe alert de erro
   const showError = useCallback(
     (title: string, message?: string, buttons?: AlertButton[]) => {
       showAlert({ type: 'error', title, message, buttons });
@@ -70,6 +77,7 @@ export function useAlert() {
     [showAlert]
   );
 
+  // Exibe alert de aviso
   const showWarning = useCallback(
     (title: string, message?: string, buttons?: AlertButton[]) => {
       showAlert({ type: 'warning', title, message, buttons });
@@ -77,6 +85,7 @@ export function useAlert() {
     [showAlert]
   );
 
+  // Exibe alert informativo
   const showInfo = useCallback(
     (title: string, message?: string, buttons?: AlertButton[]) => {
       showAlert({ type: 'info', title, message, buttons });
@@ -84,6 +93,11 @@ export function useAlert() {
     [showAlert]
   );
 
+  // --------------------------------------------------------------------------
+  // Diálogos Especiais
+  // --------------------------------------------------------------------------
+
+  // Exibe diálogo de confirmação com botões Cancelar/Confirmar
   const showConfirm = useCallback(
     (
       title: string,
@@ -112,6 +126,10 @@ export function useAlert() {
     },
     [showAlert, hideAlert]
   );
+
+  // --------------------------------------------------------------------------
+  // Retorno do Hook
+  // --------------------------------------------------------------------------
 
   return {
     alert: {

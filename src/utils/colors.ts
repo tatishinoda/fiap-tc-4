@@ -1,8 +1,15 @@
+/**
+ * Utilitários de cores para transações e categorias
+ * Fornece paleta de cores consistente e funções auxiliares
+*/
+
 import { TransactionType } from '../types';
 
-/**
- * Cores por tipo de transação
- */
+// ============================================================================
+// CONSTANTES DE CORES
+// ============================================================================
+
+/** Cores por tipo de transação */
 export const TRANSACTION_COLORS = {
   DEPOSIT: '#00D4AA',      // Verde para receitas
   WITHDRAWAL: '#FF8C42',   // Laranja para saques
@@ -11,9 +18,7 @@ export const TRANSACTION_COLORS = {
   INVESTMENT: '#9B59B6',   // Roxo para investimentos
 } as const;
 
-/**
- * Cores por categoria
- */
+/** Cores por categoria (mapeamento de palavras-chave) */
 export const CATEGORY_COLORS = {
   // Alimentação
   'alimentação': '#9b59b6',
@@ -69,16 +74,16 @@ export const CATEGORY_COLORS = {
   'default': '#95a5a6',
 } as const;
 
-/**
- * Retorna a cor baseada no tipo de transação
- */
+// ============================================================================
+// FUNÇÕES AUXILIARES DE CORES
+// ============================================================================
+
+// Retorna a cor baseada no tipo de transação
 export const getTransactionColor = (type: TransactionType): string => {
   return TRANSACTION_COLORS[type] || TRANSACTION_COLORS.PAYMENT;
 };
 
-/**
- * Retorna a cor baseada na categoria
- */
+// Retorna a cor baseada na categoria (busca exata ou por palavras-chave)
 export const getCategoryColor = (category?: string): string => {
   if (!category) return CATEGORY_COLORS.default;
   
@@ -99,9 +104,7 @@ export const getCategoryColor = (category?: string): string => {
   return CATEGORY_COLORS.default;
 };
 
-/**
- * Retorna cor com opacidade
- */
+// Retorna cor hexadecimal convertida para rgba com opacidade
 export const getColorWithOpacity = (color: string, opacity: number): string => {
   // Converte hex para rgba
   const hex = color.replace('#', '');
