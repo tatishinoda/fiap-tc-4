@@ -76,7 +76,6 @@ export async function uploadReceipt(
     const downloadURL = await getDownloadURL(storageRef);
     return downloadURL;
   } catch (error: any) {
-    console.error('Error uploading receipt:', error);
     throw new Error('Falha ao fazer upload do recibo');
   }
 }
@@ -101,7 +100,6 @@ export async function deleteReceipt(receiptUrl: string): Promise<void> {
     const storageRef = ref(storage, path);
     await deleteObject(storageRef);
   } catch (error: any) {
-    console.error('Error deleting receipt:', error);
     // Não lança erro para não bloquear a remoção do recibo no Firestore
     // Mesmo que falhe a deleção no Storage, a referência será removida
   }
