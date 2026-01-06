@@ -13,6 +13,7 @@ import {
 import { colors } from '../theme/colors';
 import { TransactionType } from '../types';
 import { SUGGESTED_CATEGORIES, TRANSACTION_TYPE_CONFIG } from '../utils/constants';
+import { formatDateInput } from '../utils';
 import { CategoryChips } from './CategoryChips';
 import { CurrencyInput } from './CurrencyInput';
 
@@ -101,11 +102,6 @@ export function AdvancedFiltersModal({
   const handleApply = () => {
     onApply(filters);
     onClose();
-  };
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return 'Selecionar';
-    return date.toLocaleDateString('pt-BR');
   };
 
   const handleDateFromChange = (date: Date | null) => {
@@ -209,7 +205,7 @@ export function AdvancedFiltersModal({
                         onPress={() => setShowDateFromPicker(true)}
                       >
                         <Text style={styles.dateButtonText}>
-                          {formatDate(filters.dateFrom)}
+                          {formatDateInput(filters.dateFrom, 'Selecionar')}
                         </Text>
                         <Ionicons name="calendar" size={16} color="#666" />
                       </TouchableOpacity>
@@ -242,7 +238,7 @@ export function AdvancedFiltersModal({
                         onPress={() => setShowDateToPicker(true)}
                       >
                         <Text style={styles.dateButtonText}>
-                          {formatDate(filters.dateTo)}
+                          {formatDateInput(filters.dateTo, 'Selecionar')}
                         </Text>
                         <Ionicons name="calendar" size={16} color="#666" />
                       </TouchableOpacity>

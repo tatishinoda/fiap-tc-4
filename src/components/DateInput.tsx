@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { formatDateInput } from '../utils';
 
 interface DateInputProps {
   label?: string;
@@ -21,11 +22,6 @@ export function DateInput({
   maximumDate,
 }: DateInputProps) {
   const [showPicker, setShowPicker] = useState(false);
-
-  const formatDate = (date: Date | null) => {
-    if (!date) return placeholder;
-    return date.toLocaleDateString('pt-BR');
-  };
 
   const handleDateChange = (date: Date | null) => {
     onChange(date);
@@ -62,7 +58,7 @@ export function DateInput({
             style={styles.dateButton}
             onPress={() => setShowPicker(true)}
           >
-            <Text style={styles.dateButtonText}>{formatDate(value)}</Text>
+            <Text style={styles.dateButtonText}>{formatDateInput(value, placeholder)}</Text>
             <Ionicons name="calendar" size={16} color="#666" />
           </TouchableOpacity>
 

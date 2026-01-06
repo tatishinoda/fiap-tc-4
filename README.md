@@ -1,103 +1,78 @@
-# 🏦 ByteBank Mobile
+# Tech Challenge - Fase 3 - Grupo 9 - 4FRNT
 
-Aplicação de gestão financeira desenvolvida com React Native.
+ByteBank: Aplicação Mobile, utilizando React Native (Expo), Firebase Storage e Cloud Firestore.
 
-## 📱 Funcionalidades Principais
+[![Expo](https://img.shields.io/badge/Expo-%7E54.0.13-000000?style=flat&logo=expo&logoColor=white)](https://expo.dev/)
+[![React Native](https://img.shields.io/badge/React_Native-0.81.4-61DAFB?style=flat&logo=react&logoColor=white)](https://reactnative.dev/)
+[![Firebase Storage](https://img.shields.io/badge/Firebase_Storage-Storage-FFA611?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/products/storage)
+[![Cloud Firestore](https://img.shields.io/badge/Cloud_Firestore-Database-FFA611?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/products/firestore)
 
-- 🔐 **Autenticação completa** - Login, cadastro e gerenciamento de sessão com Firebase
-- 💰 **Gestão financeira** - Adicionar transações (depósitos, saques, transferências, pagamentos, investimentos)
-- 📊 **Dashboard interativo** - Visão geral do saldo, gráfico de entradas vs saídas
-- 📋 **Listagem de transações** - Busca e filtros por tipo
-- 🎨 **Design moderno** - Interface responsiva com componentes reutilizáveis
-- ☁️ **Sincronização em nuvem** - Dados armazenados no Firebase Firestore
+## O que é o ByteBank?
 
-## 📁 **Estrutura do Projeto**
+O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvimento Mobile do Tech Challenge, Fase 3, do curso de pós-graduação em Front-End Engineering da FIAP.
+
+## Contexto do Projeto
+
+- 🔗 [Repositório Fase 1](https://github.com/karenkramek/bytebank-fiap)
+- 🔗 [Repositório Fase 2](https://github.com/karenkramek/fiap-tech-challenge-2)
+
+## Gestão de Projeto
+
+- 📊 [Trello (Fase 3)](https://trello.com/b/YkdMifCT/fase-3)
+- 🎨 Figma (Fase 3): TBD
+- 📹 Vídeo de Apresentação (Fase 3): TBD
+
+## Estrutura do Projeto
 
 ```
 bytebank-mobile/
+├── assets/                # Recursos estáticos (ícones, splash)
+├── src/
+│   ├── components/        # Componentes reutilizáveis e UI
+│   ├── config/            # Configurações
+│   │   └── firebase.ts    # Configuração Firebase
+│   ├── context/           # Contextos React (estado global)
+│   ├── hooks/             # Custom hooks
+│   ├── navigation/        # Rotas e navegação
+│   ├── screens/           # Telas da aplicação
+│   │   ├── auth/          # Telas de autenticação (Login, SignUp)
+│   │   └── protected/     # Telas protegidas (Home, Transactions, etc)
+│   ├── services/          # Lógica de negócio e APIs
+│   ├── store/             # Gerenciamento de estado (Zustand)
+│   ├── theme/             # Tema, cores e estilos
+│   ├── types/             # Definições TypeScript
+│   └── utils/             # Funções utilitárias
+├── App.tsx                # Componente raiz
+├── package.json           # Dependências do projeto
+├── firebase.json          # Configuração Firebase
 ├── .env                   # Variáveis de ambiente (Firebase)
 ├── .env.example           # Template das variáveis
-├── .gitignore             # Arquivos ignorados pelo Git
-├── app.json               # Configuração do Expo
-├── App.tsx                # Componente principal da aplicação
-├── index.ts               # Ponto de entrada
-├── package.json           # Dependências e scripts
-├── tsconfig.json          # Configuração TypeScript
 ├── firestore.rules        # Regras de segurança Firestore
 ├── storage.rules          # Regras de segurança Storage
 ├── firebase.json          # Configuração Firebase CLI
-├── README.md              # Documentação principal
-├── FIREBASE_STORAGE_SETUP.md  # Guia de Storage e edição de transações
-├── assets/                # Recursos estáticos (ícones, splash)
-└── src/                   # Código fonte
-    ├── api/               # Configuração de cliente HTTP (Axios)
-    ├── components/        # Componentes reutilizáveis
-    │   └── ui/            # Componentes de UI (Button, Input, etc)
-    ├── config/            # Configurações
-    │   └── firebase.ts    # Configuração Firebase
-    ├── context/           # Contextos React (estado global)
-    ├── hooks/             # Custom hooks
-    ├── navigation/        # Sistema de navegação
-    ├── screens/           # Telas da aplicação
-    │   ├── auth/          # Telas de autenticação
-    │   └── protected/     # Telas protegidas (requer login)
-    ├── services/          # Lógica de negócio/APIs
-    ├── store/             # Estado global com Zustand
-    ├── styles/            # Estilos globais
-    ├── theme/             # Tema (cores, estilos)
-    ├── types/             # Definições TypeScript
-    └── utils/             # Funções utilitárias
+└── README.md              # Documentação principal
 ```
 
-## 🛠️ **Tecnologias Utilizadas**
-
-### **Core**
-- **React** 19.1.0
-- **React Native** 0.81.5
-- **Expo** SDK 54
-- **TypeScript** 5.x
-
-### **Firebase & Backend**
-- **Firebase** 10.7.1
-- **Firebase Auth** - Autenticação
-- **Cloud Firestore** - Banco de dados
-- **Firebase Storage** - Armazenamento
-
-### **Navegação & Estado**
-- **React Navigation** 7.x
-- **React Hook Form** 7.66.0
-- **AsyncStorage** 2.2.0
-- **Zustand** 5.0.9
-
-### **UI & Animações**
-- **Expo Vector Icons** 15.0.3
-- **React Native Reanimated** 4.1.1
-- **React Native Gesture Handler** 2.28.0
-- **NativeWind** 4.2.1
-
-### **Utilitários**
-- **Axios** 1.13.2
-- **Date-fns** 3.0.0
-- **UUID** 11.1.0
-- **Expo SecureStore** 15.0.0
-
-## 🚀 **Como Executar**
+## Como Executar
 
 ### **Pré-requisitos**
 - Node.js 18+ (recomendado)
 - npm ou yarn
-- Expo CLI: `npm install -g expo-cli`
+- Expo CLI: `npm install -g expo-cli` (opcional, usamos `npx expo`)
 - Conta no Firebase (gratuita)
+- Se for testar via USB, instale o Android Platform Tools (ADB)
 
 ### **1. Clone o projeto**
 ```bash
-git clone <seu-repositorio>
+git clone https://github.com/camp0sfer/bytebank-mobile.git
 cd bytebank-mobile
 ```
 
 ### **2. Instalar dependências**
 ```bash
 npm install
+# ou
+yarn
 ```
 
 ### **3. Configurar Firebase**
@@ -133,7 +108,7 @@ EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu-measurement-id
 No Firebase Console:
 1. Habilite **Authentication** > **Email/Password**
 2. Crie um banco **Firestore Database** (modo teste)
-3. Habilite **Storage** (opcional, para uploads)
+3. Habilite **Storage** (para upload de recibos)
 4. Configure as regras de segurança (veja `firestore.rules` e `storage.rules`)
 
 #### **3.4. Implantar regras de segurança Firebase**
@@ -159,18 +134,39 @@ firebase deploy --only storage     # Apenas Storage
 
 > ⚠️ **Importante**: Sempre implante as regras após modificá-las para garantir a segurança do aplicativo.
 
-> 📚 Para mais detalhes sobre Storage e upload de recibos, consulte [FIREBASE_STORAGE_SETUP.md](FIREBASE_STORAGE_SETUP.md)
-
 ### **4. Executar o projeto**
+
+Após configurar o Firebase, inicie o servidor de desenvolvimento:
+
 ```bash
 npm start
 ```
 
-### **4. Testar no dispositivo**
-- Instale o **Expo Go** no seu celular
-- Escaneie o QR Code gerado
+### **5. Testar no dispositivo**
 
-## 🔧 **Configurações de Desenvolvimento**
+#### **Testar no Android com Expo Go**:
+- Instale `Expo Go` no celular (Google Play)
+- Certifique-se que computador e celular estão na mesma rede Wi‑Fi
+- No painel do Expo escolha `LAN` para melhor desempenho. Se não for possível, escolha `Tunnel`
+- No painel do Expo (ou no terminal) haverá um QR Code — abra `Expo Go` → `Scan QR Code` e aponte a câmera
+
+#### **Testar via USB/adb**:
+- Ative a depuração USB no Android e conecte o cabo
+- Verifique o dispositivo com `adb devices`
+- Execute no terminal:
+
+```bash
+npm run android
+# ou, após `npx expo start`, pressione `a` no terminal para abrir no dispositivo/emulador
+```
+
+#### **Rodar no navegador** (opcional):
+
+```bash
+npm run web
+```
+
+## Configurações de Desenvolvimento
 
 ### **Scripts Disponíveis**
 ```bash
@@ -180,3 +176,18 @@ npm run ios        # Executar no iOS
 npm run web        # Executar na web
 npm run build      # Build de produção
 ```
+
+## Troubleshooting
+
+- **QR Code não é lido**: Altere para `Tunnel` no Expo Dev Tools
+- **App não atualiza**: Feche e reabra `Expo Go` ou limpe o cache com `npx expo start -c`
+- **`adb devices` não lista o aparelho**: Verifique permissões/cabo e as ferramentas do Android
+
+## **Integrantes do Grupo**
+
+| Nome | Email | RM |
+|------|-------|------|
+| Fernanda Raquel Campos Jiacinto | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com) | RM366526 |
+| Kaique Kenichi Furukawa Endo | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com) | RM366448 |
+| Karen Cristina Kramek | [kakakramek@gmail.com](mailto:kakakramek@gmail.com) | RM361140 |
+| Tatiane Gabrielle Marçal Rodrigues da Costa | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | RM365215 |

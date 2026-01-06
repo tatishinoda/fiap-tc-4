@@ -1,15 +1,22 @@
+/**
+ * Utilitários de armazenamento e upload
+ * Fornece storage seguro cross-platform e upload de arquivos para Firebase
+ */
+
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
+// ============================================================================
+// STORAGE SEGURO CROSS-PLATFORM
+// ============================================================================
+
 /**
- * Cross-platform secure storage utility
- * Uses SecureStore on native platforms (iOS/Android) and localStorage on web
+ * Utilitário de storage seguro cross-platform
+ * Usa SecureStore no iOS/Android e localStorage na web
  */
 export const secureStorage = {
-  /**
-   * Store a value securely
-   */
+  // Armazena um valor de forma segura
   async setItem(key: string, value: string): Promise<void> {
     if (Platform.OS !== 'web') {
       await SecureStore.setItemAsync(key, value);
@@ -18,9 +25,7 @@ export const secureStorage = {
     }
   },
 
-  /**
-   * Retrieve a stored value
-   */
+  // Recupera um valor armazenado
   async getItem(key: string): Promise<string | null> {
     if (Platform.OS !== 'web') {
       return await SecureStore.getItemAsync(key);
@@ -29,9 +34,7 @@ export const secureStorage = {
     }
   },
 
-  /**
-   * Remove a stored value
-   */
+  // Remove um valor armazenado
   async removeItem(key: string): Promise<void> {
     if (Platform.OS !== 'web') {
       await SecureStore.deleteItemAsync(key);
@@ -40,21 +43,21 @@ export const secureStorage = {
     }
   },
 
-  /**
-   * Clear all stored values
-   */
+  // Limpa todos os valores armazenados (apenas web)
   async clear(): Promise<void> {
     if (Platform.OS === 'web') {
       localStorage.clear();
     }
-    // Note: SecureStore doesn't have a clear all method
-    // Items must be removed individually on native platforms
+    // Nota: SecureStore não possui método clear()
+    // Itens devem ser removidos individualmente em plataformas nativas
   },
 };
 
-/**
- * Upload receipt image to Firebase Storage
- */
+// ============================================================================
+// UPLOAD DE ARQUIVOS
+// ============================================================================
+
+// Faz upload de imagem de recibo para Firebase Storage
 export async function uploadReceipt(
   uri: string,
   userId: string,
