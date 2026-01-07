@@ -18,7 +18,7 @@ import { DocumentSnapshot } from 'firebase/firestore';
 import { useAuth } from '../../hooks/useAuth';
 import { Transaction } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
-import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon } from '../../utils';
+import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon, normalizeCategory } from '../../utils';
 import * as TransactionService from '../../services/TransactionService';
 import { AdvancedFiltersModal, FilterOptions } from '../../components/AdvancedFiltersModal';
 
@@ -50,14 +50,12 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<FilterOptions>(DEFAULT_FILTER_OPTIONS);
 
-  // Infinite scroll state
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [lastDoc, setLastDoc] = useState<DocumentSnapshot | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const PAGE_SIZE = 10;
 
-  // Reload transactions when screen comes into focus
   useFocusEffect(
     React.useCallback(() => {
       if (user?.id) {
@@ -73,7 +71,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
   const applyFilters = () => {
     let filtered = [...allTransactions];
 
-    // Advanced filters - Date range
     if (advancedFilters.dateFrom) {
       filtered = filtered.filter(t => {
         const transactionDate = t.date instanceof Date ? t.date : new Date(t.date);
@@ -93,21 +90,18 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       });
     }
 
-    // Advanced filters - Types
     if (advancedFilters.types.length > 0) {
       filtered = filtered.filter(t => advancedFilters.types.includes(t.type));
     }
 
-    // Advanced filters - Categories
     if (advancedFilters.categories.length > 0) {
-      filtered = filtered.filter(t =>
-        t.category && advancedFilters.categories.includes(t.category)
+      const normalizedFilterCategories = advancedFilters.categories.map(normalizeCategory);
+      filtered = filtered.filter(t => 
+        t.category && normalizedFilterCategories.includes(normalizeCategory(t.category))
       );
     }
 
-    // Advanced filters - Amount range
     if (advancedFilters.amountMin !== '') {
-      // Remove formatting and convert to cents (same as stored values)
       const cleanValue = advancedFilters.amountMin.replace(/\D/g, '');
       if (cleanValue) {
         const minAmount = parseInt(cleanValue);
@@ -116,7 +110,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     }
 
     if (advancedFilters.amountMax !== '') {
-      // Remove formatting and convert to cents (same as stored values)
       const cleanValue = advancedFilters.amountMax.replace(/\D/g, '');
       if (cleanValue) {
         const maxAmount = parseInt(cleanValue);
@@ -124,7 +117,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       }
     }
 
-    // Quick filter by type (for backwards compatibility with existing filters)
+    // Filtro rápido por tipo (retrocompatibilidade)
     if (selectedFilter !== 'all') {
       if (selectedFilter === 'income') {
         filtered = filtered.filter(t => t.type === 'DEPOSIT');
@@ -135,7 +128,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       }
     }
 
-    // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(t =>
@@ -144,7 +136,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       );
     }
 
-    // Apply sorting
+    // Aplicar ordenação
     switch (advancedFilters.sortBy) {
       case 'date-desc':
         filtered.sort((a, b) => {
@@ -187,7 +179,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     setAdvancedFilters(filters);
   };
 
-  // Extract unique categories from all transactions
   const getAvailableCategories = (): string[] => {
     const categories = allTransactions
       .map(t => t.category)
@@ -225,7 +216,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         PAGE_SIZE,
         lastDoc || undefined
       );
-      // Ensure no duplicates by filtering out transactions that already exist
+      
       setAllTransactions(prev => {
         const existingIds = new Set(prev.map(t => t.id));
         const newTransactions = transactions.filter(t => !existingIds.has(t.id));
@@ -258,7 +249,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       );
     }
 
-    // Show end message if there are transactions and no more to load
     if (!hasMore && filteredTransactions.length > 0 && !loading) {
       return (
         <View style={styles.endOfList}>
