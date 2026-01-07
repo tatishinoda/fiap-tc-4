@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "bytebank-mobile",
+    "name": "ByteBank",
     "slug": "bytebank-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/bytebank.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/bytebank.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/bytebank.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.bytebank.mobile"
@@ -27,6 +27,11 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "02030697-b297-45d0-8c5a-b95b160c3890"
+      }
+    }
   }
 }
