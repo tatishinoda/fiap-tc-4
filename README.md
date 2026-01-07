@@ -88,17 +88,7 @@ cp .env.example .env
 2. Crie um novo projeto ou use um existente
 3. Vá em **Configurações do Projeto** > **Seus aplicativos**
 4. Copie as credenciais do Firebase
-5. Cole no arquivo `.env`:
-
-```env
-EXPO_PUBLIC_FIREBASE_API_KEY=sua-api-key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=seu-projeto.firebaseapp.com
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=seu-projeto-id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu-storage-bucket.firebasestorage.app
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu-messaging-id
-EXPO_PUBLIC_FIREBASE_APP_ID=seu-app-id
-EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=seu-measurement-id
-```
+5. Cole no arquivo `.env`
 
 > ⚠️ **Importante**: Não compartilhe suas credenciais! O arquivo `.env` está no `.gitignore` e nunca será versionado.
 

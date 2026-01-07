@@ -21,7 +21,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { colors } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
-import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
+import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction, getUnifiedCategory, combineCategories } from '../../utils';
 import { uploadReceipt, deleteReceipt } from '../../utils/storage';
 import { CategoryChips, CurrencyInput } from '../../components/ui';
 
@@ -38,7 +38,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   const { showNotification } = useAppContext();
   const { user } = useAuth();
 
-  // Verifica se está editando de forma mais segura
   const transactionId = (route.params as any)?.transactionId;
   const isEditing = !!transactionId;
   const existingTransaction = isEditing ? transactions.find(t => t.id === transactionId) : null;
@@ -52,36 +51,78 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   const [receiptUri, setReceiptUri] = useState<string | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
-  // Carrega dados da transação existente ao editar
   useEffect(() => {
     if (isEditing && existingTransaction) {
       setType(existingTransaction.type);
-      // Formata o amount de centavos para string com vírgula
       const amountInReais = existingTransaction.amount / 100;
       setAmount(amountInReais.toFixed(2).replace('.', ','));
       setDescription(existingTransaction.description);
-      setCategory(existingTransaction.category || '');
+      
+      // Normaliza categoria carregada priorizando as sugeridas
+      const loadedCategory = existingTransaction.category || '';
+      if (loadedCategory) {
+        const normalizedCategory = getUnifiedCategory(
+          loadedCategory,
+          [],
+          getSuggestedCategories(existingTransaction.type)
+        );
+        setCategory(normalizedCategory);
+      } else {
+        setCategory('');
+      }
+      
       setReceiptUri((existingTransaction as any).receiptUrl || null);
     }
   }, [isEditing, existingTransaction]);
 
-  // Atualiza o título da tela
   useEffect(() => {
     navigation.setOptions({
       title: isEditing ? 'Editar Transação' : 'Nova Transação'
     });
   }, [isEditing, navigation]);
 
-  // Pega categorias sugeridas baseado no tipo
   const suggestedCategories = getSuggestedCategories(type);
 
-  // Handler para seleção de imagem
+  const existingCategoriesRaw = transactions
+    .map(t => t.category)
+    .filter((cat): cat is string => cat !== null && cat !== undefined && cat !== '');
+
+  const existingCategories = combineCategories(existingCategoriesRaw, suggestedCategories);
+
+  // Unifica sugeridas + personalizadas para exibição
+  const allCategoriesToShow = combineCategories(suggestedCategories, existingCategoriesRaw);
+
+  const handleCategoryChange = (inputCategory: string) => {
+    setCategory(inputCategory);
+  };
+
+  const handleCategoryBlur = () => {
+    if (!category.trim()) {
+      setCategory('');
+      return;
+    }
+    
+    const unifiedCategory = getUnifiedCategory(
+      category, 
+      existingCategories,
+      suggestedCategories
+    );
+    setCategory(unifiedCategory);
+  };
+
+  const handleCategoryChipPress = (selectedCategory: string) => {
+    const unifiedCategory = getUnifiedCategory(
+      selectedCategory, 
+      existingCategories,
+      suggestedCategories
+    );
+    setCategory(unifiedCategory);
+  };
+
   const handlePickImage = async () => {
     try {
-      // Verificar permissão atual
       const permission = await ImagePicker.getMediaLibraryPermissionsAsync();
 
-      // Se não tiver permissão e puder pedir novamente
       if (!permission.granted) {
         if (!permission.canAskAgain) {
           showNotification('Permissão negada. Ative nas configurações do dispositivo', 'error');
@@ -90,7 +131,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
 
         const newPermission = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!newPermission.granted) {
-          return; // Usuário negou, não mostra mensagem para permitir tentar novamente
+          return;
         }
       }
 
@@ -109,13 +150,10 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
     }
   };
 
-  // Handler para tirar foto
   const handleTakePhoto = async () => {
     try {
-      // Verificar permissão atual
       const permission = await ImagePicker.getCameraPermissionsAsync();
 
-      // Se não tiver permissão e puder pedir novamente
       if (!permission.granted) {
         if (!permission.canAskAgain) {
           showNotification('Permissão negada. Ative nas configurações do dispositivo', 'error');
@@ -124,7 +162,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
 
         const newPermission = await ImagePicker.requestCameraPermissionsAsync();
         if (!newPermission.granted) {
-          return; // Usuário negou, não mostra mensagem para permitir tentar novamente
+          return;
         }
       }
 
@@ -142,7 +180,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
     }
   };
 
-  // Handler para remover imagem
   const handleRemoveImage = async () => {
     Alert.alert(
       'Remover Recibo',
@@ -153,12 +190,11 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           text: 'Remover',
           style: 'destructive',
           onPress: async () => {
-            // Se for uma URL do Firebase Storage (começa com http), deleta do Storage
             if (receiptUri && receiptUri.startsWith('http')) {
               try {
                 await deleteReceipt(receiptUri);
               } catch (error) {
-                // Continua mesmo se falhar, pois a referência será removida
+                // Continua removendo referência mesmo se falhar no Storage
               }
             }
             
@@ -170,7 +206,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
     );
   };
 
-  // Handler para deletar transação
   const handleDelete = async () => {
     if (!isEditing || !transactionId) {
       return;
@@ -203,7 +238,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
 
   const handleSubmit = async () => {
     try {
-      // Validação centralizada
       const validation = validateTransaction(amount, description);
       if (!validation.isValid) {
         showNotification(validation.error || 'Erro de validação', 'error');
@@ -215,8 +249,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
         return;
       }
 
-      // Remove pontos de milhar e substitui vírgula por ponto
-      // Ex: "2.000,50" -> "2000.50"
+      // Converte formato brasileiro (2.000,50) para número
       const amountValue = parseFloat(amount.replace(/\./g, '').replace(',', '.'));
 
       if (isNaN(amountValue)) {
@@ -226,14 +259,12 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
 
       setUploadingReceipt(true);
 
-      // Converte para centavos
       const amountInCents = Math.round(amountValue * 100);
 
-      // Upload do recibo se houver novo recibo
+      // Upload de recibo novo (URI local) ou mantém URL existente
       let receiptUrl: string | undefined;
       if (receiptUri && !receiptUri.startsWith('http')) {
         try {
-          // Gerar ID temporário para a transação
           const tempId = isEditing ? transactionId : `temp_${Date.now()}`;
           receiptUrl = await uploadReceipt(receiptUri, user.id, tempId || '');
         } catch (uploadError: any) {
@@ -242,13 +273,10 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           return;
         }
       } else if (receiptUri) {
-        // Mantém a URL existente se não mudou
         receiptUrl = receiptUri;
       }
 
       if (isEditing && transactionId) {
-        // Atualiza transação existente
-        // Prepara dados para atualização (não incluir userId e updatedAt que são tratados no service)
         const updateData: any = {
           type,
           amount: amountInCents,
@@ -256,16 +284,13 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           date: existingTransaction?.date || new Date(),
         };
 
-        // Adiciona category apenas se tiver valor
         if (category) {
           updateData.category = category;
         }
 
-        // Adiciona receiptUrl - pode ser uma URL, null (removido) ou undefined (sem mudança)
         if (receiptUrl !== undefined) {
           updateData.receiptUrl = receiptUrl || null;
         } else if (receiptUri === null && existingTransaction?.receiptUrl) {
-          // Se o usuário removeu o recibo que existia, envia null explicitamente
           updateData.receiptUrl = null;
         }
 
@@ -274,8 +299,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
         const typeLabel = TRANSACTION_TYPE_CONFIG[type].label;
         showNotification(`${typeLabel} atualizada com sucesso!`, 'success');
       } else {
-        // Adiciona nova transação
-        // Prepara dados (userId e outros campos são tratados no Context)
         const newTransactionData: any = {
           type,
           amount: amountInCents,
@@ -283,12 +306,10 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           date: new Date(),
         };
 
-        // Adiciona category apenas se tiver valor
         if (category) {
           newTransactionData.category = category;
         }
 
-        // Adiciona receiptUrl apenas se tiver valor
         if (receiptUrl) {
           newTransactionData.receiptUrl = receiptUrl;
         }
@@ -299,7 +320,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
         showNotification(`${typeLabel} adicionada com sucesso!`, 'success');
       }
 
-      // Limpa formulário e volta
       setAmount('');
       setDescription('');
       setCategory('');
@@ -324,56 +344,53 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Form */}
         <View style={styles.form}>
 
-          {/* Tipo de transação */}
           <Text style={styles.sectionLabel}>Tipo de Transação</Text>
           <View style={styles.typeGrid}>
             {TRANSACTION_TYPES.map((transactionType) => {
               const config = TRANSACTION_TYPE_CONFIG[transactionType];
               return (
-              <TouchableOpacity
-                key={transactionType}
-                style={[
-                  styles.typeCard,
-                  type === transactionType && styles.typeCardActive,
-                  { borderColor: type === transactionType ? config.color : '#E0E0E0' }
-                ]}
-                onPress={() => setType(transactionType)}
-                activeOpacity={0.7}
-              >
-                <View style={[
-                  styles.typeIcon,
-                  { backgroundColor: type === transactionType ? config.color : '#F8F9FA' }
-                ]}>
-                  <Ionicons
-                    name={config.icon}
-                    size={20}
-                    color={type === transactionType ? '#FFFFFF' : '#666'}
-                  />
-                </View>
-                <Text style={[
-                  styles.typeLabel,
-                  type === transactionType && {
-                    color: config.color,
-                    fontWeight: '600'
-                  }
-                ]}>
-                  {config.label}
-                </Text>
-              </TouchableOpacity>
-            );})}
+                <TouchableOpacity
+                  key={transactionType}
+                  style={[
+                    styles.typeCard,
+                    type === transactionType && styles.typeCardActive,
+                    { borderColor: type === transactionType ? config.color : '#E0E0E0' }
+                  ]}
+                  onPress={() => setType(transactionType)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[
+                    styles.typeIcon,
+                    { backgroundColor: type === transactionType ? config.color : '#F8F9FA' }
+                  ]}>
+                    <Ionicons
+                      name={config.icon}
+                      size={20}
+                      color={type === transactionType ? '#FFFFFF' : '#666'}
+                    />
+                  </View>
+                  <Text style={[
+                    styles.typeLabel,
+                    type === transactionType && {
+                      color: config.color,
+                      fontWeight: '600'
+                    }
+                  ]}>
+                    {config.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          {/* Valor */}
           <CurrencyInput
             value={amount}
             onChangeValue={setAmount}
             showIcon={true}
           />
 
-          {/* Descrição */}
           <View style={styles.inputContainer}>
             <Ionicons name="document-text-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
@@ -382,33 +399,35 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
               placeholderTextColor="#999"
               value={description}
               onChangeText={setDescription}
+              maxLength={25}
             />
           </View>
 
-          {/* Categoria */}
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, { marginBottom: 8 }]}>
             <Ionicons name="pricetag-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Categoria (opcional)"
               placeholderTextColor="#999"
               value={category}
-              onChangeText={setCategory}
+              onChangeText={handleCategoryChange}
+              onBlur={handleCategoryBlur}
+              maxLength={25}
             />
           </View>
 
-          {/* Sugestões de Categorias */}
-          {suggestedCategories.length > 0 && (
-            <CategoryChips
-              categories={suggestedCategories}
-              selectedCategories={category ? [category] : []}
-              onCategoryPress={(selectedCategory) => setCategory(selectedCategory)}
-              showLabel={true}
-              labelText="Sugestões:"
-            />
+          {allCategoriesToShow.length > 0 && (
+            <View style={{ marginBottom: 16 }}>
+              <CategoryChips
+                categories={allCategoriesToShow}
+                selectedCategories={category ? [category] : []}
+                onCategoryPress={handleCategoryChipPress}
+                showLabel={true}
+                labelText="Categorias:"
+              />
+            </View>
           )}
 
-          {/* Upload de Recibo */}
           <View style={styles.receiptSection}>
             <Text style={styles.sectionLabel}>Recibo (opcional)</Text>
 
@@ -443,7 +462,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
             )}
           </View>
 
-          {/* Botões */}
           <TouchableOpacity
             style={[styles.submitButton, (loading || uploadingReceipt) && styles.submitButtonDisabled]}
             onPress={handleSubmit}
@@ -463,7 +481,6 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
             )}
           </TouchableOpacity>
 
-          {/* Botão Deletar (apenas ao editar) */}
           {isEditing && (
             <TouchableOpacity
               style={styles.deleteButton}
@@ -514,7 +531,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginBottom: 24,
+    marginBottom: 10,
   },
   typeCard: {
     width: '31%',
