@@ -76,9 +76,11 @@ export function RecentTransactions({
                   <Text style={styles.transactionTitle} numberOfLines={1}>
                     {transaction.description}
                   </Text>
-                  <Text style={styles.transactionCategory} numberOfLines={1}>
-                    {transaction.category}
-                  </Text>
+                  {transaction.category && (
+                    <Text style={styles.transactionCategory} numberOfLines={1}>
+                      {transaction.category}
+                    </Text>
+                  )}
                   <Text style={styles.transactionDate}>
                     {formatDateRelative(transaction.date)}
                   </Text>
