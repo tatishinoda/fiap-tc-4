@@ -86,12 +86,8 @@ export const getUnifiedCategory = (
   return inputCategory.trim();
 };
 
-/**
- * Combina múltiplas listas de categorias removendo duplicatas case-insensitive
- * Prioriza categorias que aparecem primeiro (sugeridas > existentes > outras)
- * @param categoriesLists - Arrays de categorias em ordem de prioridade
- * @returns Array unificado sem duplicatas
- */
+// Combina múltiplas listas de categorias removendo duplicatas case-insensitive
+// Prioriza categorias que aparecem primeiro (sugeridas > existentes > outras)
 export const combineCategories = (...categoriesLists: string[][]): string[] => {
   const seen = new Set<string>();
   const result: string[] = [];
