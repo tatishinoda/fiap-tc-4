@@ -333,37 +333,38 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
             {TRANSACTION_TYPES.map((transactionType) => {
               const config = TRANSACTION_TYPE_CONFIG[transactionType];
               return (
-              <TouchableOpacity
-                key={transactionType}
-                style={[
-                  styles.typeCard,
-                  type === transactionType && styles.typeCardActive,
-                  { borderColor: type === transactionType ? config.color : '#E0E0E0' }
-                ]}
-                onPress={() => setType(transactionType)}
-                activeOpacity={0.7}
-              >
-                <View style={[
-                  styles.typeIcon,
-                  { backgroundColor: type === transactionType ? config.color : '#F8F9FA' }
-                ]}>
-                  <Ionicons
-                    name={config.icon}
-                    size={20}
-                    color={type === transactionType ? '#FFFFFF' : '#666'}
-                  />
-                </View>
-                <Text style={[
-                  styles.typeLabel,
-                  type === transactionType && {
-                    color: config.color,
-                    fontWeight: '600'
-                  }
-                ]}>
-                  {config.label}
-                </Text>
-              </TouchableOpacity>
-            );})}
+                <TouchableOpacity
+                  key={transactionType}
+                  style={[
+                    styles.typeCard,
+                    type === transactionType && styles.typeCardActive,
+                    { borderColor: type === transactionType ? config.color : '#E0E0E0' }
+                  ]}
+                  onPress={() => setType(transactionType)}
+                  activeOpacity={0.7}
+                >
+                  <View style={[
+                    styles.typeIcon,
+                    { backgroundColor: type === transactionType ? config.color : '#F8F9FA' }
+                  ]}>
+                    <Ionicons
+                      name={config.icon}
+                      size={20}
+                      color={type === transactionType ? '#FFFFFF' : '#666'}
+                    />
+                  </View>
+                  <Text style={[
+                    styles.typeLabel,
+                    type === transactionType && {
+                      color: config.color,
+                      fontWeight: '600'
+                    }
+                  ]}>
+                    {config.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {/* Valor */}
@@ -382,11 +383,12 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
               placeholderTextColor="#999"
               value={description}
               onChangeText={setDescription}
+              maxLength={25}
             />
           </View>
 
           {/* Categoria */}
-          <View style={styles.inputContainer}>
+          <View style={[styles.inputContainer, { marginBottom: 8 }]}>
             <Ionicons name="pricetag-outline" size={20} color="#666" style={styles.inputIcon} />
             <TextInput
               style={styles.input}
@@ -394,18 +396,21 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
               placeholderTextColor="#999"
               value={category}
               onChangeText={setCategory}
+              maxLength={25}
             />
           </View>
 
           {/* Sugestões de Categorias */}
           {suggestedCategories.length > 0 && (
-            <CategoryChips
-              categories={suggestedCategories}
-              selectedCategories={category ? [category] : []}
-              onCategoryPress={(selectedCategory) => setCategory(selectedCategory)}
-              showLabel={true}
-              labelText="Sugestões:"
-            />
+            <View style={{ marginBottom: 16 }}>
+              <CategoryChips
+                categories={suggestedCategories}
+                selectedCategories={category ? [category] : []}
+                onCategoryPress={(selectedCategory) => setCategory(selectedCategory)}
+                showLabel={true}
+                labelText="Sugestões:"
+              />
+            </View>
           )}
 
           {/* Upload de Recibo */}
@@ -514,7 +519,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginBottom: 24,
+    marginBottom: 10,
   },
   typeCard: {
     width: '31%',
