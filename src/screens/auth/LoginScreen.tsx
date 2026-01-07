@@ -100,6 +100,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                 editable={!isLoading}
                 returnKeyType="go"
                 onSubmitEditing={handleLogin}
+                blurOnSubmit
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}

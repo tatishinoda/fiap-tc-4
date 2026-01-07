@@ -46,13 +46,13 @@ export const formatCurrencyValue = (value: number): string => {
   return NUMBER_FORMATTER.format(value / 100);
 };
 
-// Formata valor com sinal + ou - baseado no tipo (ex: "+R$ 12,34" ou "-R$ 50,00")
+// Formata valor com sinal - para despesas (ex: "R$ 12,34" ou "- R$ 50,00")
 export const formatAmount = (value: number, type: TransactionType): string => {
   if (!isFinite(value) || isNaN(value)) {
-    return `${type === 'DEPOSIT' ? '+' : '-'}${CURRENCY_FORMATTER.format(0)}`;
+    return `${type === 'DEPOSIT' ? '' : '- '}${CURRENCY_FORMATTER.format(0)}`;
   }
-  const sign = type === 'DEPOSIT' ? '+' : '-';
-  return `${sign} ${formatCurrency(Math.abs(value))}`;
+  const sign = type === 'DEPOSIT' ? '' : '- ';
+  return `${sign}${formatCurrency(Math.abs(value))}`;
 };
 
 // Formata valores grandes de forma compacta (ex: "R$ 1.2K", "R$ 2.5M")
