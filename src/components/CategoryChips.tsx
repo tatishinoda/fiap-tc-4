@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { colors } from '../theme/colors';
+import { normalizeCategory } from '../utils/helpers';
 
 interface CategoryChipsProps {
   categories: string[];
@@ -20,9 +21,16 @@ export function CategoryChips({
   labelText = 'Sugestões:',
 }: CategoryChipsProps) {
   const isCategorySelected = (category: string) => {
-    return multiSelect
-      ? selectedCategories.includes(category)
-      : selectedCategories[0] === category;
+    const normalizedCategory = normalizeCategory(category);
+    
+    if (multiSelect) {
+      return selectedCategories.some(
+        (selected) => normalizeCategory(selected) === normalizedCategory
+      );
+    }
+    
+    return selectedCategories.length > 0 && 
+           normalizeCategory(selectedCategories[0]) === normalizedCategory;
   };
 
   if (categories.length === 0) return null;
@@ -31,11 +39,11 @@ export function CategoryChips({
     <View style={styles.container}>
       {showLabel && <Text style={styles.label}>{labelText}</Text>}
       <View style={styles.chipsContainer}>
-        {categories.map((category) => {
+        {categories.map((category, index) => {
           const isSelected = isCategorySelected(category);
           return (
             <TouchableOpacity
-              key={category}
+              key={`${normalizeCategory(category)}-${index}`}
               style={[styles.chip, isSelected && styles.chipActive]}
               onPress={() => onCategoryPress(category)}
               activeOpacity={0.7}

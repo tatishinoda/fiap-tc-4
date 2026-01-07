@@ -134,3 +134,12 @@ export function getTransactionDescription(type: TransactionType): string {
 export function getSuggestedCategories(type: TransactionType): string[] {
   return SUGGESTED_CATEGORIES[type] || [];
 }
+
+// Retorna todas as categorias sugeridas de todos os tipos (sem duplicatas)
+export function getAllSuggestedCategories(): string[] {
+  return Array.from(
+    new Set(
+      Object.values(SUGGESTED_CATEGORIES).flat()
+    )
+  ).sort();
+}
