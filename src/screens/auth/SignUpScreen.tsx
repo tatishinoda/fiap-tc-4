@@ -151,6 +151,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
               editable={!isLoading}
               returnKeyType="go"
               onSubmitEditing={handleSignUp}
+              blurOnSubmit
             />
             <TouchableOpacity
               onPress={() => setShowConfirmPassword(!showConfirmPassword)}

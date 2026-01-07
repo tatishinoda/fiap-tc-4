@@ -80,6 +80,42 @@ export const validateName = (name: string, minLength: number = 2): ValidationRes
   return { isValid: true };
 };
 
+// Valida nome completo (deve conter nome e sobrenome)
+export const validateFullName = (name: string): ValidationResult => {
+  const trimmedName = name.trim();
+
+  // Verifica se o nome não está vazio
+  if (!trimmedName) {
+    return { isValid: false, error: 'Nome completo é obrigatório' };
+  }
+
+  // Verifica se contém apenas letras e espaços (permite acentos)
+  const nameRegex = /^[a-záàâãéèêíïóôõöúçñ\s]+$/i;
+  if (!nameRegex.test(trimmedName)) {
+    return { isValid: false, error: 'O nome deve conter apenas letras' };
+  }
+
+  // Verifica se tem pelo menos nome e sobrenome
+  const nameParts = trimmedName.split(' ').filter(part => part.length > 0);
+  if (nameParts.length < 2) {
+    return {
+      isValid: false,
+      error: 'Por favor, informe seu nome completo (nome e sobrenome)'
+    };
+  }
+
+  // Verifica se cada parte tem pelo menos 2 caracteres
+  const hasShortPart = nameParts.some(part => part.length < 2);
+  if (hasShortPart) {
+    return {
+      isValid: false,
+      error: 'Nome e sobrenome devem ter pelo menos 2 caracteres cada'
+    };
+  }
+
+  return { isValid: true };
+};
+
 // ============================================================================
 // VALIDAÇÃO DE CAMPOS GENÉRICOS
 // ============================================================================
@@ -125,7 +161,7 @@ export const validateSignUpForm = (
   confirmPassword: string
 ): boolean => {
   return validateFields([
-    validateName(name),
+    validateFullName(name),
     validateEmail(email),
     validatePassword(password),
     validatePasswordConfirmation(password, confirmPassword),
