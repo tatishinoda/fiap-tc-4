@@ -53,8 +53,7 @@ export function CategoryChips({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 12,
-    marginBottom: 12,
+    marginBottom: 0,
   },
   label: {
     fontSize: 12,

@@ -16,7 +16,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useFocusEffect } from '@react-navigation/native';
 import { DocumentSnapshot } from 'firebase/firestore';
 import { useAuth } from '../../hooks/useAuth';
-import { useTransactionContext } from '../../context';
 import { Transaction } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
 import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon } from '../../utils';
@@ -313,9 +312,11 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
           <Text style={styles.transactionTitle} numberOfLines={1}>
             {item.description}
           </Text>
-          <Text style={styles.transactionCategory} numberOfLines={1}>
-            {item.category}
-          </Text>
+          {item.category && (
+            <Text style={styles.transactionCategory} numberOfLines={1}>
+              {item.category}
+            </Text>
+          )}
           <Text style={styles.transactionDate}>
             {formatDateRelative(item.date)}
           </Text>
@@ -336,15 +337,6 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
       case 'income': return 'Receitas';
       case 'expense': return 'Despesas';
       case 'transfer': return 'Transferências';
-    }
-  };
-
-  const getFilterColor = (filter: FilterType) => {
-    switch (filter) {
-      case 'income': return '#4CAF50';
-      case 'expense': return '#F44336';
-      case 'transfer': return '#FF9800';
-      default: return '#2d6073'; // forest
     }
   };
 

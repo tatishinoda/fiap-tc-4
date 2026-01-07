@@ -410,7 +410,7 @@ export function AdvancedFiltersModal({
               </View>
             )}
 
-                        {/* Categories Section */}
+            {/* Categories Section */}
             <TouchableOpacity
               style={styles.section}
               onPress={() => toggleSection('categories')}
@@ -578,6 +578,7 @@ const styles = StyleSheet.create({
   },
   sectionContent: {
     paddingHorizontal: 24,
+    paddingTop: 12,
     paddingBottom: 16,
   },
   dateRow: {
