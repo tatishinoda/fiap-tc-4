@@ -166,6 +166,51 @@ npm run android
 npm run web
 ```
 
+## Gerando APK para Distribuição (Android)
+
+### **1. Instalar EAS CLI**
+```bash
+npm install -g eas-cli
+```
+
+### **2. Fazer login no Expo**
+```bash
+eas login
+```
+
+### **3. Configurar variáveis de ambiente no EAS**
+
+Para garantir que as credenciais do Firebase não sejam expostas no código, é necessário configurá-las como secrets no EAS:
+
+```bash
+# Configurar automaticamente todas as variáveis do .env
+cat .env | while IFS='=' read -r key value; do
+  if [ -n "$key" ] && [ -n "$value" ]; then
+    echo "Creating secret: $key"
+    eas secret:create --scope project --name "$key" --value "$value" --type string --force
+  fi
+done
+```
+
+> ⚠️ **Importante**: Este passo é necessário apenas uma vez por projeto. As variáveis ficam armazenadas de forma segura no servidor EAS e são injetadas automaticamente durante o build.
+
+### **4. Gerar o APK**
+```bash
+eas build --platform android --profile preview
+```
+
+O processo irá:
+- Fazer upload do código para o servidor EAS
+- Compilar o APK na nuvem
+- Gerar um link e QR code para download
+
+### **5. Distribuir o APK**
+
+Após o build ser concluído, você pode:
+- **Escanear o QR code** com seu dispositivo Android
+- **Compartilhar o link** com a equipe para testes
+- **Baixar o arquivo APK** diretamente do link gerado
+
 ## Configurações de Desenvolvimento
 
 ### **Scripts Disponíveis**
@@ -174,7 +219,6 @@ npm start          # Iniciar Expo Dev Server
 npm run android    # Executar no Android
 npm run ios        # Executar no iOS
 npm run web        # Executar na web
-npm run build      # Build de produção
 ```
 
 ## Troubleshooting
