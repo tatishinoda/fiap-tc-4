@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 import { colors } from '../theme/colors';
 import { TransactionType } from '../types';
-import { SUGGESTED_CATEGORIES, TRANSACTION_TYPE_CONFIG } from '../utils/constants';
-import { formatDateInput } from '../utils';
+import { TRANSACTION_TYPE_CONFIG, getAllSuggestedCategories } from '../utils/constants';
+import { formatDateInput, getUnifiedCategory, combineCategories } from '../utils';
 import { CategoryChips } from './CategoryChips';
 import { CurrencyInput } from './CurrencyInput';
 
@@ -63,27 +63,30 @@ export function AdvancedFiltersModal({
     }
   }, [visible, initialFilters]);
 
-  // Combine user's actual categories with suggested ones, removing duplicates
-  const suggestedCategories = Array.from(
-    new Set(
-      Object.values(SUGGESTED_CATEGORIES).flat()
-    )
-  );
+  const suggestedCategories = getAllSuggestedCategories();
 
-  // Prioritize user's actual categories, then add suggested ones
-  const allCategories = Array.from(
-    new Set([...availableCategories, ...suggestedCategories])
-  ).sort();
+  // Unifica sugeridas + usuário, priorizando sugeridas e removendo duplicatas
+  const allCategories = combineCategories(suggestedCategories, availableCategories);
 
   const transactionTypes = Object.keys(TRANSACTION_TYPE_CONFIG) as TransactionType[];
 
   const toggleCategory = (category: string) => {
-    setFilters(prev => ({
-      ...prev,
-      categories: prev.categories.includes(category)
-        ? prev.categories.filter(c => c !== category)
-        : [...prev.categories, category],
-    }));
+    const unifiedCategory = getUnifiedCategory(
+      category, 
+      availableCategories,
+      suggestedCategories
+    );
+    
+    setFilters(prev => {
+      const isSelected = prev.categories.includes(unifiedCategory);
+      
+      return {
+        ...prev,
+        categories: isSelected
+          ? prev.categories.filter(c => c !== unifiedCategory)
+          : [...prev.categories, unifiedCategory],
+      };
+    });
   };
 
   const toggleType = (type: TransactionType) => {
