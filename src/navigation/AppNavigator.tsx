@@ -69,7 +69,9 @@ function ProtectedTabs() {
       {/* Header Fixo */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={styles.welcomeText}>Olá, {user?.name?.split(' ')[0]}!</Text>
+          <Text style={styles.welcomeText}>
+            Olá, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuário'}!
+          </Text>
           <TouchableOpacity
             onPress={handleLogout}
             style={styles.logoutButton}
