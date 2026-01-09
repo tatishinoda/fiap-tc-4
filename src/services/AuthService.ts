@@ -60,12 +60,15 @@ export class AuthService {
         throw new Error('Perfil de usuário não encontrado. Por favor, entre em contato com o suporte.');
       }
 
-      const userData = userDoc.data() as Omit<User, 'id'>;
+      const userData = userDoc.data();
       await secureStorage.setItem('userToken', firebaseUser.uid);
 
       return {
         id: firebaseUser.uid,
-        ...userData,
+        email: userData.email,
+        name: userData.name,
+        createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt),
+        updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : new Date(userData.updatedAt),
       };
     } catch (error: any) {
       console.error('Erro ao fazer login:', error);
@@ -96,11 +99,14 @@ export class AuthService {
 
       if (!userDoc.exists()) return null;
 
-      const userData = userDoc.data() as Omit<User, 'id'>;
+      const userData = userDoc.data();
 
       return {
         id: firebaseUser.uid,
-        ...userData,
+        email: userData.email,
+        name: userData.name,
+        createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt),
+        updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : new Date(userData.updatedAt),
       };
     } catch (error) {
       console.error('Erro ao obter usuário atual:', error);
