@@ -19,8 +19,8 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvi
 ## Gestão de Projeto
 
 - 📊 [Trello (Fase 3)](https://trello.com/b/YkdMifCT/fase-3)
-- 🎨 Figma (Fase 3): TBD
-- 📹 Vídeo de Apresentação (Fase 3): TBD
+- 📹 [Vídeo de Apresentação (Fase 3)](https://drive.google.com/file/d/1A9vJEmAHEGbdnaqaWjYwAB1q334PJo8B/view?usp=sharing)
+- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/6d0669ca-5d39-4f18-887d-d279122e8dd1)
 
 ## Estrutura do Projeto
 
