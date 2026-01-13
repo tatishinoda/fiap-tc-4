@@ -1,4 +1,4 @@
-# Tech Challenge - Fase 3 - Grupo 9 - 4FRNT
+# Tech Challenge - Fase 4 - Grupo 17 - 4FRNT
 
 ByteBank: Aplicação Mobile, utilizando React Native (Expo), Firebase Storage e Cloud Firestore.
 
