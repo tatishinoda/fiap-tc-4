@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User as FirebaseUser } from 'firebase/auth';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 import { AuthService } from '../services/AuthService';
-import { AuthContextType, User } from '../types';
 import { useAuthStore } from '../store/auth.store';
+import { AuthContextType, User } from '../types';
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -14,7 +14,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
+
   // Integração com Zustand store
   const authStore = useAuthStore();
 
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (firebaseUser) {
         try {
           const userData = await AuthService.getCurrentUser();
-          
+
           if (!userData) {
             console.error('Dados do usuário não encontrados no Firestore');
             await AuthService.signOut();
@@ -34,9 +34,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             authStore.setLoading(false);
             return;
           }
-          
+
           const token = await firebaseUser.getIdToken();
-          
+
           setUser(userData);
           setIsAuthenticated(true);
           setLoading(false);
@@ -81,6 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signOut = async (): Promise<void> => {
     try {
+      await clearCache(); // Limpar cache antes do logout
       await AuthService.signOut();
       await authStore.logout();
     } catch (error) {

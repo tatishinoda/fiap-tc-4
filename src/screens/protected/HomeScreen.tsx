@@ -9,9 +9,9 @@ import { FinancialOverview } from '../../components/FinancialOverview';
 import { FinancialPieChart } from '../../components/FinancialPieChart';
 import { QuickActions } from '../../components/QuickActions';
 import { Alert } from '../../components/ui';
-import { useTransactionContext } from '../../context';
 import { useAlert } from '../../hooks/useAlert';
 import { useAuth } from '../../hooks/useAuth';
+import { useFinancialSummary, useTransactions } from '../../hooks/useTransactionQueries';
 import { colors, spacing } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
@@ -25,21 +25,20 @@ interface HomeScreenProps {
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { user } = useAuth();
-  const {
-    transactions,
-    loading,
-    balance,
-    income,
-    expenses,
-    refreshTransactions,
-  } = useTransactionContext();
+  const { data: transactions = [], isLoading: loading, refetch } = useTransactions();
+  const { data: summary } = useFinancialSummary();
   const { alert, showInfo } = useAlert();
 
   const [refreshing, setRefreshing] = useState(false);
 
+  // Extrair valores do summary ou calcular se não disponível
+  const balance = summary?.balance ?? 0;
+  const income = summary?.income ?? 0;
+  const expenses = summary?.expenses ?? 0;
+
   const onRefresh = async () => {
     setRefreshing(true);
-    await refreshTransactions();
+    await refetch();
     setRefreshing(false);
   };
 

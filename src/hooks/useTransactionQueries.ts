@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../../hooks/useAuth';
-import * as TransactionService from '../../services/TransactionService';
-import { Transaction } from '../../types';
+import * as TransactionService from '../services/TransactionService';
+import { Transaction } from '../types';
+import { useAuth } from './useAuth';
 
 /**
  * Hook para buscar transações com cache
@@ -115,7 +115,10 @@ export function useUpdateTransaction() {
     }: {
       id: string;
       data: TransactionService.UpdateTransactionData;
-    }) => TransactionService.updateTransaction(id, data),
+    }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      return TransactionService.updateTransaction(id, user.id, data);
+    },
 
     onSuccess: () => {
       // Invalida cache após sucesso
@@ -180,14 +183,14 @@ export function useFinancialSummary() {
       if (!transactions) return { balance: 0, income: 0, expenses: 0 };
 
       const income = transactions
-        .filter((t) => t.type === 'DEPOSIT')
-        .reduce((sum, t) => sum + t.amount, 0);
+        .filter((t: Transaction) => t.type === 'DEPOSIT')
+        .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
 
       const expenses = transactions
-        .filter((t) =>
+        .filter((t: Transaction) =>
           ['WITHDRAWAL', 'PAYMENT', 'TRANSFER', 'INVESTMENT'].includes(t.type)
         )
-        .reduce((sum, t) => sum + t.amount, 0);
+        .reduce((sum: number, t: Transaction) => sum + t.amount, 0);
 
       return {
         balance: income - expenses,

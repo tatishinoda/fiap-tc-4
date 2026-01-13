@@ -16,14 +16,15 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { useAppContext, useTransactionContext } from '../../context';
+import { CategoryChips, CurrencyInput } from '../../components/ui';
+import { useAppContext } from '../../context';
 import { useAuth } from '../../hooks/useAuth';
+import { useCreateTransaction, useDeleteTransaction, useTransactions, useUpdateTransaction } from '../../hooks/useTransactionQueries';
 import { colors } from '../../theme';
 import { TransactionType } from '../../types';
 import { RootStackParamList } from '../../types/navigation';
-import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction, getUnifiedCategory, combineCategories } from '../../utils';
-import { uploadReceipt, deleteReceipt } from '../../utils/storage';
-import { CategoryChips, CurrencyInput } from '../../components/ui';
+import { combineCategories, getSuggestedCategories, getUnifiedCategory, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../utils';
+import { deleteReceipt, uploadReceipt } from '../../utils/storage';
 
 type TransactionFormScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
 type TransactionFormScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
@@ -34,7 +35,10 @@ interface TransactionFormScreenProps {
 }
 
 export default function TransactionFormScreen({ route, navigation }: TransactionFormScreenProps) {
-  const { addTransaction, updateTransaction, deleteTransaction, transactions, loading } = useTransactionContext();
+  const { data: transactions = [], isLoading: loading } = useTransactions();
+  const createMutation = useCreateTransaction();
+  const updateMutation = useUpdateTransaction();
+  const deleteMutation = useDeleteTransaction();
   const { showNotification } = useAppContext();
   const { user } = useAuth();
 
@@ -57,7 +61,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       const amountInReais = existingTransaction.amount / 100;
       setAmount(amountInReais.toFixed(2).replace('.', ','));
       setDescription(existingTransaction.description);
-      
+
       // Normaliza categoria carregada priorizando as sugeridas
       const loadedCategory = existingTransaction.category || '';
       if (loadedCategory) {
@@ -70,7 +74,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       } else {
         setCategory('');
       }
-      
+
       setReceiptUri((existingTransaction as any).receiptUrl || null);
     }
   }, [isEditing, existingTransaction]);
@@ -101,9 +105,9 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       setCategory('');
       return;
     }
-    
+
     const unifiedCategory = getUnifiedCategory(
-      category, 
+      category,
       existingCategories,
       suggestedCategories
     );
@@ -112,7 +116,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
 
   const handleCategoryChipPress = (selectedCategory: string) => {
     const unifiedCategory = getUnifiedCategory(
-      selectedCategory, 
+      selectedCategory,
       existingCategories,
       suggestedCategories
     );
@@ -197,7 +201,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
                 // Continua removendo referência mesmo se falhar no Storage
               }
             }
-            
+
             setReceiptUri(null);
             showNotification('Recibo removido', 'success');
           },
@@ -221,7 +225,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           style: 'destructive',
           onPress: async () => {
             try {
-              await deleteTransaction(transactionId);
+              await deleteMutation.mutateAsync(transactionId);
               showNotification('Transação deletada com sucesso!', 'success');
               navigation.goBack();
             } catch (error: any) {
@@ -294,7 +298,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           updateData.receiptUrl = null;
         }
 
-        await updateTransaction(transactionId, updateData);
+        await updateMutation.mutateAsync({ id: transactionId, data: updateData });
 
         const typeLabel = TRANSACTION_TYPE_CONFIG[type].label;
         showNotification(`${typeLabel} atualizada com sucesso!`, 'success');
@@ -314,7 +318,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           newTransactionData.receiptUrl = receiptUrl;
         }
 
-        await addTransaction(newTransactionData);
+        await createMutation.mutateAsync(newTransactionData);
 
         const typeLabel = TRANSACTION_TYPE_CONFIG[type].label;
         showNotification(`${typeLabel} adicionada com sucesso!`, 'success');
