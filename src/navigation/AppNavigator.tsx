@@ -1,39 +1,53 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import React, { lazy, Suspense } from 'react';
+import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../hooks/useAuth';
-import { RootStackParamList, TabParamList } from '../types/navigation';
-import { GlobalNotification } from '../components/GlobalNotification';
 import { ConfirmModal } from '../components/ConfirmModal';
+import { GlobalNotification } from '../components/GlobalNotification';
+import { useAuth } from '../hooks/useAuth';
+import { useDefaultPreload } from '../hooks/useSmartPreload';
 import { colors } from '../theme/colors';
-import { getNavigationIcon, ACTION_ICONS } from '../utils/icons';
+import { RootStackParamList, TabParamList } from '../types/navigation';
+import { ACTION_ICONS, getNavigationIcon } from '../utils/icons';
 
+// Componente de loading (carregado imediatamente)
+import LoadingScreen from '../components/LoadingScreen';
+
+// 🚀 LAZY LOADING: Telas carregadas sob demanda
 // Telas de autenticação
-import LoginScreen from '../screens/auth/LoginScreen';
-import SignUpScreen from '../screens/auth/SignUpScreen';
+const LoginScreen = lazy(() => import('../screens/auth/LoginScreen'));
+const SignUpScreen = lazy(() => import('../screens/auth/SignUpScreen'));
 
 // Telas protegidas
-import HomeScreen from '../screens/protected/HomeScreen';
-import TransactionsScreen from '../screens/protected/TransactionsScreen';
-import TransactionFormScreen from '../screens/protected/TransactionFormScreen';
-
-// Componente de loading
-import LoadingScreen from '../components/LoadingScreen';
+const HomeScreen = lazy(() => import('../screens/protected/HomeScreen'));
+const TransactionsScreen = lazy(() => import('../screens/protected/TransactionsScreen'));
+const TransactionFormScreen = lazy(() => import('../screens/protected/TransactionFormScreen'));
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// Stack de autenticação
+// Stack de autenticação com Suspense
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="Login">
+        {(props) => (
+          <Suspense fallback={<LoadingScreen />}>
+            <LoginScreen {...props} />
+          </Suspense>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="SignUp">
+        {(props) => (
+          <Suspense fallback={<LoadingScreen />}>
+            <SignUpScreen {...props} />
+          </Suspense>
+        )}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -123,16 +137,20 @@ function ProtectedTabs() {
           } : undefined,
         })}
       >
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ tabBarLabel: 'Início' }}
-        />
-        <Tab.Screen
-          name="Transactions"
-          component={TransactionsScreen}
-          options={{ tabBarLabel: 'Transações' }}
-        />
+        <Tab.Screen name="Home" options={{ tabBarLabel: 'Início' }}>
+          {(props) => (
+            <Suspense fallback={<LoadingScreen />}>
+              <HomeScreen {...props} />
+            </Suspense>
+          )}
+        </Tab.Screen>
+        <Tab.Screen name="Transactions" options={{ tabBarLabel: 'Transações' }}>
+          {(props) => (
+            <Suspense fallback={<LoadingScreen />}>
+              <TransactionsScreen {...props} />
+            </Suspense>
+          )}
+        </Tab.Screen>
       </Tab.Navigator>
 
       {/* Logout Confirmation Modal */}
@@ -149,14 +167,13 @@ function ProtectedTabs() {
   );
 }
 
-// Stack principal para telas protegidas
+// Stack principal para telas protegidas com Suspense
 function ProtectedStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabs" component={ProtectedTabs} />
       <Stack.Screen
         name="AddTransaction"
-        component={TransactionFormScreen}
         options={{
           headerShown: true,
           headerTitle: 'Nova Transação',
@@ -169,10 +186,15 @@ function ProtectedStack() {
           },
           presentation: 'modal',
         }}
-      />
+      >
+        {(props) => (
+          <Suspense fallback={<LoadingScreen />}>
+            <TransactionFormScreen {...props} />
+          </Suspense>
+        )}
+      </Stack.Screen>
       <Stack.Screen
         name="EditTransaction"
-        component={TransactionFormScreen}
         options={{
           headerShown: true,
           headerTitle: 'Editar Transação',
@@ -185,13 +207,34 @@ function ProtectedStack() {
           },
           presentation: 'modal',
         }}
-      />
+      >
+        {(props) => (
+          <Suspense fallback={<LoadingScreen />}>
+            <TransactionFormScreen {...props} />
+          </Suspense>
+        )}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
 
+// Componente interno que usa o hook de navegação
+function NavigationContent() {
+  const { isAuthenticated } = useAuth();
+
+  // 🚀 Pré-carregamento inteligente de telas (dentro do NavigationContainer)
+  useDefaultPreload();
+
+  return (
+    <>
+      {isAuthenticated ? <ProtectedStack /> : <AuthStack />}
+      <GlobalNotification />
+    </>
+  );
+}
+
 export function AppNavigator() {
-  const { isAuthenticated, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <LoadingScreen />;
@@ -199,8 +242,7 @@ export function AppNavigator() {
 
   return (
     <NavigationContainer>
-      {isAuthenticated ? <ProtectedStack /> : <AuthStack />}
-      <GlobalNotification />
+      <NavigationContent />
     </NavigationContainer>
   );
 }
