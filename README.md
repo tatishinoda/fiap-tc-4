@@ -64,8 +64,8 @@ bytebank-mobile/
 
 ### **1. Clone o projeto**
 ```bash
-git clone https://github.com/camp0sfer/bytebank-mobile.git
-cd bytebank-mobile
+git clone https://github.com/tatishinoda/fiap-tc-4.git
+cd fiap-tc-4
 ```
 
 ### **2. Instalar dependências**
