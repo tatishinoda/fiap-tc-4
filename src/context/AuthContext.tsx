@@ -1,5 +1,6 @@
 import { User as FirebaseUser } from 'firebase/auth';
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import { clearCache } from '../infrastructure/cache/QueryProvider';
 import { AuthService } from '../services/AuthService';
 import { useAuthStore } from '../store/auth.store';
 import { AuthContextType, User } from '../types';
@@ -98,9 +99,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signOut,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
