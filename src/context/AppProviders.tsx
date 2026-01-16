@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
+import { QueryProvider } from '../infrastructure/cache/QueryProvider';
+import { AppProvider } from './AppContext';
 import { AuthProvider } from './AuthContext';
 import { TransactionProvider } from './TransactionContext';
-import { AppProvider } from './AppContext';
 
 interface AppProvidersProps {
   children: ReactNode;
@@ -10,18 +11,21 @@ interface AppProvidersProps {
 /**
  * Provider unificado que agrupa todos os Context Providers da aplicação.
  * Ordem de encapsulamento:
- * 1. AppProvider - Configurações globais da aplicação (tema, loading, etc.)
- * 2. AuthProvider - Autenticação e gerenciamento de usuário
- * 3. TransactionProvider - Gerenciamento de transações (requer autenticação)
+ * 1. QueryProvider - React Query para cache e sincronização
+ * 2. AppProvider - Configurações globais da aplicação (tema, loading, etc.)
+ * 3. AuthProvider - Autenticação e gerenciamento de usuário
+ * 4. TransactionProvider - Gerenciamento de transações (requer autenticação)
  */
 export function AppProviders({ children }: AppProvidersProps) {
   return (
-    <AppProvider>
-      <AuthProvider>
-        <TransactionProvider>
-          {children}
-        </TransactionProvider>
-      </AuthProvider>
-    </AppProvider>
+    <QueryProvider>
+      <AppProvider>
+        <AuthProvider>
+          <TransactionProvider>
+            {children}
+          </TransactionProvider>
+        </AuthProvider>
+      </AppProvider>
+    </QueryProvider>
   );
 }
