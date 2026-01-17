@@ -1,20 +1,20 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { CategoryAnalysis } from '../../components/CategoryAnalysis';
 import { FinancialChart } from '../../components/FinancialChart';
+import { FinancialInsights } from '../../components/FinancialInsights';
 import { FinancialOverview } from '../../components/FinancialOverview';
+import { FinancialPieChart } from '../../components/FinancialPieChart';
 import { QuickActions } from '../../components/QuickActions';
 import { RecentTransactions } from '../../components/RecentTransactions';
 import { Alert } from '../../components/ui';
 import { useAlert } from '../../hooks/useAlert';
 import { useHomeViewModel } from '../../hooks/useHomeViewModel';
 import { colors, spacing } from '../../../theme';
-import { TransactionType } from '../../../types';
+import { TransactionType } from '../../../domain/entities/Transaction';
 import { RootStackParamList } from '../../../types/navigation';
 import { TRANSACTION_TYPE_CONFIG } from '../../../utils';
-import { FinancialInsights } from '@/presentation/components/FinancialInsights';
-import { FinancialPieChart } from '@/presentation/components/FinancialPieChart';
-import { CategoryAnalysis } from '@/presentation/components/CategoryAnalysis';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -68,7 +68,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <View style={styles.container}>
-      <ScrollView 
+      <ScrollView
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -100,14 +100,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           transactions={transactions}
           refreshing={refreshing}
         />
-
-        {/* Gráfico de Pizza - Distribuição Financeira */}
-        <FinancialPieChart
-          transactions={transactions}
-        />
-
-        {/* Gastos por Categoria */}
-        <CategoryAnalysis transactions={transactions} />
 
         {/* Transações Recentes */}
         <RecentTransactions
