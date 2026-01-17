@@ -27,10 +27,6 @@ export interface TextProps extends RNTextProps {
   children: React.ReactNode;
 }
 
-/**
- * Text Component
- * Usa o design system com tipografia refinada
- */
 export const Text: React.FC<TextProps> = ({
   variant = 'bodyMedium',
   align = 'left',

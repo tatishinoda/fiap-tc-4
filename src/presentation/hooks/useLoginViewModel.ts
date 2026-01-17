@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LoginUseCase } from '../../application/usecases/auth/LoginUseCase';
+import { LoginUseCase } from '../../domain/usecases/auth/LoginUseCase';
 import { container } from '../../di/container';
 import { useAuthActions, useAuthLoading, useAuthError } from '../../state/selectors/authSelectors';
 

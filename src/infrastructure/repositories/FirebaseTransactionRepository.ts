@@ -1,8 +1,3 @@
-/**
- * Firebase Transaction Repository - Infrastructure Layer
- * Implementação concreta do repositório usando Firebase Firestore
- */
-
 import {
   collection,
   addDoc,
@@ -28,9 +23,7 @@ import { TransactionMapper } from '../mappers/TransactionMapper';
 const TRANSACTIONS_COLLECTION = 'transactions';
 
 export class FirebaseTransactionRepository implements ITransactionRepository {
-  /**
-   * Busca todas as transações de um usuário
-   */
+  // Busca todas as transações de um usuário
   async getAll(userId: string): Promise<Transaction[]> {
     try {
       const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
@@ -54,9 +47,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
     }
   }
 
-  /**
-   * Cria uma nova transação
-   */
+  // Cria uma nova transação
   async create(data: CreateTransactionDTO): Promise<Transaction> {
     try {
       const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
@@ -92,9 +83,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
     }
   }
 
-  /**
-   * Atualiza uma transação existente
-   */
+  // Atualiza uma transação existente
   async update(
     transactionId: string,
     userId: string,
@@ -127,9 +116,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
     }
   }
 
-  /**
-   * Remove uma transação
-   */
+  // Remove uma transação
   async delete(transactionId: string): Promise<void> {
     try {
       const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
@@ -140,9 +127,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
     }
   }
 
-  /**
-   * Calcula o resumo financeiro do usuário
-   */
+  // Calcula o resumo financeiro do usuário
   async getSummary(userId: string): Promise<FinancialSummary> {
     try {
       const transactions = await this.getAll(userId);

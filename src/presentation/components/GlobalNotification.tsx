@@ -5,14 +5,6 @@ import { useNotification } from '../hooks/useNotification';
 import { Text } from './ui';
 import { colors } from '../../theme';
 
-/**
- * Componente de Notificação Global
- * Exibe notificações usando Zustand Store
- * 
- * Uso:
- * 1. Adicione <GlobalNotification /> no topo da sua hierarquia de componentes
- * 2. Use useNotification() em qualquer lugar da app
- */
 export function GlobalNotification() {
   const { notification, clearNotification } = useNotification();
   const slideAnim = React.useRef(new Animated.Value(-100)).current;
