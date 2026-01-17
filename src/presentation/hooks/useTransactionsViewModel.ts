@@ -1,16 +1,13 @@
-/**
- * useTransactionsViewModel - Presentation Layer
- * ViewModel para a tela de listagem de transações
- */
+// ViewModel para a tela de listagem de transações
 
 import { useEffect } from 'react';
 import { useStore } from '../../state/store';
 import { transactionSelectors } from '../../state/selectors/transactionSelectors';
 import { authSelectors } from '../../state/selectors/authSelectors';
 import { container } from '../../di/container';
-import { GetAllTransactionsUseCase } from '../../application/usecases/transaction/GetAllTransactionsUseCase';
-import { DeleteTransactionUseCase } from '../../application/usecases/transaction/DeleteTransactionUseCase';
-import { GetFinancialSummaryUseCase } from '../../application/usecases/transaction/GetFinancialSummaryUseCase';
+import { GetAllTransactionsUseCase } from '../../domain/usecases/transaction/GetAllTransactionsUseCase';
+import { DeleteTransactionUseCase } from '../../domain/usecases/transaction/DeleteTransactionUseCase';
+import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
 
 export const useTransactionsViewModel = () => {
   const user = useStore(authSelectors.user);

@@ -14,10 +14,6 @@ interface QuickActionsProps {
   actions: QuickAction[];
 }
 
-/**
- * Quick Actions Component
- * Card flutuante elevado posicionado sobre o card de saldo
- */
 export function QuickActions({ actions }: QuickActionsProps) {
   return (
     <View style={styles.floatingCard}>

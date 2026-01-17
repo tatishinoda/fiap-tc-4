@@ -4,10 +4,6 @@ import { Text } from './ui';
 import { useStore } from '../../state/store';
 import { colors } from '../../theme/colors';
 
-/**
- * Componente de Loading Global
- * Exibe um overlay de loading quando há operações globais em andamento
- */
 export const GlobalLoading: React.FC = () => {
   const isLoading = useStore((state) => state.isLoading);
   const loadingMessage = useStore((state) => state.loadingMessage);
