@@ -28,17 +28,23 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvi
 bytebank-mobile/
 ├── assets/                # Recursos estáticos (ícones, splash)
 ├── src/
-│   ├── components/        # Componentes reutilizáveis e UI
-│   ├── config/            # Configurações
-│   │   └── firebase.ts    # Configuração Firebase
-│   ├── context/           # Contextos React (estado global)
-│   ├── hooks/             # Custom hooks
-│   ├── navigation/        # Rotas e navegação
-│   ├── screens/           # Telas da aplicação
-│   │   ├── auth/          # Telas de autenticação (Login, SignUp)
-│   │   └── protected/     # Telas protegidas (Home, Transactions, etc)
-│   ├── services/          # Lógica de negócio e APIs
-│   ├── store/             # Gerenciamento de estado (Zustand)
+│   ├── application/       # Casos de uso (regras de negócio)
+│   │   └── usecases/      # Casos de uso organizados por domínio
+│   ├── di/                # Injeção de dependências (container)
+│   ├── domain/            # Entidades e contratos (interfaces dos repositórios)
+│   │   ├── entities/      # Entidades de domínio
+│   │   └── repositories/  # Interfaces dos repositórios
+│   ├── infrastructure/    # Implementações concretas (repositórios, mapeadores, configs externas)
+│   │   ├── config/        # Configurações externas (ex: Firebase)
+│   │   ├── mappers/       # Mapeadores de entidades
+│   │   └── repositories/  # Repositórios concretos
+│   ├── presentation/      # Camada de apresentação (UI, hooks, navegação, telas, estado local)
+│   │   ├── components/    # Componentes reutilizáveis e UI
+│   │   ├── hooks/         # Custom hooks
+│   │   ├── navigation/    # Rotas e navegação
+│   │   ├── screens/       # Telas da aplicação
+│   │   └── state/         # Estado local da apresentação
+│   ├── state/             # Estado global (Redux/Zustand, selectors, slices)
 │   ├── theme/             # Tema, cores e estilos
 │   ├── types/             # Definições TypeScript
 │   └── utils/             # Funções utilitárias
@@ -49,9 +55,26 @@ bytebank-mobile/
 ├── .env.example           # Template das variáveis
 ├── firestore.rules        # Regras de segurança Firestore
 ├── storage.rules          # Regras de segurança Storage
-├── firebase.json          # Configuração Firebase CLI
 └── README.md              # Documentação principal
 ```
+
+### Arquitetura e Fluxo de Dependências
+
+O projeto segue os princípios da Clean Architecture, separando responsabilidades em camadas bem definidas:
+
+- **presentation**: Camada de interface com o usuário (UI, hooks, navegação, telas, estado local). Consome apenas casos de uso da camada application.
+- **application**: Casos de uso (regras de negócio da aplicação). Depende apenas de contratos definidos em domain.
+- **domain**: Entidades e contratos (interfaces dos repositórios). Não depende de nenhuma outra camada.
+- **infrastructure**: Implementações concretas de repositórios, mapeadores e configurações externas. Depende de domain e é injetada via DI.
+- **state**: Gerenciamento de estado global (Redux, Zustand, selectors, slices), utilizado pela camada de apresentação.
+
+O fluxo de dependências é sempre direcionado para o domínio, nunca o contrário:
+
+```
+presentation → application → domain ← infrastructure
+```
+
+Essa separação facilita testes, manutenção e evolução do projeto, além de garantir baixo acoplamento entre as camadas.
 
 ## Como Executar
 
