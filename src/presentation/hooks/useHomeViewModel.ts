@@ -1,15 +1,10 @@
-/**
- * useHomeViewModel - Presentation Layer
- * ViewModel para a tela Home/Dashboard
- */
-
 import { useEffect } from 'react';
 import { useStore } from '../../state/store';
 import { transactionSelectors } from '../../state/selectors/transactionSelectors';
 import { authSelectors } from '../../state/selectors/authSelectors';
 import { container } from '../../di/container';
-import { GetAllTransactionsUseCase } from '../../application/usecases/transaction/GetAllTransactionsUseCase';
-import { GetFinancialSummaryUseCase } from '../../application/usecases/transaction/GetFinancialSummaryUseCase';
+import { GetAllTransactionsUseCase } from '../../domain/usecases/transaction/GetAllTransactionsUseCase';
+import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
 
 export const useHomeViewModel = () => {
   const user = useStore(authSelectors.user);

@@ -12,7 +12,6 @@ export class FirebaseAuthRepository implements IAuthRepository {
 
   async signUp(email: string, password: string, name: string): Promise<User> {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    // Aqui você pode salvar o name no Firestore se necessário
     return UserMapper.toDomain(userCredential.user);
   }
 

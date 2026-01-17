@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SignUpUseCase } from '../../application/usecases/auth/SignUpUseCase';
+import { SignUpUseCase } from '../../domain/usecases/auth/SignUpUseCase';
 import { container } from '../../di/container';
 import { useAuthActions, useAuthLoading, useAuthError } from '../../state/selectors/authSelectors';
 
