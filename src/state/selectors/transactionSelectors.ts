@@ -1,8 +1,3 @@
-/**
- * Transaction Selectors - State Layer
- * Selectors para acessar o estado de transações
- */
-
 import { TransactionState } from '../slices/transactionSlice';
 
 export const transactionSelectors = {

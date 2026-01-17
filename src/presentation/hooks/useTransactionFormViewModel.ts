@@ -1,15 +1,12 @@
-/**
- * useTransactionFormViewModel - Presentation Layer
- * ViewModel para a tela de formulário de transações (criar/editar)
- */
+// ViewModel para a tela de formulário de transações (criar/editar)
 
 import { useState } from 'react';
 import { useStore } from '../../state/store';
 import { authSelectors } from '../../state/selectors/authSelectors';
 import { container } from '../../di/container';
-import { CreateTransactionUseCase } from '../../application/usecases/transaction/CreateTransactionUseCase';
-import { UpdateTransactionUseCase } from '../../application/usecases/transaction/UpdateTransactionUseCase';
-import { GetFinancialSummaryUseCase } from '../../application/usecases/transaction/GetFinancialSummaryUseCase';
+import { CreateTransactionUseCase } from '../../domain/usecases/transaction/CreateTransactionUseCase';
+import { UpdateTransactionUseCase } from '../../domain/usecases/transaction/UpdateTransactionUseCase';
+import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
 import { CreateTransactionDTO, UpdateTransactionDTO } from '../../domain/repositories/ITransactionRepository';
 
 export const useTransactionFormViewModel = () => {

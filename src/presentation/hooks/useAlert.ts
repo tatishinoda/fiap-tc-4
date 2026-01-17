@@ -1,9 +1,6 @@
 import { useState, useCallback } from 'react';
 import { AlertType } from '../components/ui/Alert';
 
-// ============================================================================
-// TIPOS E INTERFACES
-// ============================================================================
 
 export interface AlertButton {
   text: string;
@@ -19,14 +16,7 @@ export interface AlertConfig {
   closeOnBackdropPress?: boolean;
 }
 
-// ============================================================================
-// HOOK PRINCIPAL
-// ============================================================================
-
 export function useAlert() {
-  // --------------------------------------------------------------------------
-  // Estado
-  // --------------------------------------------------------------------------
 
   const [alertConfig, setAlertConfig] = useState<AlertConfig & { visible: boolean }>({
     visible: false,
@@ -36,10 +26,6 @@ export function useAlert() {
     buttons: [],
     closeOnBackdropPress: true,
   });
-
-  // --------------------------------------------------------------------------
-  // Controles Básicos
-  // --------------------------------------------------------------------------
 
   // Exibe alert com configuração customizada
   const showAlert = useCallback((config: AlertConfig) => {
@@ -56,10 +42,6 @@ export function useAlert() {
       visible: false,
     }));
   }, []);
-
-  // --------------------------------------------------------------------------
-  // Atalhos por Tipo
-  // --------------------------------------------------------------------------
 
   // Exibe alert de sucesso
   const showSuccess = useCallback(
@@ -93,10 +75,6 @@ export function useAlert() {
     [showAlert]
   );
 
-  // --------------------------------------------------------------------------
-  // Diálogos Especiais
-  // --------------------------------------------------------------------------
-
   // Exibe diálogo de confirmação com botões Cancelar/Confirmar
   const showConfirm = useCallback(
     (
@@ -126,10 +104,6 @@ export function useAlert() {
     },
     [showAlert, hideAlert]
   );
-
-  // --------------------------------------------------------------------------
-  // Retorno do Hook
-  // --------------------------------------------------------------------------
 
   return {
     alert: {
