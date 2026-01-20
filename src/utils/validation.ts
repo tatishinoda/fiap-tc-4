@@ -4,15 +4,7 @@
  */
 
 import { Alert } from 'react-native';
-
-// ============================================================================
-// TIPOS E INTERFACES
-// ============================================================================
-
-export interface ValidationResult {
-  isValid: boolean;
-  error?: string;
-}
+import { TransactionFormData, ValidationResult } from '../types';
 
 // ============================================================================
 // VALIDAÇÃO DE AUTENTICAÇÃO
@@ -229,6 +221,41 @@ export const validateTransaction = (
   const descriptionResult = validateDescription(description);
   if (!descriptionResult.isValid) {
     return descriptionResult;
+  }
+
+  return { isValid: true };
+};
+
+// Valida formulário de transação completo usando TransactionFormData
+export const validateTransactionFormData = (
+  data: TransactionFormData
+): ValidationResult => {
+  // Valida amount
+  const amountResult = validateAmount(data.amount);
+  if (!amountResult.isValid) {
+    return amountResult;
+  }
+
+  // Valida description
+  const descriptionResult = validateDescription(data.description);
+  if (!descriptionResult.isValid) {
+    return descriptionResult;
+  }
+
+  // Valida type
+  const validTypes = ['income', 'expense', 'transfer'];
+  if (!validTypes.includes(data.type)) {
+    return { isValid: false, error: 'Tipo de transação inválido' };
+  }
+
+  // Valida date
+  if (!data.date || !(data.date instanceof Date) || isNaN(data.date.getTime())) {
+    return { isValid: false, error: 'Data inválida' };
+  }
+
+  // Category é opcional, então não precisa validar se estiver vazio
+  if (data.category && data.category.trim().length > 50) {
+    return { isValid: false, error: 'Categoria muito longa (máximo 50 caracteres)' };
   }
 
   return { isValid: true };

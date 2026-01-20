@@ -10,14 +10,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Text';
 import { Button } from './Button';
 import { colors, cards, spacing, shadows } from '../../../theme';
+import { AlertButton } from '../../../types';
 
 export type AlertType = 'info' | 'success' | 'warning' | 'error';
-
-export interface AlertButton {
-  text: string;
-  onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-}
 
 interface AlertProps {
   visible: boolean;

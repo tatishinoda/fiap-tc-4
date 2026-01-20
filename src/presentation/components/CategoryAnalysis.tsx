@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Transaction } from '../../types';
+import { Transaction } from '../../domain/entities/Transaction';
 import { formatCurrency } from '../../utils';
 
 interface CategoryAnalysisProps {

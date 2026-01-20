@@ -484,16 +484,16 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
             onPress={handleSubmit}
             disabled={loading || uploadingReceipt}
           >
-            {uploadingReceipt ? (
+            {(loading || uploadingReceipt) ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator color="#FFFFFF" />
                 <Text style={[styles.submitButtonText, { marginLeft: 8 }]}>
-                  Fazendo upload...
+                  {isEditing ? 'Atualizando...' : 'Adicionando...'}
                 </Text>
               </View>
             ) : (
               <Text style={styles.submitButtonText}>
-                {loading ? (isEditing ? 'Atualizando...' : 'Adicionando...') : (isEditing ? 'Atualizar' : 'Adicionar')}
+                {isEditing ? 'Atualizar' : 'Adicionar'}
               </Text>
             )}
           </TouchableOpacity>

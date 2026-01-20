@@ -9,7 +9,7 @@ import Animated, {
   withDelay,
    withTiming
 } from 'react-native-reanimated';
-import { Transaction } from '../../types';
+import { Transaction } from '../../domain/entities/Transaction';
 import { formatCurrency } from '../../utils';
 import { INSIGHT_ICONS } from '../../utils/icons';
 

@@ -11,7 +11,7 @@ import {
   View
 } from 'react-native';
 import { colors } from '../../theme/colors';
-import { TransactionType } from '../../types';
+import { TransactionType } from '../../domain/entities/Transaction';
 import { TRANSACTION_TYPE_CONFIG, getAllSuggestedCategories } from '../../utils/constants';
 import { formatDateInput, getUnifiedCategory, combineCategories } from '../../utils';
 import { CategoryChips } from './CategoryChips';
