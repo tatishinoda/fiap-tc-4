@@ -28,8 +28,6 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvi
 bytebank-mobile/
 ├── assets/                # Recursos estáticos (ícones, splash)
 ├── src/
-│   ├── application/       # Casos de uso (regras de negócio)
-│   │   └── usecases/      # Casos de uso organizados por domínio
 │   ├── di/                # Injeção de dependências (container)
 │   ├── domain/            # Entidades e contratos (interfaces dos repositórios)
 │   │   ├── entities/      # Entidades de domínio
