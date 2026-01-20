@@ -5,7 +5,7 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
-import { TransactionType } from '../types';
+import { TransactionType } from '../domain/entities/Transaction';
 
 // ============================================================================
 // TIPOS DE TRANSAÇÃO

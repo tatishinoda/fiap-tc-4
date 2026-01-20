@@ -1,12 +1,6 @@
 import { useState, useCallback } from 'react';
 import { AlertType } from '../components/ui/Alert';
-
-
-export interface AlertButton {
-  text: string;
-  onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
-}
+import { AlertButton } from '../../types';
 
 export interface AlertConfig {
   type?: AlertType;
