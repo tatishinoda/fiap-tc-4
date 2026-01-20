@@ -1,4 +1,4 @@
-# Tech Challenge - Fase 3 - Grupo 9 - 4FRNT
+# Tech Challenge - Fase 4 - Grupo 17 - 4FRNT
 
 ByteBank: Aplicação Mobile, utilizando React Native (Expo), Firebase Storage e Cloud Firestore.
 
@@ -58,24 +58,6 @@ bytebank-mobile/
 └── README.md              # Documentação principal
 ```
 
-### Arquitetura e Fluxo de Dependências
-
-O projeto segue os princípios da Clean Architecture, separando responsabilidades em camadas bem definidas:
-
-- **presentation**: Camada de interface com o usuário (UI, hooks, navegação, telas, estado local). Consome apenas casos de uso da camada application.
-- **application**: Casos de uso (regras de negócio da aplicação). Depende apenas de contratos definidos em domain.
-- **domain**: Entidades e contratos (interfaces dos repositórios). Não depende de nenhuma outra camada.
-- **infrastructure**: Implementações concretas de repositórios, mapeadores e configurações externas. Depende de domain e é injetada via DI.
-- **state**: Gerenciamento de estado global (Redux, Zustand, selectors, slices), utilizado pela camada de apresentação.
-
-O fluxo de dependências é sempre direcionado para o domínio, nunca o contrário:
-
-```
-presentation → application → domain ← infrastructure
-```
-
-Essa separação facilita testes, manutenção e evolução do projeto, além de garantir baixo acoplamento entre as camadas.
-
 ## Como Executar
 
 ### **Pré-requisitos**
@@ -87,8 +69,8 @@ Essa separação facilita testes, manutenção e evolução do projeto, além de
 
 ### **1. Clone o projeto**
 ```bash
-git clone https://github.com/camp0sfer/bytebank-mobile.git
-cd bytebank-mobile
+git clone https://github.com/tatishinoda/fiap-tc-4.git
+cd fiap-tc-4
 ```
 
 ### **2. Instalar dependências**
