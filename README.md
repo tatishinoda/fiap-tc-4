@@ -58,24 +58,6 @@ bytebank-mobile/
 └── README.md              # Documentação principal
 ```
 
-### Arquitetura e Fluxo de Dependências
-
-O projeto segue os princípios da Clean Architecture, separando responsabilidades em camadas bem definidas:
-
-- **presentation**: Camada de interface com o usuário (UI, hooks, navegação, telas, estado local). Consome apenas casos de uso da camada application.
-- **application**: Casos de uso (regras de negócio da aplicação). Depende apenas de contratos definidos em domain.
-- **domain**: Entidades e contratos (interfaces dos repositórios). Não depende de nenhuma outra camada.
-- **infrastructure**: Implementações concretas de repositórios, mapeadores e configurações externas. Depende de domain e é injetada via DI.
-- **state**: Gerenciamento de estado global (Redux, Zustand, selectors, slices), utilizado pela camada de apresentação.
-
-O fluxo de dependências é sempre direcionado para o domínio, nunca o contrário:
-
-```
-presentation → application → domain ← infrastructure
-```
-
-Essa separação facilita testes, manutenção e evolução do projeto, além de garantir baixo acoplamento entre as camadas.
-
 ## Como Executar
 
 ### **Pré-requisitos**
