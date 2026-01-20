@@ -1,11 +1,7 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
+import React, { useEffect } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import { Transaction, TransactionType } from '../../domain/entities/Transaction';
 import { TRANSACTION_TYPE_CONFIG } from '../../utils/constants';
@@ -13,7 +9,8 @@ import { formatCurrency, formatCurrencyCompact } from '../../utils';
 import { INSIGHT_ICONS } from '../../utils/icons';
 
 interface TypeData {
-  type: string;
+  type: TransactionType;
+  label: string;
   amount: number;
   color: string;
   icon: string;
@@ -27,7 +24,7 @@ interface FinancialPieChartProps {
 export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
   // Agrupar transações por tipo
   const typeMap = new Map<TransactionType, number>();
-  
+
   transactions.forEach(transaction => {
     const current = typeMap.get(transaction.type) || 0;
     typeMap.set(transaction.type, current + transaction.amount);
@@ -38,17 +35,18 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
     .map(([type, amount]) => {
       const config = TRANSACTION_TYPE_CONFIG[type];
       return {
-        type: config.label,
-        amount: amount / 100, // Converter de centavos
+        type,
+        label: config.label,
+        amount,
         color: config.color,
         icon: config.icon,
-        percentage: 0, // Será calculado abaixo
+        percentage: 0,
       };
     })
     .sort((a, b) => b.amount - a.amount);
 
   const totalAmount = typeData.reduce((sum, item) => sum + item.amount, 0);
-  
+
   // Calcular percentuais
   typeData.forEach(item => {
     item.percentage = totalAmount > 0 ? item.amount / totalAmount : 0;
@@ -56,12 +54,12 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
 
   // Calcular saldo (receitas - despesas)
   const incomeTransactions = transactions.filter(t => t.type === 'DEPOSIT');
-  const expenseTransactions = transactions.filter(t => 
+  const expenseTransactions = transactions.filter(t =>
     t.type === 'WITHDRAWAL' || t.type === 'PAYMENT' || t.type === 'TRANSFER' || t.type === 'INVESTMENT'
   );
-  
-  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0) / 100;
-  const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0) / 100;
+
+  const totalIncome = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
+  const totalExpense = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
   const balance = totalIncome - totalExpense;
 
   // Animação de escala
@@ -85,21 +83,12 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(Number(value));
-  };
-
   if (totalAmount === 0 || typeData.length === 0) {
     return (
       <View style={styles.container}>
-        <Text style={styles.sectionTitle}>Distribuição por Tipo</Text>
+        <Text style={styles.sectionTitle}>Distribuição por Tipo de Transação</Text>
         <View style={styles.emptyState}>
-          <Ionicons name="pie-chart-outline" size={48} color="#E0E0E0" />
+          <Ionicons name={INSIGHT_ICONS.pieChart} size={48} color="#E0E0E0" />
           <Text style={styles.emptyText}>Sem dados para exibir</Text>
         </View>
       </View>
@@ -109,7 +98,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Distribuição por Tipo de Transação</Text>
-      
+
       <View style={styles.card}>
         <Animated.View style={[styles.chartContainer, animatedStyle]}>
           <Svg width={size} height={size}>
@@ -150,7 +139,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
                 );
               })}
             </G>
-            
+
             {/* Texto central */}
             <SvgText
               x={center}
@@ -170,30 +159,34 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
               fill={balance >= 0 ? "#4CAF50" : "#F44336"}
               textAnchor="middle"
             >
-              {formatCurrency(balance)}
+              {formatCurrencyCompact(balance)}
             </SvgText>
           </Svg>
         </Animated.View>
 
         {/* Legenda */}
         <View style={styles.legend}>
-          {typeData.slice(0, 5).map((item, index) => (
-            <View key={item.type}>
-              <View style={styles.legendItem}>
-                <View style={styles.legendLeft}>
-                  <View style={[styles.legendDot, { backgroundColor: item.color }]} />
-                  <View style={styles.legendInfo}>
-                    <Text style={styles.legendLabel}>{item.type}</Text>
-                    <Text style={styles.legendPercentage}>{(item.percentage * 100).toFixed(1)}%</Text>
+          {typeData.slice(0, 5).map((item, index) => {           
+            return (
+              <View key={item.label}>
+                <View style={styles.legendItem}>
+                  <View style={styles.legendLeft}>
+                    <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                    <View style={styles.legendInfo}>
+                      <Text style={styles.legendLabel}>{item.label}</Text>
+                      <Text style={styles.legendPercentage}>
+                        {(item.percentage * 100).toFixed(1)}%
+                      </Text>
+                    </View>
                   </View>
+                  <Text style={[styles.legendValue]}>
+                    {formatCurrency(item.amount)}
+                  </Text>
                 </View>
-                <Text style={[styles.legendValue, { color: item.color }]}>
-                  {formatCurrency(item.amount)}
-                </Text>
+                {index < Math.min(typeData.length - 1, 4) && <View style={styles.divider} />}
               </View>
-              {index < Math.min(typeData.length - 1, 4) && <View style={styles.divider} />}
-            </View>
-          ))}
+            );
+          })}
           {typeData.length > 5 && (
             <Text style={styles.moreCategories}>
               +{typeData.length - 5} tipos
