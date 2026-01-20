@@ -12,7 +12,7 @@ import { Alert } from '../../components/ui';
 import { useAlert } from '../../hooks/useAlert';
 import { useHomeViewModel } from '../../hooks/useHomeViewModel';
 import { colors, spacing } from '../../../theme';
-import { TransactionType } from '../../../types';
+import { TransactionType } from '../../../domain/entities/Transaction';
 import { RootStackParamList } from '../../../types/navigation';
 import { TRANSACTION_TYPE_CONFIG } from '../../../utils';
 

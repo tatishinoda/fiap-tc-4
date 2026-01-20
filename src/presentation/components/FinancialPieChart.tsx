@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
-import { Transaction, TransactionType } from '../../types';
+import { Transaction, TransactionType } from '../../domain/entities/Transaction';
 import { TRANSACTION_TYPE_CONFIG } from '../../utils/constants';
 import { formatCurrency, formatCurrencyCompact } from '../../utils';
 import { INSIGHT_ICONS } from '../../utils/icons';

@@ -1,5 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import { Transaction } from '../../domain/entities/Transaction';
+import { TransactionDTO } from '../../types';
 
 export class TransactionMapper {
   // Converte documento do Firestore para entidade Transaction
@@ -18,9 +19,14 @@ export class TransactionMapper {
     };
   }
 
+  // Converte dados do Firestore (após busca) para entidade Transaction
+  static fromFirestore(docId: string, data: any): Transaction {
+    return this.toDomain(docId, data);
+  }
+
   // Converte entidade Transaction para formato do Firestore
-  static toFirestore(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>): any {
-    const data: any = {
+  static toFirestore(transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>): TransactionDTO {
+    const data: TransactionDTO = {
       userId: transaction.userId,
       type: transaction.type,
       amount: transaction.amount,

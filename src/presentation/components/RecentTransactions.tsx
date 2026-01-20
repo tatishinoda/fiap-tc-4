@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Transaction } from '../../types';
+import { Transaction } from '../../domain/entities/Transaction';
 import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon } from '../../utils';
 
 interface RecentTransactionsProps {
