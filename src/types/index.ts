@@ -1,43 +1,58 @@
-export interface User {
-  id: string;
+// ============================================================================
+// VALIDATION & UI TYPES
+// ============================================================================
+
+// Resultado de validação
+export interface ValidationResult {
+  isValid: boolean;
+  error?: string;
+}
+
+// Botão de alerta customizado
+export interface AlertButton {
+  text: string;
+  onPress: () => void;
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+}
+
+// ============================================================================
+// DTOs para comunicação com Firestore
+// ============================================================================
+
+// ============================================================================
+// USER DTOs
+// ============================================================================
+
+// DTO para salvar User no Firestore
+export interface UserFirestoreDTO {
   email: string;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: any; // Firestore Timestamp
+  updatedAt?: any; // Firestore Timestamp
 }
 
-export type TransactionType = 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | 'PAYMENT' | 'INVESTMENT';
+// ============================================================================
+// TRANSACTION DTOs
+// ============================================================================
 
-export interface Transaction {
-  id: string;
+// DTO para salvar Transaction no Firestore
+export interface TransactionDTO {
   userId: string;
-  type: TransactionType;
+  type: 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER' | 'PAYMENT' | 'INVESTMENT';
   amount: number;
-  date: Date;
   description: string;
+  date: any; // Firestore Timestamp
   category?: string;
   receiptUrl?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: any; // Firestore Timestamp
+  updatedAt?: any; // Firestore Timestamp
 }
 
-export interface Category {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  type: 'income' | 'expense';
-}
+// ============================================================================
+// FORM DTOs
+// ============================================================================
 
-export interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  isAuthenticated: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string) => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
+// DTO para formulário de transação
 export interface TransactionFormData {
   type: 'income' | 'expense' | 'transfer';
   category: string;

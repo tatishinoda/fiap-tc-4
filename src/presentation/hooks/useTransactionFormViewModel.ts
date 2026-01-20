@@ -8,6 +8,18 @@ import { CreateTransactionUseCase } from '../../domain/usecases/transaction/Crea
 import { UpdateTransactionUseCase } from '../../domain/usecases/transaction/UpdateTransactionUseCase';
 import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
 import { CreateTransactionDTO, UpdateTransactionDTO } from '../../domain/repositories/ITransactionRepository';
+import { TransactionFormData } from '../../types';
+import { TransactionType } from '../../domain/entities/Transaction';
+
+// Mapeia tipo do formulário para tipo da entidade
+const mapFormTypeToEntityType = (formType: TransactionFormData['type']): TransactionType => {
+  const typeMap: Record<TransactionFormData['type'], TransactionType> = {
+    'income': 'DEPOSIT',
+    'expense': 'WITHDRAWAL',
+    'transfer': 'TRANSFER',
+  };
+  return typeMap[formType];
+};
 
 export const useTransactionFormViewModel = () => {
   const user = useStore(authSelectors.user);
@@ -83,11 +95,55 @@ export const useTransactionFormViewModel = () => {
     setError(null);
   };
 
+  // Cria transação a partir de TransactionFormData
+  const createTransactionFromForm = async (formData: TransactionFormData) => {
+    const amount = parseFloat(formData.amount.replace(/[^\d,.-]/g, '').replace(',', '.'));
+    
+    const createDTO: Omit<CreateTransactionDTO, 'userId'> = {
+      type: mapFormTypeToEntityType(formData.type),
+      amount,
+      description: formData.description,
+      category: formData.category || undefined,
+      date: formData.date,
+    };
+
+    return await createTransaction(createDTO);
+  };
+
+  // Atualiza transação a partir de TransactionFormData
+  const updateTransactionFromForm = async (transactionId: string, formData: Partial<TransactionFormData>) => {
+    const updateDTO: UpdateTransactionDTO = {};
+
+    if (formData.type) {
+      updateDTO.type = mapFormTypeToEntityType(formData.type);
+    }
+    
+    if (formData.amount) {
+      updateDTO.amount = parseFloat(formData.amount.replace(/[^\d,.-]/g, '').replace(',', '.'));
+    }
+
+    if (formData.description !== undefined) {
+      updateDTO.description = formData.description;
+    }
+
+    if (formData.category !== undefined) {
+      updateDTO.category = formData.category || undefined;
+    }
+
+    if (formData.date) {
+      updateDTO.date = formData.date;
+    }
+
+    return await updateTransaction(transactionId, updateDTO);
+  };
+
   return {
     isLoading,
     error,
     createTransaction,
     updateTransaction,
+    createTransactionFromForm,
+    updateTransactionFromForm,
     clearError,
   };
 };

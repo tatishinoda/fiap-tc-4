@@ -3,7 +3,8 @@ export class User {
     public readonly id: string,
     public readonly email: string,
     public readonly name: string,
-    public readonly createdAt: Date
+    public readonly createdAt: Date,
+    public readonly updatedAt: Date
   ) {}
 
   // Regra de negócio

@@ -3,8 +3,8 @@
  * Fornece filtros avançados, ordenação e extração de dados
  */
 
-import { Transaction, TransactionType } from '../types';
-import { FilterOptions } from '../components/AdvancedFiltersModal';
+import { Transaction, TransactionType } from '../domain/entities/Transaction';
+import { FilterOptions } from '../presentation/components/AdvancedFiltersModal';
 
 // ============================================================================
 // TIPOS E INTERFACES

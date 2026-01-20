@@ -4,7 +4,7 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
-import { TransactionType } from '../types';
+import { TransactionType } from '../domain/entities/Transaction';
 import { TRANSACTION_ICONS } from './icons';
 import { TRANSACTION_COLORS } from './colors';
 
