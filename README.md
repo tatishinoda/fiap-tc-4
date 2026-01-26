@@ -15,12 +15,13 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvi
 
 - 🔗 [Repositório Fase 1](https://github.com/karenkramek/bytebank-fiap)
 - 🔗 [Repositório Fase 2](https://github.com/karenkramek/fiap-tech-challenge-2)
+- 🔗 [Repositório Fase 3](https://github.com/camp0sfer/bytebank-mobile)
 
 ## Gestão de Projeto
 
-- 📊 [Trello (Fase 3)](https://trello.com/b/YkdMifCT/fase-3)
-- 📹 [Vídeo de Apresentação (Fase 3)](https://drive.google.com/file/d/1A9vJEmAHEGbdnaqaWjYwAB1q334PJo8B/view?usp=sharing)
-- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/6d0669ca-5d39-4f18-887d-d279122e8dd1)
+- 📊 [Trello (Fase 4)](https://trello.com/b/JdDDGx3G/fase-4)
+- 📹 [Vídeo de Apresentação (Fase 4)](www.google.com)(verificar)
+- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/6d0669ca-5d39-4f18-887d-d279122e8dd1)(verificar)
 
 ## Estrutura do Projeto
 
@@ -28,17 +29,21 @@ O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvi
 bytebank-mobile/
 ├── assets/                # Recursos estáticos (ícones, splash)
 ├── src/
-│   ├── components/        # Componentes reutilizáveis e UI
-│   ├── config/            # Configurações
-│   │   └── firebase.ts    # Configuração Firebase
-│   ├── context/           # Contextos React (estado global)
-│   ├── hooks/             # Custom hooks
-│   ├── navigation/        # Rotas e navegação
-│   ├── screens/           # Telas da aplicação
-│   │   ├── auth/          # Telas de autenticação (Login, SignUp)
-│   │   └── protected/     # Telas protegidas (Home, Transactions, etc)
-│   ├── services/          # Lógica de negócio e APIs
-│   ├── store/             # Gerenciamento de estado (Zustand)
+│   ├── di/                # Injeção de dependências (container)
+│   ├── domain/            # Entidades e contratos (interfaces dos repositórios)
+│   │   ├── entities/      # Entidades de domínio
+│   │   └── repositories/  # Interfaces dos repositórios
+│   ├── infrastructure/    # Implementações concretas (repositórios, mapeadores, configs externas)
+│   │   ├── config/        # Configurações externas (ex: Firebase)
+│   │   ├── mappers/       # Mapeadores de entidades
+│   │   └── repositories/  # Repositórios concretos
+│   ├── presentation/      # Camada de apresentação (UI, hooks, navegação, telas, estado local)
+│   │   ├── components/    # Componentes reutilizáveis e UI
+│   │   ├── hooks/         # Custom hooks
+│   │   ├── navigation/    # Rotas e navegação
+│   │   ├── screens/       # Telas da aplicação
+│   │   └── state/         # Estado local da apresentação
+│   ├── state/             # Estado global (Redux/Zustand, selectors, slices)
 │   ├── theme/             # Tema, cores e estilos
 │   ├── types/             # Definições TypeScript
 │   └── utils/             # Funções utilitárias
@@ -49,7 +54,6 @@ bytebank-mobile/
 ├── .env.example           # Template das variáveis
 ├── firestore.rules        # Regras de segurança Firestore
 ├── storage.rules          # Regras de segurança Storage
-├── firebase.json          # Configuração Firebase CLI
 └── README.md              # Documentação principal
 ```
 
