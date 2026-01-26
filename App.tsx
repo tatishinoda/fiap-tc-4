@@ -4,10 +4,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-gesture-handler';
 import './global.css';
 
-import { AppProviders } from './src/context';
-import { AppNavigator } from './src/navigation/AppNavigator';
-import { GlobalLoading } from './src/components/GlobalLoading';
-import { GlobalNotification } from './src/components/GlobalNotification';
+import { AppNavigator } from './src/presentation/navigation/AppNavigator';
+import { GlobalLoading } from './src/presentation/components/GlobalLoading';
+import { GlobalNotification } from './src/presentation/components/GlobalNotification';
 
 // Ignorar warnings específicos
 LogBox.ignoreLogs([
@@ -39,10 +38,10 @@ export default function App() {
   }, []);
 
   return (
-    <AppProviders>
+    <>
       <AppNavigator />
       <GlobalNotification />
       <GlobalLoading />
-    </AppProviders>
+    </>
   );
 }

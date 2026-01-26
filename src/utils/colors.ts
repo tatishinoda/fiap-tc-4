@@ -9,7 +9,7 @@
  * Dica: Use cores distintas e acessíveis para cada tipo
  */
 
-import { TransactionType } from '../types';
+import { TransactionType } from '../domain/entities/Transaction';
 
 // ============================================================================
 // MAPEAMENTO DE CORES

@@ -1,4 +1,4 @@
-import { TransactionType } from './index';
+import { TransactionType } from '../domain/entities/Transaction';
 
 // Tipos de navegação para toda a aplicação
 export type RootStackParamList = {

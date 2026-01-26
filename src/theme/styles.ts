@@ -1,9 +1,6 @@
 import { ViewStyle, TextStyle } from 'react-native';
 import { colors } from './colors';
 
-/**
- * Shadow System - Natural e funcional
- */
 export const shadows = {
   // Card shadows - Naturais
   card: {
@@ -59,9 +56,7 @@ export const shadows = {
   } as ViewStyle,
 };
 
-/**
- * Card Styles
- */
+
 export const cards = {
   // Cartão de saldo principal - Branco com sombra
   balanceCard: {

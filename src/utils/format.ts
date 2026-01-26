@@ -5,7 +5,7 @@
 
 import { format, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { TransactionType } from '../types';
+import { TransactionType } from '../domain/entities/Transaction';
 
 // ============================================================================
 // CONSTANTES DE FORMATAÇÃO (Performance Optimization)
