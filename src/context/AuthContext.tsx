@@ -1,0 +1,103 @@
+import { User as FirebaseUser } from 'firebase/auth';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
+import { clearCache } from '../infrastructure/cache/QueryProvider';
+import { AuthService } from '../services/AuthService';
+import { useAuthStore } from '../store/auth.store';
+import { AuthContextType, User } from '../types';
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Integração com Zustand store
+  const authStore = useAuthStore();
+
+  useEffect(() => {
+    const unsubscribe = AuthService.onAuthStateChange(async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        try {
+          const userData = await AuthService.getCurrentUser();
+
+          if (!userData) {
+            console.error('Dados do usuário não encontrados no Firestore');
+            await AuthService.signOut();
+            setUser(null);
+            setIsAuthenticated(false);
+            await authStore.logout();
+            setLoading(false);
+            authStore.setLoading(false);
+            return;
+          }
+
+          const token = await firebaseUser.getIdToken();
+
+          setUser(userData);
+          setIsAuthenticated(true);
+          setLoading(false);
+          authStore.setLoading(false);
+          await authStore.login(userData as any, token);
+        } catch (error) {
+          console.error('Erro ao obter dados do usuário:', error);
+          await AuthService.signOut();
+          setUser(null);
+          setIsAuthenticated(false);
+          setLoading(false);
+          authStore.setLoading(false);
+          await authStore.logout();
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+        setLoading(false);
+        authStore.setLoading(false);
+        await authStore.logout();
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const signIn = async (email: string, password: string): Promise<void> => {
+    try {
+      await AuthService.signIn(email, password);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const signUp = async (email: string, password: string, name: string): Promise<void> => {
+    try {
+      await AuthService.signUp(email, password, name);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const signOut = async (): Promise<void> => {
+    try {
+      await clearCache(); // Limpa cache antes do logout
+      await AuthService.signOut();
+      await authStore.logout();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const value: AuthContextType = {
+    user,
+    loading,
+    isAuthenticated,
+    signIn,
+    signUp,
+    signOut,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
