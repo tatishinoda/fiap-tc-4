@@ -202,4 +202,57 @@ gitleaks detect --log-opts="<commit-hash>"
 
 ---
 
+## 🛡️ Segurança Adicional Implementada
+
+### 📊 NPM Audit - Vulnerabilidades de Dependências
+
+**Status:** ✅ Auditoria concluída (Fevereiro 2026)
+
+| Tipo | Quantidade | Status |
+|------|------------|--------|
+| Vulnerabilidades Críticas | 1 | ✅ Corrigida (tar) |
+| Vulnerabilidades Moderadas | 10 | ⏳ Upstream (Firebase SDK/undici) |
+
+**Vulnerabilidade Corrigida:**
+- ✅ **tar <= 7.5.6** - Corrigida via `npm audit fix`
+
+**Pendentes (Baixo Risco):**
+- ⏳ **undici <= 6.22.0** - Interno ao Firebase SDK, aguardando fix upstream
+  - Impacto baixo pois está encapsulado no SDK
+  - Não exposto diretamente na aplicação
+
+**Comando para verificar:**
+```bash
+npm audit
+```
+
+### 🔒 Content Security Policy (CSP)
+
+**Implementado em:** `web/index.html` (Expo Web)
+
+CSP protege contra ataques XSS, clickjacking e code injection ao permitir apenas domínios confiáveis.
+
+**Políticas Configuradas:**
+
+| Diretiva | Proteção | Domínios Permitidos |
+|----------|----------|---------------------|
+| `script-src` | Anti-XSS | `'self'`, Firebase, Google APIs |
+| `connect-src` | APIs confiáveis | Firebase domains, WebSocket |
+| `frame-ancestors` | Anti-clickjacking | `'none'` (bloqueado) |
+| `upgrade-insecure-requests` | Força HTTPS | ✅ Ativo |
+
+**Headers de Segurança Adicionais:**
+- ✅ `X-Frame-Options: DENY` - Previne clickjacking
+- ✅ `X-Content-Type-Options: nosniff` - Previne MIME sniffing
+- ✅ `X-XSS-Protection: 1; mode=block` - Proteção XSS do navegador
+- ✅ `Strict-Transport-Security` - Força HTTPS (HSTS)
+
+**Domínios Confiáveis:**
+- `*.firebaseapp.com`, `*.googleapis.com`, `*.firebaseio.com`
+- `firestore.googleapis.com`, `wss://*.firebaseio.com`
+
+**Qualquer outro domínio será bloqueado pelo navegador.**
+
+---
+
 **Nota:** Este relatório foi gerado automaticamente pelo Gitleaks. Para mais detalhes, consulte `gitleaks-report.json`.

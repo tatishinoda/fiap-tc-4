@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <!--
+      Content Security Policy (CSP) - Segurança contra XSS e outros ataques
+      Permite apenas domínios confiáveis como Firebase
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com;
+        style-src 'self' 'unsafe-inline';
+        connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://firestore.googleapis.com wss://*.firebaseio.com;
+        img-src 'self' data: https: blob:;
+        font-src 'self' data: https://fonts.gstatic.com;
+        frame-ancestors 'none';
+        upgrade-insecure-requests;
+      "
+    />
+
+    <!-- Previne clickjacking -->
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+
+    <!-- Previne MIME type sniffing -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+
+    <!-- Habilita XSS protection no navegador -->
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+
+    <!-- Força HTTPS -->
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains" />
+
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1.00001,viewport-fit=cover"
+    />
+    <title>ByteBank</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

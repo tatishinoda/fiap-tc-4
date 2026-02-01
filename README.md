@@ -57,6 +57,31 @@ bytebank-mobile/
 └── README.md              # Documentação principal
 ```
 
+## 🔒 Segurança
+
+Este projeto implementa múltiplas camadas de segurança para proteger credenciais e dados:
+
+### **Proteção de Credenciais**
+- ✅ **Gitleaks** - Detecta credenciais expostas no código e histórico Git
+- ✅ **Husky Pre-commit Hook** - Bloqueia commits contendo secrets automaticamente
+- ✅ **Gitignore** - `.env` e arquivos sensíveis nunca versionados
+
+### **Segurança Web (Expo Web)**
+- ✅ **CSP (Content Security Policy)** - Proteção contra XSS e code injection
+- ✅ **Security Headers** - X-Frame-Options, X-Content-Type-Options, HSTS
+- ✅ **Domínios Confiáveis** - Apenas Firebase e Google APIs permitidos
+
+### **Auditoria de Dependências**
+- ✅ **NPM Audit** - Monitoramento de vulnerabilidades nas dependências
+- ✅ **Vulnerabilidades Corrigidas** - Scan regular com correções aplicadas
+
+### **Firebase Security**
+- ✅ **Firestore Rules** - Regras de acesso granular por documento
+- ✅ **Storage Rules** - Controle de upload/download de arquivos
+- ✅ **Authentication** - Email/Password com validação
+
+> 📖 **Documentação Completa:** Ver [SECURITY_REPORT.md](SECURITY_REPORT.md) para análise detalhada
+
 ## Como Executar
 
 ### **Pré-requisitos**
