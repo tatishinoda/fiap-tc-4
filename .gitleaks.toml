@@ -1,0 +1,66 @@
+# Gitleaks Configuration
+# Configuração customizada para o projeto ByteBank
+
+title = "Gitleaks Configuration for ByteBank"
+
+# Regras customizadas para Firebase e outros secrets
+[[rules]]
+id = "firebase-api-key"
+description = "Firebase API Key"
+regex = '''AIza[0-9A-Za-z_-]{35}'''
+tags = ["firebase", "api-key"]
+
+[[rules]]
+id = "firebase-config"
+description = "Firebase Configuration Block"
+regex = '''(?i)(firebase[_-]?api[_-]?key|firebase[_-]?auth[_-]?domain|firebase[_-]?project[_-]?id|firebase[_-]?storage[_-]?bucket|firebase[_-]?messaging[_-]?sender[_-]?id|firebase[_-]?app[_-]?id|firebase[_-]?measurement[_-]?id)\s*[:=]\s*["']?[A-Za-z0-9._-]+["']?'''
+tags = ["firebase", "config"]
+
+[[rules]]
+id = "generic-api-key"
+description = "Generic API Key"
+regex = '''(?i)(api[_-]?key|apikey|access[_-]?key)\s*[:=]\s*["'][0-9a-zA-Z_-]{20,}["']'''
+tags = ["api-key", "secret"]
+
+[[rules]]
+id = "jwt-token"
+description = "JWT Token"
+regex = '''eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*'''
+tags = ["jwt", "token"]
+
+[[rules]]
+id = "aws-access-key"
+description = "AWS Access Key ID"
+regex = '''(?i)aws[_-]?access[_-]?key[_-]?id\s*[:=]\s*["']?AKIA[0-9A-Z]{16}["']?'''
+tags = ["aws", "secret"]
+
+[[rules]]
+id = "private-key"
+description = "Private Key"
+regex = '''-----BEGIN (RSA |EC |OPENSSH |PGP )?PRIVATE KEY( BLOCK)?-----'''
+tags = ["private-key", "secret"]
+
+# Arquivos a serem permitidos (não reportar)
+[allowlist]
+description = "Arquivos que devem ser ignorados pelo scan"
+paths = [
+  '''\.env\.example$''',
+  '''README\.md$''',
+  '''\.gitleaks\.toml$''',
+  '''package-lock\.json$''',
+  '''yarn\.lock$''',
+]
+
+# Commits específicos a serem ignorados (se necessário)
+commits = []
+
+# Regexes para ignorar
+regexes = [
+  '''your_api_key_here''',
+  '''your_project''',
+  '''your_sender_id''',
+  '''your_app_id''',
+  '''your_measurement_id''',
+  '''example\.com''',
+  '''localhost''',
+]
