@@ -1,0 +1,32 @@
+# Verificar se gitleaks está instalado
+if ! command -v gitleaks &> /dev/null; then
+    echo "❌ ERRO: Gitleaks não está instalado!"
+    echo "📦 Instale com: brew install gitleaks"
+    exit 1
+fi
+
+# Rodar Gitleaks nos arquivos staged
+echo "🔍 Verificando secrets com Gitleaks..."
+gitleaks protect --staged --verbose
+
+if [ $? -eq 0 ]; then
+    echo "✅ Nenhum secret detectado. Commit permitido!"
+    exit 0
+else
+    echo ""
+    echo "🚨 =========================================="
+    echo "🚨  COMMIT BLOQUEADO!"
+    echo "🚨 =========================================="
+    echo ""
+    echo "❌ Gitleaks detectou possíveis secrets ou credenciais nos arquivos."
+    echo ""
+    echo "📋 Próximos passos:"
+    echo "   1. Revise os arquivos listados acima"
+    echo "   2. Remova as credenciais expostas"
+    echo "   3. Use variáveis de ambiente (.env)"
+    echo "   4. Certifique-se de que .env está no .gitignore"
+    echo ""
+    echo "ℹ️  Para mais detalhes, veja: SECURITY_REPORT.md"
+    echo ""
+    exit 1
+fi

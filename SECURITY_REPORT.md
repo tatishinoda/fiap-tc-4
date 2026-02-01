@@ -102,19 +102,18 @@ gitleaks-report.json
 .gitleaks-report.json
 ```
 
-#### B. **Configurar Git Hook para prevenir futuros commits**
+#### B. **Configurar Git Hook para prevenir futuros commits** (✓ Feito)
 
-Criar `.git/hooks/pre-commit`:
-```bash
-#!/bin/sh
-# Executar Gitleaks antes de cada commit
-gitleaks protect --staged --verbose
-```
+✅ **Husky + Gitleaks implementado com sucesso!**
 
-Tornar executável:
-```bash
-chmod +x .git/hooks/pre-commit
-```
+Configuração atual:
+- Husky instalado como dependência de desenvolvimento
+- Pre-commit hook configurado em `.husky/pre-commit`
+- Gitleaks executa automaticamente antes de cada commit
+- Commits com secrets são bloqueados automaticamente
+- Desenvolvedor recebe feedback imediato com instruções
+
+Para mais detalhes, veja: [HUSKY_SETUP.md](HUSKY_SETUP.md)
 
 #### C. **GitHub Actions para CI/CD** (Recomendado)
 
@@ -144,11 +143,13 @@ jobs:
 - [x] Scan completo executado
 - [x] Relatório gerado
 - [x] `.gitignore` atualizado
+- [x] **Husky instalado e configurado**
+- [x] **Pre-commit hook implementado**
+- [x] **Bloqueio automático de commits com secrets**
 - [ ] **Credenciais Firebase revogadas/regeneradas**
 - [ ] **Arquivo `.env` com novas credenciais (local apenas)**
-- [ ] Git hook pre-commit configurado (opcional)
 - [ ] GitHub Actions configurado (opcional)
-- [ ] Histórico Git limpo (opcional)
+- [ ] Histórico Git limpo (executado)
 - [ ] Equipe notificada sobre as mudanças
 
 ---
