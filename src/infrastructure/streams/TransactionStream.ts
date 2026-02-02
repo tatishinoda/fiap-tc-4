@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-import { FinancialSummary, Transaction } from '../../domain/entities/Transaction';
+import { FinancialSummary, Transaction, TransactionType } from '../../domain/entities/Transaction';
 
 /**
  * TransactionStream - Gerenciador reativo de transações usando RxJS
