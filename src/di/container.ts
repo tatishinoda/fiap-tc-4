@@ -5,6 +5,7 @@ import { LogoutUseCase } from '@/domain/usecases/auth/LogoutUseCase';
 
 import { FirebaseTransactionRepository } from '../infrastructure/repositories/FirebaseTransactionRepository';
 import { GetAllTransactionsUseCase } from '@/domain/usecases/transaction/GetAllTransactionsUseCase';
+import { GetPaginatedTransactionsUseCase } from '@/domain/usecases/transaction/GetPaginatedTransactionsUseCase';
 import { CreateTransactionUseCase } from '@/domain/usecases/transaction/CreateTransactionUseCase';
 import { UpdateTransactionUseCase } from '@/domain/usecases/transaction/UpdateTransactionUseCase';
 import { DeleteTransactionUseCase } from '@/domain/usecases/transaction/DeleteTransactionUseCase';
@@ -29,9 +30,10 @@ class DIContainer {
     this.services.set('LoginUseCase', new LoginUseCase(authRepository));
     this.services.set('SignUpUseCase', new SignUpUseCase(authRepository));
     this.services.set('LogoutUseCase', new LogoutUseCase(authRepository));
-    
+
     // Use Cases - Transaction
     this.services.set('GetAllTransactionsUseCase', new GetAllTransactionsUseCase(transactionRepository));
+    this.services.set('GetPaginatedTransactionsUseCase', new GetPaginatedTransactionsUseCase(transactionRepository));
     this.services.set('CreateTransactionUseCase', new CreateTransactionUseCase(transactionRepository));
     this.services.set('UpdateTransactionUseCase', new UpdateTransactionUseCase(transactionRepository));
     this.services.set('DeleteTransactionUseCase', new DeleteTransactionUseCase(transactionRepository));

@@ -27,6 +27,7 @@ import { TransactionType } from '../../../domain/entities/Transaction';
 import { useStore } from '../../../state/store';
 import { container } from '../../../di/container';
 import { DeleteTransactionUseCase } from '@/domain/usecases/transaction/DeleteTransactionUseCase';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 type TransactionFormScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
 type TransactionFormScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
@@ -42,11 +43,10 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
     error,
     createTransaction,
     updateTransaction,
-    clearError,
   } = useTransactionFormViewModel();
 
   const { showNotification } = useNotification();
-  
+
   // Estado do Zustand para acessar user e transactions
   const user = useStore((state) => state.user);
   const transactions = useStore((state) => state.transactions);
@@ -64,6 +64,8 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   const [category, setCategory] = useState('');
   const [receiptUri, setReceiptUri] = useState<string | null>(null);
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
+  const [showRemoveReceiptModal, setShowRemoveReceiptModal] = useState(false);
+  const [showDeleteTransactionModal, setShowDeleteTransactionModal] = useState(false);
 
   useEffect(() => {
     if (isEditing && existingTransaction) {
@@ -71,7 +73,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       const amountInReais = existingTransaction.amount / 100;
       setAmount(amountInReais.toFixed(2).replace('.', ','));
       setDescription(existingTransaction.description);
-      
+
       // Normaliza categoria carregada priorizando as sugeridas
       const loadedCategory = existingTransaction.category || '';
       if (loadedCategory) {
@@ -84,7 +86,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       } else {
         setCategory('');
       }
-      
+
       setReceiptUri((existingTransaction as any).receiptUrl || null);
     }
   }, [isEditing, existingTransaction]);
@@ -115,9 +117,9 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       setCategory('');
       return;
     }
-    
+
     const unifiedCategory = getUnifiedCategory(
-      category, 
+      category,
       existingCategories,
       suggestedCategories
     );
@@ -126,7 +128,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
 
   const handleCategoryChipPress = (selectedCategory: string) => {
     const unifiedCategory = getUnifiedCategory(
-      selectedCategory, 
+      selectedCategory,
       existingCategories,
       suggestedCategories
     );
@@ -194,62 +196,79 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
     }
   };
 
-  const handleRemoveImage = async () => {
-    Alert.alert(
-      'Remover Recibo',
-      'Deseja remover o recibo desta transação?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Remover',
-          style: 'destructive',
-          onPress: async () => {
-            if (receiptUri && receiptUri.startsWith('http')) {
-              try {
-                await deleteReceipt(receiptUri);
-              } catch (error) {
-                // Remove a referência mesmo se falhar no Storage
-              }
-            }
-            
-            setReceiptUri(null);
-            showNotification('Recibo removido', 'success');
+  const handleRemoveImage = () => {
+    if (Platform.OS === 'web') {
+      setShowRemoveReceiptModal(true);
+    } else {
+      Alert.alert(
+        'Remover Recibo',
+        'Deseja remover o recibo desta transação?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Remover',
+            style: 'destructive',
+            onPress: confirmRemoveReceipt,
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
 
-  const handleDelete = async () => {
+  const confirmRemoveReceipt = async () => {
+    if (receiptUri && receiptUri.startsWith('http')) {
+      try {
+        await deleteReceipt(receiptUri);
+      } catch (error) {
+        // Remove a referência mesmo se falhar no Storage
+      }
+    }
+
+    setReceiptUri(null);
+    setShowRemoveReceiptModal(false);
+    showNotification('Recibo removido', 'success');
+  };
+
+  const handleDelete = () => {
     if (!isEditing || !transactionId) {
       return;
     }
 
-    Alert.alert(
-      'Deletar Transação',
-      'Tem certeza que deseja deletar esta transação? Esta ação não pode ser desfeita.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Deletar',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              const deleteUseCase = container.get<DeleteTransactionUseCase>('DeleteTransactionUseCase');
-              await deleteUseCase.execute(transactionId);
-              removeTransaction(transactionId);
-              showNotification('Transação deletada com sucesso!', 'success');
-              navigation.goBack();
-            } catch (error: any) {
-              showNotification(
-                error.message || 'Erro ao deletar transação',
-                'error'
-              );
-            }
+    if (Platform.OS === 'web') {
+      setShowDeleteTransactionModal(true);
+    } else {
+      Alert.alert(
+        'Deletar Transação',
+        'Tem certeza que deseja deletar esta transação? Esta ação não pode ser desfeita.',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          {
+            text: 'Deletar',
+            style: 'destructive',
+            onPress: confirmDeleteTransaction,
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
+  };
+
+  const confirmDeleteTransaction = async () => {
+    if (!transactionId) return;
+
+    try {
+      const deleteUseCase = container.get<DeleteTransactionUseCase>('DeleteTransactionUseCase');
+      await deleteUseCase.execute(transactionId);
+      removeTransaction(transactionId);
+      setShowDeleteTransactionModal(false);
+      showNotification('Transação deletada com sucesso!', 'success');
+      navigation.goBack();
+    } catch (error: any) {
+      setShowDeleteTransactionModal(false);
+      showNotification(
+        error.message || 'Erro ao deletar transação',
+        'error'
+      );
+    }
   };
 
   const handleSubmit = async () => {
@@ -512,6 +531,26 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
           )}
         </View>
       </ScrollView>
+
+      <ConfirmModal
+        visible={showRemoveReceiptModal}
+        title="Remover Recibo"
+        message="Deseja remover o recibo desta transação?"
+        confirmText="Remover"
+        cancelText="Cancelar"
+        onConfirm={confirmRemoveReceipt}
+        onCancel={() => setShowRemoveReceiptModal(false)}
+      />
+
+      <ConfirmModal
+        visible={showDeleteTransactionModal}
+        title="Deletar Transação"
+        message="Tem certeza que deseja deletar esta transação? Esta ação não pode ser desfeita."
+        confirmText="Deletar"
+        cancelText="Cancelar"
+        onConfirm={confirmDeleteTransaction}
+        onCancel={() => setShowDeleteTransactionModal(false)}
+      />
     </KeyboardAvoidingView>
   );
 }

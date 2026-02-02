@@ -4,10 +4,12 @@ import {
     deleteDoc,
     doc,
     getDocs,
+    limit,
     onSnapshot,
     orderBy,
     query,
     serverTimestamp,
+    startAfter,
     Timestamp,
     Unsubscribe,
     updateDoc,
@@ -17,6 +19,7 @@ import { FinancialSummary, Transaction } from '../../domain/entities/Transaction
 import {
     CreateTransactionDTO,
     ITransactionRepository,
+    PaginatedResult,
     UpdateTransactionDTO,
 } from '../../domain/repositories/ITransactionRepository';
 import { db } from '../config/firebase';
@@ -41,6 +44,48 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
       return transactions;
     } catch (error) {
       console.error('Erro ao buscar transações:', error);
+      throw new Error('Erro ao buscar transações do Firestore');
+    }
+  }
+
+  // Busca transações paginadas (scroll infinito)
+  async getPaginated(userId: string, limitCount: number = 10, lastDocument?: any): Promise<PaginatedResult> {
+    try {
+      const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
+
+      let q = query(
+        transactionsRef,
+        where('userId', '==', userId),
+        orderBy('date', 'desc'),
+        limit(limitCount + 1)
+      );
+
+      if (lastDocument) {
+        q = query(
+          transactionsRef,
+          where('userId', '==', userId),
+          orderBy('date', 'desc'),
+          startAfter(lastDocument),
+          limit(limitCount + 1)
+        );
+      }
+
+      const querySnapshot = await getDocs(q);
+      const docs = querySnapshot.docs;
+      const hasMore = docs.length > limitCount;
+      const limitedDocs = hasMore ? docs.slice(0, limitCount) : docs;
+
+      const transactions: Transaction[] = limitedDocs.map(doc =>
+        TransactionMapper.toDomain(doc.id, doc.data())
+      );
+
+      return {
+        transactions,
+        lastDoc: limitedDocs[limitedDocs.length - 1],
+        hasMore,
+      };
+    } catch (error) {
+      console.error('Erro ao buscar transações paginadas:', error);
       throw new Error('Erro ao buscar transações do Firestore');
     }
   }

@@ -19,6 +19,7 @@ import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIc
 import { AdvancedFiltersModal, FilterOptions } from '../../components/AdvancedFiltersModal';
 import { useTransactionsViewModel } from '../../hooks/useTransactionsViewModel';
 import { Transaction } from '../../../domain/entities/Transaction';
+import { transactionStream } from '../../../infrastructure/streams/TransactionStream';
 
 type TransactionsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Transactions'>;
 
@@ -40,14 +41,14 @@ const DEFAULT_FILTER_OPTIONS: FilterOptions = {
 
 export default function TransactionsScreen({ navigation }: TransactionsScreenProps) {
   const {
-    transactions: allTransactions,
+    fetchPaginatedTransactions,
     isLoading: loading,
     error,
     deleteTransaction,
-    refreshTransactions,
     clearError,
   } = useTransactionsViewModel();
 
+  const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,15 +56,50 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<FilterOptions>(DEFAULT_FILTER_OPTIONS);
 
+  // Estados para scroll infinito
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 10;
+
   useFocusEffect(
     React.useCallback(() => {
-      refreshTransactions();
+      loadInitialTransactions();
     }, [])
   );
 
   useEffect(() => {
     applyFilters();
   }, [allTransactions, searchQuery, selectedFilter, advancedFilters]);
+
+  // Carrega transações iniciais
+  const loadInitialTransactions = async () => {
+    try {
+      const result = await fetchPaginatedTransactions(PAGE_SIZE);
+      setAllTransactions(result.transactions);
+      setLastDoc(result.lastDoc);
+      setHasMore(result.hasMore);
+    } catch (err) {
+      console.error('Erro ao carregar transações:', err);
+    }
+  };
+
+  // Carrega mais transações
+  const loadMoreTransactions = async () => {
+    if (!hasMore || loadingMore) return;
+
+    setLoadingMore(true);
+    try {
+      const result = await fetchPaginatedTransactions(PAGE_SIZE, lastDoc);
+      setAllTransactions(prev => [...prev, ...result.transactions]);
+      setLastDoc(result.lastDoc);
+      setHasMore(result.hasMore);
+    } catch (err) {
+      console.error('Erro ao carregar mais transações:', err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const applyFilters = () => {
     let filtered = [...allTransactions];
@@ -93,7 +129,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
 
     if (advancedFilters.categories.length > 0) {
       const normalizedFilterCategories = advancedFilters.categories.map(normalizeCategory);
-      filtered = filtered.filter(t => 
+      filtered = filtered.filter(t =>
         t.category && normalizedFilterCategories.includes(normalizeCategory(t.category))
       );
     }
@@ -185,13 +221,23 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await refreshTransactions();
+    setLastDoc(null);
+    transactionStream.resetPagination();
+    await loadInitialTransactions();
     setRefreshing(false);
   };
 
   const renderFooter = () => {
-    // Footer simplificado - paginação removida
-    if (!loading && filteredTransactions.length > 0) {
+    if (loadingMore) {
+      return (
+        <View style={styles.footerLoader}>
+          <ActivityIndicator size="small" color="#4a9fb8" />
+          <Text style={styles.footerText}>Carregando mais...</Text>
+        </View>
+      );
+    }
+
+    if (!hasMore && filteredTransactions.length > 0) {
       return (
         <View style={styles.endOfList}>
           <Ionicons name="checkmark-circle-outline" size={20} color="#6b7280" />
@@ -363,6 +409,8 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
           </View>
         ) : renderEmptyState()}
         ListFooterComponent={renderFooter}
+        onEndReached={loadMoreTransactions}
+        onEndReachedThreshold={0.5}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

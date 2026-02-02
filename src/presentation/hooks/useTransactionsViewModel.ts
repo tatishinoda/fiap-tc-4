@@ -6,6 +6,7 @@ import { transactionSelectors } from '../../state/selectors/transactionSelectors
 import { authSelectors } from '../../state/selectors/authSelectors';
 import { container } from '../../di/container';
 import { GetAllTransactionsUseCase } from '../../domain/usecases/transaction/GetAllTransactionsUseCase';
+import { GetPaginatedTransactionsUseCase } from '../../domain/usecases/transaction/GetPaginatedTransactionsUseCase';
 import { DeleteTransactionUseCase } from '../../domain/usecases/transaction/DeleteTransactionUseCase';
 import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
 
@@ -24,6 +25,7 @@ export const useTransactionsViewModel = () => {
   const clearError = useStore((state) => state.clearError);
 
   const getAllTransactionsUseCase = container.get<GetAllTransactionsUseCase>('GetAllTransactionsUseCase');
+  const getPaginatedTransactionsUseCase = container.get<GetPaginatedTransactionsUseCase>('GetPaginatedTransactionsUseCase');
   const deleteTransactionUseCase = container.get<DeleteTransactionUseCase>('DeleteTransactionUseCase');
   const getFinancialSummaryUseCase = container.get<GetFinancialSummaryUseCase>('GetFinancialSummaryUseCase');
 
@@ -84,6 +86,18 @@ export const useTransactionsViewModel = () => {
     await fetchTransactions();
   };
 
+  // Funções de paginação para scroll infinito
+  const fetchPaginatedTransactions = async (limit: number = 10, lastDoc?: any) => {
+    if (!user?.id) return { transactions: [], lastDoc: null, hasMore: false };
+
+    try {
+      return await getPaginatedTransactionsUseCase.execute(user.id, limit, lastDoc);
+    } catch (err: any) {
+      console.error('Erro ao buscar transações paginadas:', err);
+      throw err;
+    }
+  };
+
   return {
     transactions,
     summary,
@@ -93,6 +107,7 @@ export const useTransactionsViewModel = () => {
     income: summary.totalIncome,
     expenses: summary.totalExpense,
     fetchTransactions,
+    fetchPaginatedTransactions,
     deleteTransaction: handleDeleteTransaction,
     refreshTransactions,
     clearError,

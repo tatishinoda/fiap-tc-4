@@ -19,8 +19,15 @@ export interface UpdateTransactionDTO {
   receiptUrl?: string;
 }
 
+export interface PaginatedResult {
+  transactions: Transaction[];
+  lastDoc: any;
+  hasMore: boolean;
+}
+
 export interface ITransactionRepository {
   getAll(userId: string): Promise<Transaction[]>;
+  getPaginated(userId: string, limit: number, lastDoc?: any): Promise<PaginatedResult>;
   create(data: CreateTransactionDTO): Promise<Transaction>;
   update(transactionId: string, userId: string, data: UpdateTransactionDTO): Promise<void>;
   delete(transactionId: string): Promise<void>;
