@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, filter, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Transaction, FinancialSummary } from '../../domain/entities/Transaction';
+import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { FinancialSummary, Transaction } from '../../domain/entities/Transaction';
 
 /**
  * TransactionStream - Gerenciador reativo de transações usando RxJS
@@ -21,8 +21,7 @@ export class TransactionStream {
   private errorSubject = new Subject<Error | null>();
 
   // Observables públicos (read-only)
-  public transactions$: Observable<Transaction[]> =
-    this.transactionsSubject.asObservable();
+  public transactions$: Observable<Transaction[]> = this.transactionsSubject.asObservable();
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public error$: Observable<Error | null> = this.errorSubject.asObservable();
 
@@ -62,9 +61,9 @@ export class TransactionStream {
   }
 
   /**
-   * Obtém transações do tipo específico (income/expense)
+   * Obtém transações do tipo específico
    */
-  getTransactionsByType$(type: 'income' | 'expense'): Observable<Transaction[]> {
+  getTransactionsByType$(type: TransactionType): Observable<Transaction[]> {
     return this.transactions$.pipe(
       map((transactions) => transactions.filter((t) => t.type === type))
     );
@@ -75,17 +74,14 @@ export class TransactionStream {
    */
   getTransactionsByCategory$(category: string): Observable<Transaction[]> {
     return this.transactions$.pipe(
-      map((transactions) => transactions.filter((t) => t.category === category))
+      map((transactions) => transactions.filter((t) => t.category && t.category === category))
     );
   }
 
   /**
    * Obtém transações filtradas por período
    */
-  getTransactionsByPeriod$(
-    startDate: Date,
-    endDate: Date
-  ): Observable<Transaction[]> {
+  getTransactionsByPeriod$(startDate: Date, endDate: Date): Observable<Transaction[]> {
     return this.transactions$.pipe(
       map((transactions) =>
         transactions.filter((t) => {
@@ -108,7 +104,7 @@ export class TransactionStream {
         return this.transactionsSubject.value.filter(
           (t) =>
             t.description.toLowerCase().includes(lowerTerm) ||
-            t.category.toLowerCase().includes(lowerTerm)
+            (t.category && t.category.toLowerCase().includes(lowerTerm))
         );
       })
     );
@@ -121,40 +117,19 @@ export class TransactionStream {
     return this.transactions$.pipe(
       map((transactions) => {
         const income = transactions
-          .filter((t) => t.type === 'income')
+          .filter((t) => t.type === 'DEPOSIT')
           .reduce((sum, t) => sum + t.amount, 0);
 
         const expenses = transactions
-          .filter((t) => t.type === 'expense')
+          .filter((t) => t.type === 'WITHDRAWAL' || t.type === 'PAYMENT')
           .reduce((sum, t) => sum + t.amount, 0);
 
         const balance = income - expenses;
 
-        // Calcula por categoria
-        const categoryTotals = transactions.reduce(
-          (acc, t) => {
-            if (!acc[t.category]) {
-              acc[t.category] = 0;
-            }
-            acc[t.category] += t.type === 'expense' ? t.amount : 0;
-            return acc;
-          },
-          {} as Record<string, number>
-        );
-
-        // Encontra categoria com mais gastos
-        const topCategory = Object.entries(categoryTotals).reduce(
-          (max, [category, amount]) => (amount > max.amount ? { category, amount } : max),
-          { category: '', amount: 0 }
-        );
-
         return {
           totalIncome: income,
-          totalExpenses: expenses,
+          totalExpense: expenses,
           balance,
-          transactionCount: transactions.length,
-          topCategory: topCategory.category,
-          categoryBreakdown: categoryTotals,
         };
       })
     );
@@ -164,9 +139,7 @@ export class TransactionStream {
    * Stream de transações recentes (últimas 5)
    */
   getRecentTransactions$(): Observable<Transaction[]> {
-    return this.transactions$.pipe(
-      map((transactions) => transactions.slice(0, 5))
-    );
+    return this.transactions$.pipe(map((transactions) => transactions.slice(0, 5)));
   }
 
   /**

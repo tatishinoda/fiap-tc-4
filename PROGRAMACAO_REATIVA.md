@@ -37,12 +37,14 @@ React Components (UI atualiza automaticamente)
 **Arquivo**: `src/infrastructure/streams/TransactionStream.ts`
 
 **Responsabilidades**:
+
 - Gerenciar estado reativo de transações usando BehaviorSubject
 - Fornecer Observables para diferentes tipos de dados
 - Aplicar operadores RxJS para transformações
 - Manter sincronização com Firestore
 
 **Features**:
+
 ```typescript
 // BehaviorSubjects (mantém último valor)
 private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
@@ -62,6 +64,7 @@ searchTransactions$(searchTerm$): Observable<Transaction[]>
 ```
 
 **Exemplo de Uso**:
+
 ```typescript
 import { transactionStream } from '@/infrastructure/streams/TransactionStream';
 
@@ -85,6 +88,7 @@ transactionStream.getTransactionsByType$('income').subscribe((incomes) => {
 **Métodos Reativos Adicionados**:
 
 #### `subscribeToTransactions()`
+
 ```typescript
 subscribeToTransactions(
   userId: string,
@@ -94,12 +98,14 @@ subscribeToTransactions(
 ```
 
 **Funcionamento**:
+
 1. Cria query no Firestore
 2. Usa `onSnapshot()` para escutar mudanças
 3. Chama callback toda vez que dados mudam
 4. Retorna função `unsubscribe` para cleanup
 
 **Exemplo**:
+
 ```typescript
 const unsubscribe = repository.subscribeToTransactions(
   userId,
@@ -117,6 +123,7 @@ unsubscribe();
 ```
 
 #### `subscribeToTransaction()`
+
 ```typescript
 subscribeToTransaction(
   transactionId: string,
@@ -134,6 +141,7 @@ Escuta mudanças em uma transação específica.
 **Arquivo**: `src/hooks/useTransactionStream.ts`
 
 #### `useTransactionStream()`
+
 Hook principal que conecta Firestore onSnapshot com RxJS streams.
 
 ```typescript
@@ -145,17 +153,12 @@ export function useTransactionStream() {
 
   useEffect(() => {
     // Inscreve no stream RxJS
-    const streamSubscription = transactionStream.transactions$.subscribe(
-      setTransactions
-    );
+    const streamSubscription = transactionStream.transactions$.subscribe(setTransactions);
 
     // Inscreve no Firestore onSnapshot
-    const unsubscribeFirestore = repository.subscribeToTransactions(
-      user.id,
-      (transactions) => {
-        transactionStream.updateTransactions(transactions);
-      }
-    );
+    const unsubscribeFirestore = repository.subscribeToTransactions(user.id, (transactions) => {
+      transactionStream.updateTransactions(transactions);
+    });
 
     // Cleanup automático
     return () => {
@@ -169,6 +172,7 @@ export function useTransactionStream() {
 ```
 
 **Como funciona**:
+
 1. Firestore onSnapshot detecta mudança no banco
 2. Callback é chamado com novos dados
 3. Atualiza TransactionStream (RxJS)
@@ -209,15 +213,19 @@ useTransactionsByCategory(category)
 **Arquivo**: `src/presentation/components/ReactiveTransactionsDemo.tsx`
 
 ```tsx
-import { useTransactionStream, useFinancialSummary, useRecentTransactions } from '@/hooks/useTransactionStream';
+import {
+  useTransactionStream,
+  useFinancialSummary,
+  useRecentTransactions,
+} from '@/hooks/useTransactionStream';
 
 export function ReactiveTransactionsDemo() {
   // Stream reativo - atualiza automaticamente
   const { transactions, loading, error } = useTransactionStream();
-  
+
   // Resumo calculado reativamente
   const summary = useFinancialSummary();
-  
+
   // Últimas 5 transações
   const recentTransactions = useRecentTransactions();
 
@@ -231,12 +239,10 @@ export function ReactiveTransactionsDemo() {
       <Text>Receitas: {formatCurrency(summary.totalIncome)}</Text>
       <Text>Despesas: {formatCurrency(summary.totalExpenses)}</Text>
       <Text>Saldo: {formatCurrency(summary.balance)}</Text>
-      
+
       <FlatList
         data={recentTransactions}
-        renderItem={({ item }) => (
-          <TransactionItem transaction={item} />
-        )}
+        renderItem={({ item }) => <TransactionItem transaction={item} />}
       />
     </View>
   );
@@ -244,6 +250,7 @@ export function ReactiveTransactionsDemo() {
 ```
 
 **Sem refetch manual!** Tudo atualiza automaticamente quando:
+
 - Nova transação é adicionada
 - Transação é editada
 - Transação é deletada
@@ -254,6 +261,7 @@ export function ReactiveTransactionsDemo() {
 ## ⚡ Operadores RxJS Utilizados
 
 ### 1. `map` - Transformação de dados
+
 ```typescript
 getTransactionsByType$(type: 'income' | 'expense'): Observable<Transaction[]> {
   return this.transactions$.pipe(
@@ -263,14 +271,14 @@ getTransactionsByType$(type: 'income' | 'expense'): Observable<Transaction[]> {
 ```
 
 ### 2. `filter` - Filtrar valores
+
 ```typescript
 // Só emite se houver transações
-this.transactions$.pipe(
-  filter((transactions) => transactions.length > 0)
-)
+this.transactions$.pipe(filter((transactions) => transactions.length > 0));
 ```
 
 ### 3. `debounceTime` - Debounce para performance
+
 ```typescript
 searchTransactions$(searchTerm$: Observable<string>): Observable<Transaction[]> {
   return searchTerm$.pipe(
@@ -282,10 +290,11 @@ searchTransactions$(searchTerm$: Observable<string>): Observable<Transaction[]> 
 ```
 
 ### 4. `distinctUntilChanged` - Evita emissões duplicadas
+
 ```typescript
 searchTerm$.pipe(
   distinctUntilChanged() // Não emite se o valor for igual ao anterior
-)
+);
 ```
 
 ---
@@ -309,24 +318,28 @@ searchTerm$.pipe(
 ## 📊 Benefícios da Implementação
 
 ### Performance
+
 ✅ Debounce em buscas reduz requisições
 ✅ Cache reativo evita buscas desnecessárias
 ✅ Cleanup automático previne memory leaks
 ✅ Observables compartilhados (BehaviorSubject)
 
 ### UX (User Experience)
+
 ✅ Atualizações em tempo real
 ✅ Não precisa fazer pull-to-refresh
 ✅ UI sempre sincronizada com backend
 ✅ Feedback instantâneo de mudanças
 
 ### Developer Experience
+
 ✅ Código declarativo e legível
 ✅ Separação de responsabilidades clara
 ✅ Fácil adicionar novos streams
 ✅ Testável (Observables são fáceis de testar)
 
 ### Manutenibilidade
+
 ✅ Lógica reativa centralizada (TransactionStream)
 ✅ Hooks reutilizáveis
 ✅ Fácil adicionar novos filtros/transformações
@@ -339,6 +352,7 @@ searchTerm$.pipe(
 ### 1. Teste Manual - Tempo Real
 
 **Passos**:
+
 1. Abra o app em dois dispositivos/emuladores
 2. Adicione uma transação no Dispositivo A
 3. **Veja aparecer automaticamente no Dispositivo B** ✨
@@ -353,11 +367,7 @@ function SearchExample() {
 
   return (
     <View>
-      <TextInput
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        placeholder="Buscar..."
-      />
+      <TextInput value={searchTerm} onChangeText={setSearchTerm} placeholder="Buscar..." />
       {/* Resultados aparecem com debounce de 300ms */}
       <FlatList data={results} />
     </View>
@@ -416,22 +426,28 @@ const { transactions, loading, error } = useTransactionStream();
 ## 🎓 Conceitos de Programação Reativa Aplicados
 
 ### 1. **Observables**
+
 Streams que emitem valores ao longo do tempo.
 
 ### 2. **BehaviorSubject**
+
 Observable que mantém o último valor emitido e entrega para novos subscribers.
 
 ### 3. **Operators**
+
 Funções que transformam streams (map, filter, debounceTime, etc.)
 
 ### 4. **Subscription**
+
 Conexão com um Observable. Precisa de cleanup (unsubscribe).
 
 ### 5. **Hot vs Cold Observables**
+
 - **Cold**: Começa a emitir quando alguém subscreve
 - **Hot**: BehaviorSubject é hot (sempre emitindo)
 
 ### 6. **Reactive Programming Principles**
+
 - **Push-based**: Dados são "empurrados" para subscribers
 - **Declarative**: Você descreve WHAT, não HOW
 - **Composable**: Streams podem ser combinados
@@ -441,11 +457,13 @@ Conexão com um Observable. Precisa de cleanup (unsubscribe).
 ## 📚 Recursos Adicionais
 
 ### Documentação:
+
 - [RxJS Official](https://rxjs.dev/)
 - [Firestore onSnapshot](https://firebase.google.com/docs/firestore/query-data/listen)
 - [React Hooks](https://react.dev/reference/react)
 
 ### Operadores RxJS Úteis:
+
 - `map`: Transformar valores
 - `filter`: Filtrar valores
 - `debounceTime`: Debounce
@@ -485,9 +503,10 @@ Conexão com um Observable. Precisa de cleanup (unsubscribe).
 
 ## 🎉 Conclusão
 
-A implementação de **Programação Reativa** com **RxJS + Firestore onSnapshot** foi **concluída com sucesso**! 
+A implementação de **Programação Reativa** com **RxJS + Firestore onSnapshot** foi **concluída com sucesso**!
 
 O ByteBank Mobile agora possui:
+
 - ⚡ Atualizações em tempo real
 - 🔄 Streams reativos com RxJS
 - 📡 Firestore listeners automáticos
@@ -498,6 +517,6 @@ O ByteBank Mobile agora possui:
 
 ---
 
-**Autor**: GitHub Copilot  
-**Data**: 02 de Fevereiro de 2026  
+**Autor**: GitHub Copilot
+**Data**: 02 de Fevereiro de 2026
 **Projeto**: ByteBank Mobile - Tech Challenge FIAP Fase 4

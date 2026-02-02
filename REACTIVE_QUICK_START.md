@@ -2,10 +2,10 @@
 
 ## O que foi implementado?
 
-✅ **RxJS** - Biblioteca para programação reativa  
-✅ **Firestore onSnapshot** - Listener em tempo real  
-✅ **8 Hooks Reativos** - Para diferentes casos de uso  
-✅ **Exemplos Práticos** - Componentes demonstrativos  
+✅ **RxJS** - Biblioteca para programação reativa
+✅ **Firestore onSnapshot** - Listener em tempo real
+✅ **8 Hooks Reativos** - Para diferentes casos de uso
+✅ **Exemplos Práticos** - Componentes demonstrativos
 
 ---
 
@@ -18,16 +18,14 @@ import { useTransactionStream } from '@/hooks/useTransactionStream';
 
 function MyComponent() {
   const { transactions, loading, error } = useTransactionStream();
-  
+
   // transactions atualiza AUTOMATICAMENTE quando:
   // - Nova transação é adicionada
   // - Transação é editada
   // - Transação é deletada
   // - Qualquer mudança no Firebase
-  
-  return (
-    <FlatList data={transactions} />
-  );
+
+  return <FlatList data={transactions} />;
 }
 ```
 
@@ -42,7 +40,7 @@ import { useFinancialSummary } from '@/hooks/useTransactionStream';
 
 function SummaryCard() {
   const summary = useFinancialSummary();
-  
+
   return (
     <View>
       <Text>Receitas: {formatCurrency(summary.totalIncome)}</Text>
@@ -64,14 +62,10 @@ import { useTransactionSearch } from '@/hooks/useTransactionStream';
 
 function SearchScreen() {
   const { searchTerm, setSearchTerm, results } = useTransactionSearch();
-  
+
   return (
     <View>
-      <TextInput
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        placeholder="Buscar..."
-      />
+      <TextInput value={searchTerm} onChangeText={setSearchTerm} placeholder="Buscar..." />
       <FlatList data={results} />
     </View>
   );
@@ -89,7 +83,7 @@ import { useRecentTransactions } from '@/hooks/useTransactionStream';
 
 function RecentList() {
   const recentTransactions = useRecentTransactions(); // Últimas 5
-  
+
   return <FlatList data={recentTransactions} />;
 }
 ```
@@ -103,7 +97,7 @@ import { useTransactionsByType } from '@/hooks/useTransactionStream';
 
 function IncomeList() {
   const incomes = useTransactionsByType('income');
-  
+
   return <FlatList data={incomes} />;
 }
 ```
@@ -119,7 +113,7 @@ function NotificationDemo() {
   useNewTransactionNotifications((transaction) => {
     Alert.alert('Nova transação!', transaction.description);
   });
-  
+
   return <View>...</View>;
 }
 ```
@@ -148,18 +142,21 @@ src/
 ## ⚡ Benefícios
 
 ### Performance
+
 - ✅ Debounce em buscas (300ms)
 - ✅ Cache reativo
 - ✅ Cleanup automático
 - ✅ Sem requisições desnecessárias
 
 ### UX
+
 - ✅ Atualizações em tempo real
 - ✅ Sem necessidade de pull-to-refresh
 - ✅ UI sempre sincronizada
 - ✅ Feedback instantâneo
 
 ### Developer Experience
+
 - ✅ Código declarativo
 - ✅ Hooks reutilizáveis
 - ✅ Fácil de testar
@@ -178,16 +175,16 @@ src/
 
 ## 📚 Todos os Hooks Disponíveis
 
-| Hook | Descrição |
-|------|-----------|
-| `useTransactionStream()` | Todas as transações (tempo real) |
-| `useFinancialSummary()` | Resumo financeiro reativo |
-| `useTransactionSearch()` | Busca com debounce |
-| `useRecentTransactions()` | Últimas 5 transações |
-| `useTransactionsByType(type)` | Filtrar por income/expense |
-| `useTransactionsByCategory(cat)` | Filtrar por categoria |
-| `useTransactionsByPeriod(start, end)` | Filtrar por período |
-| `useNewTransactionNotifications(cb)` | Notificação de novas |
+| Hook                                  | Descrição                        |
+| ------------------------------------- | -------------------------------- |
+| `useTransactionStream()`              | Todas as transações (tempo real) |
+| `useFinancialSummary()`               | Resumo financeiro reativo        |
+| `useTransactionSearch()`              | Busca com debounce               |
+| `useRecentTransactions()`             | Últimas 5 transações             |
+| `useTransactionsByType(type)`         | Filtrar por income/expense       |
+| `useTransactionsByCategory(cat)`      | Filtrar por categoria            |
+| `useTransactionsByPeriod(start, end)` | Filtrar por período              |
+| `useNewTransactionNotifications(cb)`  | Notificação de novas             |
 
 ---
 
@@ -218,6 +215,7 @@ src/
 ## 📖 Documentação Completa
 
 Ver [PROGRAMACAO_REATIVA.md](./PROGRAMACAO_REATIVA.md) para:
+
 - Arquitetura detalhada
 - Todos os operadores RxJS
 - Exemplos avançados
@@ -237,6 +235,6 @@ Para adicionar novos streams ou operadores:
 
 ---
 
-**Projeto**: ByteBank Mobile  
-**Tech Challenge**: FIAP - Fase 4  
+**Projeto**: ByteBank Mobile
+**Tech Challenge**: FIAP - Fase 4
 **Data**: 02 de Fevereiro de 2026

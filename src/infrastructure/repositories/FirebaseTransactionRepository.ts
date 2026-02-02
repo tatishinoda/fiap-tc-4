@@ -1,25 +1,25 @@
 import {
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  where,
-  orderBy,
-  serverTimestamp,
-  Timestamp,
-  onSnapshot,
-  Unsubscribe,
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    onSnapshot,
+    orderBy,
+    query,
+    serverTimestamp,
+    Timestamp,
+    Unsubscribe,
+    updateDoc,
+    where,
 } from 'firebase/firestore';
-import { db } from '../config/firebase';
-import { Transaction, FinancialSummary } from '../../domain/entities/Transaction';
+import { FinancialSummary, Transaction } from '../../domain/entities/Transaction';
 import {
-  ITransactionRepository,
-  CreateTransactionDTO,
-  UpdateTransactionDTO,
+    CreateTransactionDTO,
+    ITransactionRepository,
+    UpdateTransactionDTO,
 } from '../../domain/repositories/ITransactionRepository';
+import { db } from '../config/firebase';
 import { TransactionMapper } from '../mappers/TransactionMapper';
 
 const TRANSACTIONS_COLLECTION = 'transactions';
@@ -29,11 +29,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
   async getAll(userId: string): Promise<Transaction[]> {
     try {
       const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-      const q = query(
-        transactionsRef,
-        where('userId', '==', userId),
-        orderBy('date', 'desc')
-      );
+      const q = query(transactionsRef, where('userId', '==', userId), orderBy('date', 'desc'));
 
       const querySnapshot = await getDocs(q);
       const transactions: Transaction[] = [];
@@ -53,7 +49,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
   async create(data: CreateTransactionDTO): Promise<Transaction> {
     try {
       const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-      
+
       const transactionData = TransactionMapper.toFirestore({
         ...data,
         date: data.date instanceof Date ? data.date : new Date(data.date),
@@ -86,11 +82,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
   }
 
   // Atualiza uma transação existente
-  async update(
-    transactionId: string,
-    userId: string,
-    data: UpdateTransactionDTO
-  ): Promise<void> {
+  async update(transactionId: string, userId: string, data: UpdateTransactionDTO): Promise<void> {
     try {
       const transactionRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
 
@@ -106,9 +98,10 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
 
       // Converte data para Timestamp, se presente
       if (data.date) {
-        updateData.date = data.date instanceof Date
-          ? Timestamp.fromDate(data.date)
-          : Timestamp.fromDate(new Date(data.date));
+        updateData.date =
+          data.date instanceof Date
+            ? Timestamp.fromDate(data.date)
+            : Timestamp.fromDate(new Date(data.date));
       }
 
       await updateDoc(transactionRef, updateData);
@@ -178,11 +171,7 @@ export class FirebaseTransactionRepository implements ITransactionRepository {
   ): Unsubscribe {
     try {
       const transactionsRef = collection(db, TRANSACTIONS_COLLECTION);
-      const q = query(
-        transactionsRef,
-        where('userId', '==', userId),
-        orderBy('date', 'desc')
-      );
+      const q = query(transactionsRef, where('userId', '==', userId), orderBy('date', 'desc'));
 
       // onSnapshot retorna uma função unsubscribe
       const unsubscribe = onSnapshot(

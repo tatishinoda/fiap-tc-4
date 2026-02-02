@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Subject } from 'rxjs';
 import { container } from '../di/container';
-import { Transaction, FinancialSummary } from '../domain/entities/Transaction';
+import { FinancialSummary, Transaction, TransactionType } from '../domain/entities/Transaction';
 import { FirebaseTransactionRepository } from '../infrastructure/repositories/FirebaseTransactionRepository';
 import { transactionStream } from '../infrastructure/streams/TransactionStream';
 import { useAuth } from './useAuth';
@@ -33,11 +33,9 @@ export function useTransactionStream() {
     );
 
     // Inscreve no stream RxJS
-    const streamSubscription = transactionStream.transactions$.subscribe(
-      (transactions) => {
-        setTransactions(transactions);
-      }
-    );
+    const streamSubscription = transactionStream.transactions$.subscribe((transactions) => {
+      setTransactions(transactions);
+    });
 
     const loadingSubscription = transactionStream.loading$.subscribe(setLoading);
     const errorSubscription = transactionStream.error$.subscribe(setError);
@@ -72,15 +70,13 @@ export function useTransactionStream() {
 }
 
 /**
- * Hook para filtrar transações por tipo (income/expense) reativamente
+ * Hook para filtrar transações por tipo reativamente
  */
-export function useTransactionsByType(type: 'income' | 'expense') {
+export function useTransactionsByType(type: TransactionType) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    const subscription = transactionStream
-      .getTransactionsByType$(type)
-      .subscribe(setTransactions);
+    const subscription = transactionStream.getTransactionsByType$(type).subscribe(setTransactions);
 
     return () => subscription.unsubscribe();
   }, [type]);
@@ -94,17 +90,12 @@ export function useTransactionsByType(type: 'income' | 'expense') {
 export function useFinancialSummary() {
   const [summary, setSummary] = useState<FinancialSummary>({
     totalIncome: 0,
-    totalExpenses: 0,
+    totalExpense: 0,
     balance: 0,
-    transactionCount: 0,
-    topCategory: '',
-    categoryBreakdown: {},
   });
 
   useEffect(() => {
-    const subscription = transactionStream
-      .getFinancialSummary$()
-      .subscribe(setSummary);
+    const subscription = transactionStream.getFinancialSummary$().subscribe(setSummary);
 
     return () => subscription.unsubscribe();
   }, []);
@@ -172,9 +163,7 @@ export function useNewTransactionNotifications(
   useEffect(() => {
     if (!onNewTransaction) return;
 
-    const subscription = transactionStream
-      .getNewTransactions$()
-      .subscribe(onNewTransaction);
+    const subscription = transactionStream.getNewTransactions$().subscribe(onNewTransaction);
 
     return () => subscription.unsubscribe();
   }, [onNewTransaction]);
