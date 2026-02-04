@@ -1,6 +1,6 @@
-﻿import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+﻿import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Transaction } from '../../domain/entities/Transaction';
 import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon } from '../../utils';
 
@@ -19,6 +19,8 @@ export function RecentTransactions({
   showTitle = false,
   onTransactionPress
 }: RecentTransactionsProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [seeAllHovered, setSeeAllHovered] = useState(false);
 
   if (isLoading) {
     return (
@@ -40,8 +42,15 @@ export function RecentTransactions({
       {showTitle && (
         <View style={styles.titleHeader}>
           <Text style={styles.sectionTitle}>Transações recentes</Text>
-          <TouchableOpacity onPress={onSeeAll}>
-            <Text style={styles.seeAllText}>Ver todas </Text>
+          <TouchableOpacity 
+            onPress={onSeeAll}
+            onMouseEnter={() => setSeeAllHovered(true)}
+            onMouseLeave={() => setSeeAllHovered(false)}
+          >
+            <Text style={[
+              styles.seeAllText,
+              seeAllHovered && Platform.OS === 'web' && { opacity: 0.7 }
+            ]}>Ver todas </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -54,13 +63,24 @@ export function RecentTransactions({
         </View>
       ) : (
         <View style={styles.transactionsList}>
-          {transactions.slice(0, 5).map((transaction) => (
-            <TouchableOpacity 
-              key={transaction.id} 
-              style={styles.transactionItem}
-              activeOpacity={0.7}
-              onPress={() => onTransactionPress?.(transaction)}
-            >
+          {transactions.map((transaction) => {
+            const isHovered = hoveredId === transaction.id;
+            return (
+              <TouchableOpacity 
+                key={transaction.id} 
+                style={[
+                  styles.transactionItem,
+                  isHovered && Platform.OS === 'web' && {
+                    backgroundColor: '#f8f9fa',
+                    borderColor: '#d0d0d0',
+                    shadowOpacity: 0.08,
+                  }
+                ]}
+                activeOpacity={0.7}
+                onPress={() => onTransactionPress?.(transaction)}
+                onMouseEnter={() => setHoveredId(transaction.id)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
               <View style={styles.transactionLeft}>
                 <View style={[
                   styles.iconContainer,
@@ -93,7 +113,8 @@ export function RecentTransactions({
                 <Ionicons name="chevron-forward" size={18} color="#999999" />
               </View>
             </TouchableOpacity>
-          ))}
+          );
+          })}
         </View>
       )}
     </View>

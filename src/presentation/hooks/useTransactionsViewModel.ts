@@ -1,14 +1,14 @@
 // ViewModel para a tela de listagem de transações
 
 import { useEffect } from 'react';
-import { useStore } from '../../state/store';
-import { transactionSelectors } from '../../state/selectors/transactionSelectors';
-import { authSelectors } from '../../state/selectors/authSelectors';
 import { container } from '../../di/container';
-import { GetAllTransactionsUseCase } from '../../domain/usecases/transaction/GetAllTransactionsUseCase';
-import { GetPaginatedTransactionsUseCase } from '../../domain/usecases/transaction/GetPaginatedTransactionsUseCase';
 import { DeleteTransactionUseCase } from '../../domain/usecases/transaction/DeleteTransactionUseCase';
+import { GetAllTransactionsUseCase } from '../../domain/usecases/transaction/GetAllTransactionsUseCase';
 import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
+import { GetPaginatedTransactionsUseCase } from '../../domain/usecases/transaction/GetPaginatedTransactionsUseCase';
+import { authSelectors } from '../../state/selectors/authSelectors';
+import { transactionSelectors } from '../../state/selectors/transactionSelectors';
+import { useStore } from '../../state/store';
 
 export const useTransactionsViewModel = () => {
   const user = useStore(authSelectors.user);
@@ -98,6 +98,19 @@ export const useTransactionsViewModel = () => {
     }
   };
 
+  // Buscar total de transações (apenas para contagem)
+  const fetchTransactionCount = async () => {
+    if (!user?.id) return 0;
+
+    try {
+      const allTransactions = await getAllTransactionsUseCase.execute(user.id);
+      return allTransactions.length;
+    } catch (err: any) {
+      console.error('Erro ao buscar total de transações:', err);
+      return 0;
+    }
+  };
+
   return {
     transactions,
     summary,
@@ -108,6 +121,7 @@ export const useTransactionsViewModel = () => {
     expenses: summary.totalExpense,
     fetchTransactions,
     fetchPaginatedTransactions,
+    fetchTransactionCount,
     deleteTransaction: handleDeleteTransaction,
     refreshTransactions,
     clearError,

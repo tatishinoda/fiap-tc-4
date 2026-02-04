@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,6 +27,8 @@ interface LoginScreenProps {
 export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false);
   const passwordRef = React.useRef<TextInput>(null);
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = windowWidth >= 768;
 
   const {
     email,
@@ -54,6 +57,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={[styles.contentWrapper, isDesktop && styles.contentWrapperDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             <Ionicons name="wallet-outline" size={60} color="#FFFFFF" />
@@ -131,6 +135,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
               <Text style={styles.registerLink}>Criar conta</Text>
             </TouchableOpacity>
           </View>
+        </View>
         </ScrollView>
       </KeyboardAvoidingView>
   );
@@ -145,6 +150,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
+  },
+  contentWrapper: {
+    width: '100%',
+  },
+  contentWrapperDesktop: {
+    maxWidth: 440,
+    width: '100%',
+    alignSelf: 'center',
   },
   header: {
     alignItems: 'center',

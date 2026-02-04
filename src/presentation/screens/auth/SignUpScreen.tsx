@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useSignUpViewModel } from '../../hooks/useSignUpViewModel';
-import { RootStackParamList } from '../../../types/navigation';
+import { StatusBar } from 'expo-status-bar';
+import React, { useEffect, useState } from 'react';
+import {
+    Alert,
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 import { colors } from '../../../theme/colors';
+import { RootStackParamList } from '../../../types/navigation';
+import { useSignUpViewModel } from '../../hooks/useSignUpViewModel';
 
 type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
 
@@ -27,6 +28,8 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = windowWidth >= 768;
 
   const emailRef = React.useRef<TextInput>(null);
   const passwordRef = React.useRef<TextInput>(null);
@@ -70,6 +73,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={[styles.contentWrapper, isDesktop && styles.contentWrapperDesktop]}>
         {/* Header */}
         <View style={styles.header}>
           <Ionicons name="wallet-outline" size={60} color="#FFFFFF" />
@@ -192,6 +196,7 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
             <Text style={styles.loginLink}>Entrar</Text>
           </TouchableOpacity>
         </View>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -206,6 +211,14 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
+  },
+  contentWrapper: {
+    width: '100%',
+  },
+  contentWrapperDesktop: {
+    maxWidth: 440,
+    width: '100%',
+    alignSelf: 'center',
   },
   header: {
     alignItems: 'center',
