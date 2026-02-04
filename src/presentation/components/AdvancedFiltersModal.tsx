@@ -507,10 +507,8 @@ export function AdvancedFiltersModal({
           }}
         />
       )}
-      
     </Modal>
-    
-  );
+  )
 }
 
 const styles = StyleSheet.create({
