@@ -4,8 +4,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import Svg, { Circle, G, Text as SvgText } from 'react-native-svg';
 import { Transaction, TransactionType } from '../../domain/entities/Transaction';
-import { TRANSACTION_TYPE_CONFIG } from '../../utils/constants';
 import { formatCurrency, formatCurrencyCompact } from '../../utils';
+import { TRANSACTION_TYPE_CONFIG } from '../../utils/constants';
 import { INSIGHT_ICONS } from '../../utils/icons';
 
 interface TypeData {
@@ -77,8 +77,8 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
     transform: [{ scale: scale.value }],
   }));
 
-  const size = 200;
-  const strokeWidth = 30;
+  const size = 160;
+  const strokeWidth = 25;
   const center = size / 2;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -102,7 +102,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
       <View style={styles.card}>
         <Animated.View style={[styles.chartContainer, animatedStyle]}>
           <Svg width={size} height={size}>
-            <G rotation={-90} origin={`${center}, ${center}`}>
+            <G rotation={-90} originX={center} originY={center}>
               {/* Círculo de fundo */}
               <Circle
                 cx={center}
@@ -123,7 +123,7 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
                 const strokeDashoffset = circumference * (1 - item.percentage);
 
                 return (
-                  <G key={item.type} rotation={rotation} origin={`${center}, ${center}`}>
+                  <G key={item.type} rotation={rotation} originX={center} originY={center}>
                     <Circle
                       cx={center}
                       cy={center}
@@ -201,18 +201,20 @@ export function FinancialPieChart({ transactions }: FinancialPieChartProps) {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
+    flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 16,
+    marginBottom: 12,
     paddingHorizontal: 4,
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 24,
+    padding: 16,
+    flex: 1,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -221,7 +223,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   legend: {
     marginTop: 8,
@@ -230,7 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   legendLeft: {
     flexDirection: 'row',
@@ -238,26 +240,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   legendDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 12,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 10,
   },
   legendInfo: {
     flex: 1,
   },
   legendLabel: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
     color: '#1A1A1A',
     marginBottom: 2,
   },
   legendPercentage: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#999',
   },
   legendValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
   },
   divider: {

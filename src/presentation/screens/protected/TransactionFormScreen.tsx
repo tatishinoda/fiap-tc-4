@@ -1,33 +1,34 @@
+import { DeleteTransactionUseCase } from '@/domain/usecases/transaction/DeleteTransactionUseCase';
 import { Ionicons } from '@expo/vector-icons';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { useNotification } from '../../hooks/useNotification';
-import { useTransactionFormViewModel } from '../../hooks/useTransactionFormViewModel';
-import { colors } from '../../../theme';
-import { RootStackParamList } from '../../../types/navigation';
-import { getSuggestedCategories, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction, getUnifiedCategory, combineCategories } from '../../../utils';
-import { uploadReceipt, deleteReceipt } from '../../../utils/storage';
-import { CategoryChips, CurrencyInput } from '../../components/ui';
+import { container } from '../../../di/container';
 import { TransactionType } from '../../../domain/entities/Transaction';
 import { useStore } from '../../../state/store';
-import { container } from '../../../di/container';
-import { DeleteTransactionUseCase } from '@/domain/usecases/transaction/DeleteTransactionUseCase';
+import { colors } from '../../../theme';
+import { RootStackParamList } from '../../../types/navigation';
+import { combineCategories, getSuggestedCategories, getUnifiedCategory, TRANSACTION_TYPE_CONFIG, TRANSACTION_TYPES, validateTransaction } from '../../../utils';
+import { deleteReceipt, uploadReceipt } from '../../../utils/storage';
 import { ConfirmModal } from '../../components/ConfirmModal';
+import { CategoryChips, CurrencyInput } from '../../components/ui';
+import { useNotification } from '../../hooks/useNotification';
+import { useTransactionFormViewModel } from '../../hooks/useTransactionFormViewModel';
 
 type TransactionFormScreenRouteProp = RouteProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
 type TransactionFormScreenNavigationProp = StackNavigationProp<RootStackParamList, 'AddTransaction' | 'EditTransaction'>;
@@ -38,6 +39,9 @@ interface TransactionFormScreenProps {
 }
 
 export default function TransactionFormScreen({ route, navigation }: TransactionFormScreenProps) {
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
+
   const {
     isLoading: loading,
     error,
@@ -377,20 +381,21 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[styles.scrollContainer, isDesktop && styles.scrollContainerDesktop]}
         showsVerticalScrollIndicator={false}
       >
+        <View style={[styles.formWrapper, isDesktop && styles.formWrapperDesktop]}>
         <View style={styles.form}>
 
           <Text style={styles.sectionLabel}>Tipo de Transação</Text>
-          <View style={styles.typeGrid}>
+          <View style={[styles.typeGrid, isDesktop && styles.typeGridDesktop]}>
             {TRANSACTION_TYPES.map((transactionType) => {
               const config = TRANSACTION_TYPE_CONFIG[transactionType];
               return (
                 <TouchableOpacity
                   key={transactionType}
                   style={[
-                    styles.typeCard,
+                    isDesktop ? styles.typeCardDesktop : styles.typeCard,
                     type === transactionType && styles.typeCardActive,
                     { borderColor: type === transactionType ? config.color : '#E0E0E0' }
                   ]}
@@ -398,17 +403,17 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
                   activeOpacity={0.7}
                 >
                   <View style={[
-                    styles.typeIcon,
+                    isDesktop ? styles.typeIconDesktop : styles.typeIcon,
                     { backgroundColor: type === transactionType ? config.color : '#F8F9FA' }
                   ]}>
                     <Ionicons
                       name={config.icon}
-                      size={20}
+                      size={isDesktop ? 24 : 20}
                       color={type === transactionType ? '#FFFFFF' : '#666'}
                     />
                   </View>
                   <Text style={[
-                    styles.typeLabel,
+                    isDesktop ? styles.typeLabelDesktop : styles.typeLabel,
                     type === transactionType && {
                       color: config.color,
                       fontWeight: '600'
@@ -530,6 +535,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
             </TouchableOpacity>
           )}
         </View>
+        </View>
       </ScrollView>
 
       <ConfirmModal
@@ -564,6 +570,17 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
   },
+  scrollContainerDesktop: {
+    paddingHorizontal: 40,
+  },
+  formWrapper: {
+    width: '100%',
+  },
+  formWrapperDesktop: {
+    maxWidth: 1000,
+    width: '100%',
+    alignSelf: 'center',
+  },
   form: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
@@ -589,32 +606,60 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
   },
+  typeGridDesktop: {
+    flexWrap: 'nowrap',
+    gap: 12,
+  },
   typeCard: {
     width: '31%',
-    aspectRatio: 1,
+    aspectRatio: 1.8,
+    borderWidth: 1.5,
+    borderRadius: 8,
+    padding: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  typeCardDesktop: {
+    flex: 1,
+    aspectRatio: 1.2,
     borderWidth: 2,
-    borderRadius: 12,
-    padding: 8,
+    borderRadius: 10,
+    padding: 10,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
   },
   typeCardActive: {
-    borderWidth: 2,
+    borderWidth: 1.5,
     backgroundColor: '#F8F9FA',
   },
   typeIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+  typeIconDesktop: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 6,
   },
   typeLabel: {
-    fontSize: 11,
+    fontSize: 9,
     textAlign: 'center',
     color: '#666',
+  },
+  typeLabelDesktop: {
+    fontSize: 12,
+    textAlign: 'center',
+    color: '#666',
+    fontWeight: '500',
   },
   inputContainer: {
     flexDirection: 'row',

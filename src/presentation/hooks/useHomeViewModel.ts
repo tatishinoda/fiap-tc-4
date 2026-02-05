@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { useStore } from '../../state/store';
-import { transactionSelectors } from '../../state/selectors/transactionSelectors';
-import { authSelectors } from '../../state/selectors/authSelectors';
 import { container } from '../../di/container';
 import { GetAllTransactionsUseCase } from '../../domain/usecases/transaction/GetAllTransactionsUseCase';
 import { GetFinancialSummaryUseCase } from '../../domain/usecases/transaction/GetFinancialSummaryUseCase';
+import { authSelectors } from '../../state/selectors/authSelectors';
+import { transactionSelectors } from '../../state/selectors/transactionSelectors';
+import { useStore } from '../../state/store';
 
 export const useHomeViewModel = () => {
   const user = useStore(authSelectors.user);

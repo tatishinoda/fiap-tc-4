@@ -1,11 +1,10 @@
-import { User as FirebaseUser } from 'firebase/auth';
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
-import { clearCache } from '../infrastructure/cache/QueryProvider';
-import { User } from '../domain/entities/User';
 import { container } from '../di/container';
+import { User } from '../domain/entities/User';
 import { LoginUseCase } from '../domain/usecases/auth/LoginUseCase';
-import { SignUpUseCase } from '../domain/usecases/auth/SignUpUseCase';
 import { LogoutUseCase } from '../domain/usecases/auth/LogoutUseCase';
+import { SignUpUseCase } from '../domain/usecases/auth/SignUpUseCase';
+import { clearCache } from '../infrastructure/cache/QueryProvider';
 import { FirebaseAuthRepository } from '../infrastructure/repositories/FirebaseAuthRepository';
 import { useStore } from '../state/store';
 

@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface QuickAction {
   id: string;
@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flex: 1,
     paddingVertical: 4,
+    borderRadius: 12,
   },
   divider: {
     width: 1,

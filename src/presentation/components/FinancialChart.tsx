@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { formatCurrency } from '../../utils';
 
 interface ChartData {
@@ -101,26 +101,25 @@ export function FinancialChart({ data, isLoading = false, showTitle = true }: Fi
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 28,
+    marginBottom: 0,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#1a1a1a',
-    letterSpacing: -0.3,
-    marginBottom: 16,
+    color: '#1A1A1A',
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
   container: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 24,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 2,
-    borderWidth: 0.5,
-    borderColor: 'rgba(0, 0, 0, 0.04)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
   },
   loadingContainer: {
     alignItems: 'center',
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     overflow: 'hidden',
     backgroundColor: '#F8F9FA',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   progressSegment: {
     height: '100%',

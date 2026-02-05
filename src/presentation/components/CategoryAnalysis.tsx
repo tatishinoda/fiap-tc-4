@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { Transaction } from '../../domain/entities/Transaction';
 import { formatCurrency } from '../../utils';
 
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 16,
+    marginBottom: 12,
     paddingHorizontal: 4,
   },
   card: {
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   categoryItem: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   categoryHeader: {
     flexDirection: 'row',

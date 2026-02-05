@@ -1,25 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
+  ActivityIndicator,
+  Dimensions,
+  FlatList,
+  Platform,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
-  FlatList,
-  ScrollView,
   TouchableOpacity,
-  RefreshControl,
-  Alert,
-  ActivityIndicator,
+  View
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { useFocusEffect } from '@react-navigation/native';
+import { Transaction } from '../../../domain/entities/Transaction';
+import { transactionStream } from '../../../infrastructure/streams/TransactionStream';
+import { authSelectors } from '../../../state/selectors/authSelectors';
+import { useStore } from '../../../state/store';
+import { colors } from '../../../theme';
 import { RootStackParamList } from '../../../types/navigation';
 import { formatAmount, formatDateRelative, getTransactionColor, getTransactionIcon, normalizeCategory } from '../../../utils';
 import { AdvancedFiltersModal, FilterOptions } from '../../components/AdvancedFiltersModal';
 import { useTransactionsViewModel } from '../../hooks/useTransactionsViewModel';
-import { Transaction } from '../../../domain/entities/Transaction';
-import { transactionStream } from '../../../infrastructure/streams/TransactionStream';
 
 type TransactionsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Transactions'>;
 
@@ -40,8 +44,10 @@ const DEFAULT_FILTER_OPTIONS: FilterOptions = {
 };
 
 export default function TransactionsScreen({ navigation }: TransactionsScreenProps) {
+  const user = useStore(authSelectors.user);
   const {
     fetchPaginatedTransactions,
+    fetchTransactionCount,
     isLoading: loading,
     error,
     deleteTransaction,
@@ -50,11 +56,17 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
 
   const [allTransactions, setAllTransactions] = useState<Transaction[]>([]);
   const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
+  const [totalTransactions, setTotalTransactions] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<FilterOptions>(DEFAULT_FILTER_OPTIONS);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null);
+  
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
 
   // Estados para scroll infinito
   const [loadingMore, setLoadingMore] = useState(false);
@@ -75,10 +87,15 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
   // Carrega transações iniciais
   const loadInitialTransactions = async () => {
     try {
-      const result = await fetchPaginatedTransactions(PAGE_SIZE);
+      const [result, total] = await Promise.all([
+        fetchPaginatedTransactions(PAGE_SIZE),
+        fetchTransactionCount()
+      ]);
       setAllTransactions(result.transactions);
       setLastDoc(result.lastDoc);
       setHasMore(result.hasMore);
+      // Define o total real do banco de dados
+      setTotalTransactions(total);
     } catch (err) {
       console.error('Erro ao carregar transações:', err);
     }
@@ -91,7 +108,13 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     setLoadingMore(true);
     try {
       const result = await fetchPaginatedTransactions(PAGE_SIZE, lastDoc);
-      setAllTransactions(prev => [...prev, ...result.transactions]);
+      setAllTransactions(prev => {
+        // Criar Set de IDs existentes para evitar duplicatas
+        const existingIds = new Set(prev.map(t => t.id));
+        // Filtrar apenas transações que ainda não existem
+        const newTransactions = result.transactions.filter(t => !existingIds.has(t.id));
+        return [...prev, ...newTransactions];
+      });
       setLastDoc(result.lastDoc);
       setHasMore(result.hasMore);
     } catch (err) {
@@ -208,6 +231,18 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     );
   };
 
+  const hasAnyActiveFilter = () => {
+    return (
+      searchQuery.trim() !== '' ||
+      selectedFilter !== 'all' ||
+      hasActiveAdvancedFilters()
+    );
+  };
+
+  const getDisplayCount = () => {
+    return hasAnyActiveFilter() ? filteredTransactions.length : totalTransactions;
+  };
+
   const handleApplyAdvancedFilters = (filters: FilterOptions) => {
     setAdvancedFilters(filters);
   };
@@ -269,12 +304,23 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
     </View>
   );
 
-  const renderTransactionItem = ({ item }: { item: Transaction }) => (
-    <TouchableOpacity
-      style={styles.transactionItem}
-      activeOpacity={0.7}
-      onPress={() => navigation.navigate('EditTransaction', { transactionId: item.id })}
-    >
+  const renderTransactionItem = ({ item }: { item: Transaction }) => {
+    const isHovered = hoveredId === item.id;
+    return (
+      <TouchableOpacity
+        style={[
+          styles.transactionItem,
+          isHovered && Platform.OS === 'web' && {
+            backgroundColor: '#f8f9fa',
+            borderColor: '#d0d0d0',
+            shadowOpacity: 0.08,
+          }
+        ]}
+        activeOpacity={0.7}
+        onPress={() => navigation.navigate('EditTransaction', { transactionId: item.id })}
+        onMouseEnter={() => setHoveredId(item.id)}
+        onMouseLeave={() => setHoveredId(null)}
+      >
       <View style={styles.transactionLeft}>
         <View style={[
           styles.iconContainer,
@@ -307,7 +353,8 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         <Ionicons name="chevron-forward" size={18} color="#999999" />
       </View>
     </TouchableOpacity>
-  );
+    );
+  };
 
   const getFilterLabel = (filter: FilterType) => {
     switch (filter) {
@@ -320,33 +367,81 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
 
   return (
     <View style={styles.container}>
+      {isDesktop ? (
+        <View style={styles.desktopLayout}>
+          {/* Sidebar Left - Menu */}
+          <View style={styles.sidebar}>
+            <View style={styles.sidebarHeader}>
+              <Ionicons name="wallet-outline" size={32} color="#FFFFFF" />
+              <Text style={styles.sidebarTitle}>ByteBank</Text>
+            </View>
+
+            <View style={styles.welcomeSection}>
+              <Text style={styles.welcomeText}>
+                Olá, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuário'}!
+              </Text>
+            </View>
+
+            <View style={styles.navMenu}>
+              <TouchableOpacity 
+                style={[
+                  styles.navItemInactive,
+                  hoveredNav === 'home' && { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
+                ]} 
+                activeOpacity={0.7}
+                onPress={() => navigation.navigate('Home')}
+                onMouseEnter={() => setHoveredNav('home')}
+                onMouseLeave={() => setHoveredNav(null)}
+              >
+                <Ionicons name="home-outline" size={24} color="rgba(255, 255, 255, 0.6)" />
+                <Text style={styles.navTextInactive}>Início</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[
+                  styles.navItem,
+                  hoveredNav === 'transactions' && { backgroundColor: 'rgba(255, 255, 255, 0.15)' }
+                ]} 
+                activeOpacity={0.7}
+                onMouseEnter={() => setHoveredNav('transactions')}
+                onMouseLeave={() => setHoveredNav(null)}
+              >
+                <Ionicons name="receipt" size={24} color="#FFFFFF" />
+                <Text style={styles.navText}>Transações</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Main Content */}
+          <View style={styles.mainContent}>
       {/* Header com busca e filtros */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>Transações</Text>
-          <Text style={styles.headerSubtitle}>
-            {filteredTransactions.length} {filteredTransactions.length === 1 ? 'transação' : 'transações'}
-          </Text>
-        </View>
+      <View style={[styles.header, isDesktop && styles.headerDesktop]}>
+        <View style={isDesktop ? styles.contentWrapper : null}>
+          <View style={styles.headerTop}>
+            <Text style={styles.headerTitle}>Transações</Text>
+            <Text style={styles.headerSubtitle}>
+              {getDisplayCount()} {getDisplayCount() === 1 ? 'transação' : 'transações'}
+            </Text>
+          </View>
 
-        {/* Barra de busca clean */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="rgba(0, 0, 0, 0.4)" style={styles.searchIcon} />
-          <TextInput
-            placeholder="Buscar transações..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            style={styles.searchInput}
-            placeholderTextColor="rgba(0, 0, 0, 0.4)"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
-              <Ionicons name="close-circle" size={20} color="rgba(0, 0, 0, 0.3)" />
-            </TouchableOpacity>
-          )}
-        </View>
+          {/* Barra de busca clean */}
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="rgba(0, 0, 0, 0.4)" style={styles.searchIcon} />
+            <TextInput
+              placeholder="Buscar transações..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={styles.searchInput}
+              placeholderTextColor="rgba(0, 0, 0, 0.4)"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+                <Ionicons name="close-circle" size={20} color="rgba(0, 0, 0, 0.3)" />
+              </TouchableOpacity>
+            )}
+          </View>
 
-        {/* Filtros rápidos e botão de filtros avançados */}
+          {/* Filtros rápidos e botão de filtros avançados */}
         <View style={styles.filtersRow}>
           <ScrollView
             horizontal
@@ -395,13 +490,14 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
           </TouchableOpacity>
         </View>
       </View>
+      </View>
 
       {/* Lista de transações */}
       <FlatList
         data={filteredTransactions}
         renderItem={renderTransactionItem}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
+        contentContainerStyle={[styles.listContainer, isDesktop && styles.listContainerDesktop]}
         ListEmptyComponent={loading ? (
           <View style={styles.centerState}>
             <ActivityIndicator size="large" color="#4a9fb8" />
@@ -410,7 +506,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         ) : renderEmptyState()}
         ListFooterComponent={renderFooter}
         onEndReached={loadMoreTransactions}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={isDesktop ? 0.1 : 0.5}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -421,6 +517,113 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         }
         showsVerticalScrollIndicator={false}
       />
+          </View>
+        </View>
+      ) : (
+        <>
+          {/* Header com busca e filtros - Mobile */}
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <Text style={styles.headerTitle}>Transações</Text>
+              <Text style={styles.headerSubtitle}>
+                {getDisplayCount()} {getDisplayCount() === 1 ? 'transação' : 'transações'}
+              </Text>
+            </View>
+
+            {/* Barra de busca clean */}
+            <View style={styles.searchContainer}>
+              <Ionicons name="search" size={20} color="rgba(0, 0, 0, 0.4)" style={styles.searchIcon} />
+              <TextInput
+                placeholder="Buscar transações..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                style={styles.searchInput}
+                placeholderTextColor="rgba(0, 0, 0, 0.4)"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearButton}>
+                  <Ionicons name="close-circle" size={20} color="rgba(0, 0, 0, 0.3)" />
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Filtros rápidos e botão de filtros avançados */}
+            <View style={styles.filtersRow}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.filtersContainer}
+                contentContainerStyle={styles.filtersContent}
+              >
+                {(['all', 'income', 'expense', 'transfer'] as FilterType[]).map((filter) => (
+                  <TouchableOpacity
+                    key={filter}
+                    style={[
+                      styles.filterChip,
+                      selectedFilter === filter && styles.filterChipActive
+                    ]}
+                    onPress={() => setSelectedFilter(filter)}
+                  >
+                    <Text style={[
+                      styles.filterChipText,
+                      selectedFilter === filter && styles.filterChipTextActive
+                    ]}>
+                      {getFilterLabel(filter)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+
+              {/* Advanced Filters Button */}
+              <TouchableOpacity
+                style={[
+                  styles.advancedFilterButton,
+                  hasActiveAdvancedFilters() && styles.advancedFilterButtonActive
+                ]}
+                onPress={() => setShowAdvancedFilters(true)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="options-outline"
+                  size={20}
+                  color={hasActiveAdvancedFilters() ? '#FFFFFF' : 'rgba(0, 0, 0, 0.6)'}
+                />
+                {hasActiveAdvancedFilters() && (
+                  <View style={styles.filterBadge}>
+                    <View style={styles.filterBadgeDot} />
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Lista de transações - Mobile */}
+          <FlatList
+            data={filteredTransactions}
+            renderItem={renderTransactionItem}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.listContainer}
+            ListEmptyComponent={loading ? (
+              <View style={styles.centerState}>
+                <ActivityIndicator size="large" color="#4a9fb8" />
+                <Text style={styles.loadingText}>Carregando...</Text>
+              </View>
+            ) : renderEmptyState()}
+            ListFooterComponent={renderFooter}
+            onEndReached={loadMoreTransactions}
+            onEndReachedThreshold={0.5}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor="#4a9fb8"
+                colors={['#4a9fb8']}
+              />
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </>
+      )}
 
       {/* Advanced Filters Modal */}
       <AdvancedFiltersModal
@@ -439,11 +642,93 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5F5F5',
   },
+  desktopLayout: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  sidebar: {
+    width: 240,
+    backgroundColor: colors.brand.forest,
+    padding: 24,
+  },
+  sidebarHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 48,
+  },
+  sidebarTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginLeft: 12,
+  },
+  welcomeSection: {
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+    marginBottom: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontWeight: '500',
+  },
+  navMenu: {
+    gap: 8,
+  },
+  navItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  navItemInactive: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+  },
+  navText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginLeft: 12,
+  },
+  navTextInactive: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.6)',
+    marginLeft: 12,
+  },
+  mainContent: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+  },
   header: {
     paddingTop: 20,
     paddingBottom: 20,
     paddingHorizontal: 24,
     backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+    zIndex: 10,
+  },
+  headerDesktop: {
+    paddingHorizontal: 0,
+  },
+  contentWrapper: {
+    maxWidth: 1000,
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 24,
+  },
+  listWrapper: {
+    flex: 1,
   },
   headerTop: {
     marginBottom: 20,
@@ -559,8 +844,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
   },
   listContainer: {
-    padding: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
     paddingBottom: 100,
+  },
+  listContainerDesktop: {
+    maxWidth: 1000,
+    width: '100%',
+    alignSelf: 'center',
   },
   centerState: {
     flex: 1,

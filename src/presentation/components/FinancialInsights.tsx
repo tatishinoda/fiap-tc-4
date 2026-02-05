@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withDelay,
-   withTiming
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withSpring,
+    withTiming
 } from 'react-native-reanimated';
 import { Transaction } from '../../domain/entities/Transaction';
 import { formatCurrency } from '../../utils';
@@ -28,6 +28,26 @@ export function FinancialInsights({
   transactions,
   refreshing = false,
 }: FinancialInsightsProps) {
+  const [windowWidth, setWindowWidth] = React.useState(Dimensions.get('window').width);
+  
+  React.useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setWindowWidth(window.width);
+    });
+    return () => subscription?.remove();
+  }, []);
+
+  // Calcular altura dinâmica dos cards baseado na largura da janela
+  const calculateCardHeight = () => {
+    if (windowWidth < 768) return 140; // Mobile
+    if (windowWidth < 1307) return 160; // Single column desktop
+    if (windowWidth < 1600) return 180; // Small desktop
+    if (windowWidth < 1920) return 200; // Medium desktop
+    return 220; // Large desktop
+  };
+
+  const cardHeight = calculateCardHeight();
+
   // Converter de centavos para reais
   const incomeValue = totalIncome / 100;
   const expenseValue = totalExpense / 100;
@@ -104,7 +124,7 @@ export function FinancialInsights({
       
       <View style={styles.insightsGrid}>
         {/* Taxa de Economia */}
-        <Animated.View style={[styles.insightCard, card1Style]}>
+        <Animated.View style={[styles.insightCard, { height: cardHeight }, card1Style]}>
           <LinearGradient
             colors={['#667EEA', '#764BA2']}
             start={{ x: 0, y: 0 }}
@@ -123,7 +143,7 @@ export function FinancialInsights({
         </Animated.View>
 
         {/* Saúde Financeira */}
-        <Animated.View style={[styles.insightCard, card2Style]}>
+        <Animated.View style={[styles.insightCard, { height: cardHeight }, card2Style]}>
           <LinearGradient
             colors={balanceValue > 0 ? ['#4CAF50', '#45B7A0'] : ['#FF9800', '#F57C00']}
             start={{ x: 0, y: 0 }}
@@ -142,7 +162,7 @@ export function FinancialInsights({
         </Animated.View>
 
         {/* Gasto Médio */}
-        <Animated.View style={[styles.insightCard, card3Style]}>
+        <Animated.View style={[styles.insightCard, { height: cardHeight }, card3Style]}>
           <LinearGradient
             colors={['#F093FB', '#F5576C']}
             start={{ x: 0, y: 0 }}
@@ -159,7 +179,7 @@ export function FinancialInsights({
         </Animated.View>
 
         {/* Total de Transações */}
-        <Animated.View style={[styles.insightCard, card4Style]}>
+        <Animated.View style={[styles.insightCard, { height: cardHeight }, card4Style]}>
           <LinearGradient
             colors={['#4FACFE', '#00F2FE']}
             start={{ x: 0, y: 0 }}
@@ -181,23 +201,25 @@ export function FinancialInsights({
 
 const styles = StyleSheet.create({
   container: {
+    paddingHorizontal: 4,
+    flex: 1,
     marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 16,
+    marginBottom: 12,
     paddingHorizontal: 4,
   },
   insightsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
+    flex: 1,
   },
   insightCard: {
     width: '48%',
-    aspectRatio: 1,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -208,28 +230,28 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    padding: 16,
+    padding: 12,
     justifyContent: 'space-between',
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   insightLabel: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.9)',
-    marginTop: 8,
+    marginTop: 4,
   },
   insightValue: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginTop: 4,
+    marginTop: 2,
   },
   insightDescription: {
     fontSize: 11,
