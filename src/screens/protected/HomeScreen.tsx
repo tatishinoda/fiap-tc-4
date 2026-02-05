@@ -96,13 +96,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         {/* Ações Rápidas */}
         <QuickActions actions={quickActions} />
 
-        {/* DEBUG - Remover depois */}
-        <View style={{ padding: 20, backgroundColor: 'yellow', margin: 20 }}>
-          <Text style={{ color: 'black', fontSize: 16, fontWeight: 'bold' }}>
-            DEBUG: Width={windowWidth}px | Desktop={isDesktop ? 'SIM' : 'NÃO'}
-          </Text>
-        </View>
-
         {/* Widgets Container */}
         <View style={isDesktop ? styles.widgetsGrid : styles.widgetsMobile}>
           {/* Card de Análises */}
