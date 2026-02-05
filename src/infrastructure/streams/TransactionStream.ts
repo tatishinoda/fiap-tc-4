@@ -20,10 +20,19 @@ export class TransactionStream {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   private errorSubject = new Subject<Error | null>();
 
+  // Subject para paginação (scroll infinito)
+  private loadMoreSubject = new Subject<{ limit: number; lastDoc: any }>();
+  private paginatedTransactionsSubject = new BehaviorSubject<Transaction[]>([]);
+  private hasMoreSubject = new BehaviorSubject<boolean>(true);
+
   // Observables públicos (read-only)
   public transactions$: Observable<Transaction[]> = this.transactionsSubject.asObservable();
   public loading$: Observable<boolean> = this.loadingSubject.asObservable();
   public error$: Observable<Error | null> = this.errorSubject.asObservable();
+
+  // Observables para paginação
+  public paginatedTransactions$: Observable<Transaction[]> = this.paginatedTransactionsSubject.asObservable();
+  public hasMore$: Observable<boolean> = this.hasMoreSubject.asObservable();
 
   /**
    * Atualiza o stream de transações
@@ -176,10 +185,37 @@ export class TransactionStream {
   }
 
   /**
-   * Obtém valor atual das transações (não reativo)
+   * Atualiza transações paginadas (para scroll infinito)
    */
-  getCurrentTransactions(): Transaction[] {
-    return this.transactionsSubject.value;
+  updatePaginatedTransactions(transactions: Transaction[], append: boolean = false): void {
+    if (append) {
+      const current = this.paginatedTransactionsSubject.value;
+      this.paginatedTransactionsSubject.next([...current, ...transactions]);
+    } else {
+      this.paginatedTransactionsSubject.next(transactions);
+    }
+  }
+
+  /**
+   * Define se há mais transações para carregar
+   */
+  setHasMore(hasMore: boolean): void {
+    this.hasMoreSubject.next(hasMore);
+  }
+
+  /**
+   * Obtém transações paginadas atuais
+   */
+  getCurrentPaginatedTransactions(): Transaction[] {
+    return this.paginatedTransactionsSubject.value;
+  }
+
+  /**
+   * Reseta paginação
+   */
+  resetPagination(): void {
+    this.paginatedTransactionsSubject.next([]);
+    this.hasMoreSubject.next(true);
   }
 
   /**
@@ -187,8 +223,10 @@ export class TransactionStream {
    */
   clear(): void {
     this.transactionsSubject.next([]);
+    this.paginatedTransactionsSubject.next([]);
     this.loadingSubject.next(false);
     this.errorSubject.next(null);
+    this.hasMoreSubject.next(true);
   }
 
   /**
@@ -198,6 +236,9 @@ export class TransactionStream {
     this.transactionsSubject.complete();
     this.loadingSubject.complete();
     this.errorSubject.complete();
+    this.loadMoreSubject.complete();
+    this.paginatedTransactionsSubject.complete();
+    this.hasMoreSubject.complete();
   }
 }
 

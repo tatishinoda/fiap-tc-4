@@ -1,9 +1,22 @@
 import { User as FirebaseUser } from 'firebase/auth';
 import React, { createContext, ReactNode, useEffect, useState } from 'react';
 import { clearCache } from '../infrastructure/cache/QueryProvider';
-import { AuthService } from '../services/AuthService';
-import { useAuthStore } from '../store/auth.store';
-import { AuthContextType, User } from '../types';
+import { User } from '../domain/entities/User';
+import { container } from '../di/container';
+import { LoginUseCase } from '../domain/usecases/auth/LoginUseCase';
+import { SignUpUseCase } from '../domain/usecases/auth/SignUpUseCase';
+import { LogoutUseCase } from '../domain/usecases/auth/LogoutUseCase';
+import { FirebaseAuthRepository } from '../infrastructure/repositories/FirebaseAuthRepository';
+import { useStore } from '../state/store';
+
+export interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  isAuthenticated: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, name: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -16,57 +29,39 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Integração com Zustand store
-  const authStore = useAuthStore();
+  // Zustand store
+  const setUserStore = useStore((state) => state.setUser);
+  const clearAuth = useStore((state) => state.clearAuth);
+
+  // Repository
+  const authRepository = container.get<FirebaseAuthRepository>('AuthRepository');
 
   useEffect(() => {
-    const unsubscribe = AuthService.onAuthStateChange(async (firebaseUser: FirebaseUser | null) => {
-      if (firebaseUser) {
-        try {
-          const userData = await AuthService.getCurrentUser();
-
-          if (!userData) {
-            console.error('Dados do usuário não encontrados no Firestore');
-            await AuthService.signOut();
-            setUser(null);
-            setIsAuthenticated(false);
-            await authStore.logout();
-            setLoading(false);
-            authStore.setLoading(false);
-            return;
-          }
-
-          const token = await firebaseUser.getIdToken();
-
-          setUser(userData);
+    const checkAuth = async () => {
+      try {
+        const currentUser = await authRepository.getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
           setIsAuthenticated(true);
-          setLoading(false);
-          authStore.setLoading(false);
-          await authStore.login(userData as any, token);
-        } catch (error) {
-          console.error('Erro ao obter dados do usuário:', error);
-          await AuthService.signOut();
-          setUser(null);
-          setIsAuthenticated(false);
-          setLoading(false);
-          authStore.setLoading(false);
-          await authStore.logout();
+          setUserStore(currentUser);
         }
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
+      } catch (error) {
+        console.error('Erro ao verificar autenticação:', error);
+      } finally {
         setLoading(false);
-        authStore.setLoading(false);
-        await authStore.logout();
       }
-    });
+    };
 
-    return unsubscribe;
+    checkAuth();
   }, []);
 
   const signIn = async (email: string, password: string): Promise<void> => {
     try {
-      await AuthService.signIn(email, password);
+      const loginUseCase = container.get<LoginUseCase>('LoginUseCase');
+      const loggedUser = await loginUseCase.execute(email, password);
+      setUser(loggedUser);
+      setIsAuthenticated(true);
+      setUserStore(loggedUser);
     } catch (error) {
       throw error;
     }
@@ -74,7 +69,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string, name: string): Promise<void> => {
     try {
-      await AuthService.signUp(email, password, name);
+      const signUpUseCase = container.get<SignUpUseCase>('SignUpUseCase');
+      const newUser = await signUpUseCase.execute(email, password, name);
+      setUser(newUser);
+      setIsAuthenticated(true);
+      setUserStore(newUser);
     } catch (error) {
       throw error;
     }
@@ -82,9 +81,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signOut = async (): Promise<void> => {
     try {
-      await clearCache(); // Limpa cache antes do logout
-      await AuthService.signOut();
-      await authStore.logout();
+      await clearCache();
+      const logoutUseCase = container.get<LogoutUseCase>('LogoutUseCase');
+      await logoutUseCase.execute();
+      setUser(null);
+      setIsAuthenticated(false);
+      clearAuth();
     } catch (error) {
       throw error;
     }
