@@ -5,7 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { Suspense, lazy } from 'react';
-import { Alert, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { container } from '../../di/container';
 import { useSmartPreload } from '../../hooks/useSmartPreload';
@@ -61,6 +61,9 @@ function ProtectedTabs() {
   const clearAuth = useStore((state) => state.clearAuth);
   const insets = useSafeAreaInsets();
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -85,19 +88,19 @@ function ProtectedTabs() {
     <View style={styles.container}>
       <StatusBar style="light" backgroundColor={colors.brand.forest} />
 
-      {/* Header Fixo */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.welcomeText}>
-            Olá, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuário'}!
-          </Text>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton} activeOpacity={0.7}>
-            <Ionicons name={ACTION_ICONS.logout} size={24} color="#FFFFFF" />
-          </TouchableOpacity>
+      {!isDesktop && (
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
+            <Text style={styles.welcomeText}>
+              Olá, {user?.name?.split(' ')[0] || user?.email?.split('@')[0] || 'Usuário'}!
+            </Text>
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutButton} activeOpacity={0.7}>
+              <Ionicons name={ACTION_ICONS.logout} size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      )}
 
-      {/* Tab Navigator */}
       <Tab.Navigator
         screenOptions={({ route }) => ({
           headerShown: false,
@@ -119,15 +122,17 @@ function ProtectedTabs() {
           },
           tabBarActiveTintColor: colors.brand.forest,
           tabBarInactiveTintColor: '#666',
-          tabBarStyle: {
-            backgroundColor: '#FFFFFF',
-            borderTopWidth: 1,
-            borderTopColor: '#E0E0E0',
-            paddingBottom: Platform.OS === 'web' ? 16 : insets.bottom > 0 ? insets.bottom : 12,
-            paddingTop: Platform.OS === 'web' ? 8 : 8,
-            height: Platform.OS === 'web' ? 'auto' : 70 + (insets.bottom > 0 ? insets.bottom : 0),
-            minHeight: Platform.OS === 'web' ? 80 : undefined,
-          },
+          tabBarStyle: isDesktop
+            ? { display: 'none' }
+            : {
+                backgroundColor: '#FFFFFF',
+                borderTopWidth: 1,
+                borderTopColor: '#E0E0E0',
+                paddingBottom: Platform.OS === 'web' ? 16 : insets.bottom > 0 ? insets.bottom : 12,
+                paddingTop: Platform.OS === 'web' ? 8 : 8,
+                height: Platform.OS === 'web' ? 'auto' : 70 + (insets.bottom > 0 ? insets.bottom : 0),
+                minHeight: Platform.OS === 'web' ? 80 : undefined,
+              },
           tabBarLabelStyle: {
             fontSize: 12,
             fontWeight: 'bold',
@@ -157,7 +162,6 @@ function ProtectedTabs() {
         </Tab.Screen>
       </Tab.Navigator>
 
-      {/* Logout Confirmation Modal */}
       <ConfirmModal
         visible={showLogoutModal}
         title="Sair"

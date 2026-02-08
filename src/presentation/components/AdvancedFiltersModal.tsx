@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useState } from 'react';
 import {
+  Dimensions,
   Modal,
   Platform,
   ScrollView,
@@ -10,10 +11,10 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { colors } from '../../theme/colors';
 import { TransactionType } from '../../domain/entities/Transaction';
+import { colors } from '../../theme/colors';
+import { combineCategories, formatDateInput, getUnifiedCategory } from '../../utils';
 import { TRANSACTION_TYPE_CONFIG, getAllSuggestedCategories } from '../../utils/constants';
-import { formatDateInput, getUnifiedCategory, combineCategories } from '../../utils';
 import { CategoryChips } from './CategoryChips';
 import { CurrencyInput } from './CurrencyInput';
 
@@ -52,6 +53,8 @@ export function AdvancedFiltersModal({
   initialFilters = DEFAULT_FILTERS,
   availableCategories = [],
 }: AdvancedFiltersModalProps) {
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
   const [filters, setFilters] = useState<FilterOptions>(initialFilters);
   const [showDateFromPicker, setShowDateFromPicker] = useState(false);
   const [showDateToPicker, setShowDateToPicker] = useState(false);
@@ -144,8 +147,9 @@ export function AdvancedFiltersModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <View style={styles.modal}>
+      <View style={[styles.overlay, isDesktop && styles.overlayDesktop]}>
+        <View style={[styles.modal, isDesktop && styles.modalDesktop]}>
+          <View style={[styles.modalContent, isDesktop && styles.modalContentDesktop]}>
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Filtros Avançados</Text>
@@ -477,6 +481,7 @@ export function AdvancedFiltersModal({
               <Text style={styles.applyButtonText}>Aplicar Filtros</Text>
             </TouchableOpacity>
           </View>
+          </View>
         </View>
       </View>
 
@@ -503,7 +508,7 @@ export function AdvancedFiltersModal({
         />
       )}
     </Modal>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -512,6 +517,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'flex-end',
   },
+  overlayDesktop: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
   modal: {
     backgroundColor: '#FFFFFF',
     borderTopLeftRadius: 24,
@@ -519,6 +529,21 @@ const styles = StyleSheet.create({
     maxHeight: '90%',
     height: '90%',
     paddingTop: 20,
+  },
+  modalDesktop: {
+    borderRadius: 16,
+    maxHeight: '90%',
+    height: 'auto',
+    maxWidth: 700,
+    width: '100%',
+  },
+  modalContent: {
+    flex: 1,
+  },
+  modalContentDesktop: {
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
   },
   header: {
     flexDirection: 'row',

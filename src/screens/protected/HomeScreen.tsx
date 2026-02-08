@@ -1,7 +1,7 @@
 import { RecentTransactions } from '@/components/RecentTransactions';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Dimensions, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { CategoryAnalysis } from '../../components/CategoryAnalysis';
 import { FinancialChart } from '../../components/FinancialChart';
 import { FinancialInsights } from '../../components/FinancialInsights';
@@ -28,6 +28,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const { data: transactions = [], isLoading: loading, refetch } = useTransactions();
   const { data: summary } = useFinancialSummary();
   const { alert, showInfo } = useAlert();
+  const windowWidth = Dimensions.get('window').width;
+  const isDesktop = windowWidth >= 768;
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -94,39 +96,52 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         {/* Ações Rápidas */}
         <QuickActions actions={quickActions} />
 
-        {/* Análises Financeiras */}
-        <FinancialInsights
-          totalIncome={income}
-          totalExpense={expenses}
-          balance={balance}
-          transactions={transactions}
-          refreshing={refreshing}
-        />
+        {/* Widgets Container */}
+        <View style={isDesktop ? styles.widgetsGrid : styles.widgetsMobile}>
+          {/* Card de Análises */}
+          <View style={isDesktop ? styles.widgetItem : null}>
+            <FinancialInsights
+              totalIncome={income}
+              totalExpense={expenses}
+              balance={balance}
+              transactions={transactions}
+              refreshing={refreshing}
+            />
+          </View>
 
-        {/* Transações Recentes */}
-        <RecentTransactions
-          transactions={recentTransactions}
-          isLoading={loading}
-          onSeeAll={handleSeeAllTransactions}
-          onTransactionPress={handleTransactionPress}
-          showTitle={true}
-        />
+          {/* Card de Transações Recentes */}
+          <View style={isDesktop ? styles.widgetItem : null}>
+            <RecentTransactions
+              transactions={recentTransactions}
+              isLoading={loading}
+              onSeeAll={handleSeeAllTransactions}
+              onTransactionPress={handleTransactionPress}
+              showTitle={true}
+            />
+          </View>
 
-        {/* Gráfico de Pizza - Distribuição Financeira */}
-        <FinancialPieChart transactions={transactions} />
+          {/* Card de Gráfico Pizza */}
+          <View style={isDesktop ? styles.widgetItem : null}>
+            <FinancialPieChart transactions={transactions} />
+          </View>
 
-        {/* Gastos por Categoria */}
-        <CategoryAnalysis transactions={transactions} />
+          {/* Card de Categorias */}
+          <View style={isDesktop ? styles.widgetItem : null}>
+            <CategoryAnalysis transactions={transactions} />
+          </View>
 
-        {/* Resumo Financeiro */}
-        <FinancialChart
-          data={{
-            income: income,
-            expense: expenses,
-          }}
-          isLoading={loading}
-          showTitle={true}
-        />
+          {/* Card de Resumo */}
+          <View style={isDesktop ? styles.widgetItem : null}>
+            <FinancialChart
+              data={{
+                income: income,
+                expense: expenses,
+              }}
+              isLoading={loading}
+              showTitle={true}
+            />
+          </View>
+        </View>
       </ScrollView>
 
       {/* Alert */}
@@ -148,6 +163,22 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: spacing.xl * 2,
     flexGrow: 1,
+  },
+  widgetsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: -10,
+    maxWidth: 1100,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  widgetsMobile: {
+    flexDirection: 'column',
+  },
+  widgetItem: {
+    width: '50%',
+    paddingHorizontal: 10,
+    marginBottom: 20,
   },
   header: {
     marginBottom: spacing.xl,

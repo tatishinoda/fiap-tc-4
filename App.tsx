@@ -1,12 +1,13 @@
+import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import { LogBox } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-gesture-handler';
 import './global.css';
 
-import { AppNavigator } from './src/presentation/navigation/AppNavigator';
+import { AppProviders } from './src/context/AppProviders';
 import { GlobalLoading } from './src/presentation/components/GlobalLoading';
 import { GlobalNotification } from './src/presentation/components/GlobalNotification';
+import { AppNavigator } from './src/presentation/navigation/AppNavigator';
 
 // Ignorar warnings específicos
 LogBox.ignoreLogs([
@@ -38,10 +39,10 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <AppProviders>
       <AppNavigator />
       <GlobalNotification />
       <GlobalLoading />
-    </>
+    </AppProviders>
   );
 }
