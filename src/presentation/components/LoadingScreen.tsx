@@ -9,13 +9,13 @@ export default function LoadingScreen() {
   return (
     <View style={styles.container}>
       <StatusBar style="light" backgroundColor={colors.brand.forest} />
-      
+
       <View style={styles.content}>
         <Ionicons name="wallet-outline" size={80} color="#FFFFFF" />
         <Text variant="displayMedium" style={styles.title}>
           ByteBank
         </Text>
-        
+
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#FFFFFF" />
         </View>
@@ -26,10 +26,12 @@ export default function LoadingScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.brand.forest,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 9999,
+    elevation: 9999,
   },
   content: {
     alignItems: 'center',

@@ -1,10 +1,10 @@
 import { LogoutUseCase } from '@/domain/usecases/auth/LogoutUseCase';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationState } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { Alert, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { container } from '../../di/container';
@@ -61,9 +61,20 @@ function ProtectedTabs() {
   const clearAuth = useStore((state) => state.clearAuth);
   const insets = useSafeAreaInsets();
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
-  
+  const [isTransitioning, setIsTransitioning] = React.useState(false);
+
   const windowWidth = Dimensions.get('window').width;
   const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
+
+  // Detecta quando está fazendo transição entre telas
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isTransitioning) {
+      // Remove o loading após um delay para garantir que a tela carregou
+      timeout = setTimeout(() => setIsTransitioning(false), 300);
+    }
+    return () => clearTimeout(timeout);
+  }, [isTransitioning]);
 
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -132,6 +143,8 @@ function ProtectedTabs() {
                 paddingTop: Platform.OS === 'web' ? 8 : 8,
                 height: Platform.OS === 'web' ? 'auto' : 70 + (insets.bottom > 0 ? insets.bottom : 0),
                 minHeight: Platform.OS === 'web' ? 80 : undefined,
+                zIndex: 1,
+                elevation: 8,
               },
           tabBarLabelStyle: {
             fontSize: 12,
@@ -145,22 +158,31 @@ function ProtectedTabs() {
                 }
               : undefined,
         })}
+        screenListeners={{
+          tabPress: () => {
+            if (!isDesktop) {
+              setIsTransitioning(true);
+            }
+          },
+        }}
       >
         <Tab.Screen name="Home" options={{ tabBarLabel: 'Início' }}>
           {(props) => (
-            <Suspense fallback={<LoadingScreen />}>
+            <Suspense fallback={<View style={{ flex: 1, backgroundColor: colors.brand.forest }} />}>
               <HomeScreen {...props} />
             </Suspense>
           )}
         </Tab.Screen>
         <Tab.Screen name="Transactions" options={{ tabBarLabel: 'Transações' }}>
           {(props) => (
-            <Suspense fallback={<LoadingScreen />}>
+            <Suspense fallback={<View style={{ flex: 1, backgroundColor: colors.brand.forest }} />}>
               <TransactionsScreen {...props} />
             </Suspense>
           )}
         </Tab.Screen>
       </Tab.Navigator>
+
+      {isTransitioning && <LoadingScreen />}
 
       <ConfirmModal
         visible={showLogoutModal}

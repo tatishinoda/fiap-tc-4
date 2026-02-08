@@ -7,6 +7,7 @@ import {
   Dimensions,
   FlatList,
   Platform,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -64,7 +65,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
   const [advancedFilters, setAdvancedFilters] = useState<FilterOptions>(DEFAULT_FILTER_OPTIONS);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [hoveredNav, setHoveredNav] = useState<string | null>(null);
-  
+
   const windowWidth = Dimensions.get('window').width;
   const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
 
@@ -307,7 +308,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
   const renderTransactionItem = ({ item }: { item: Transaction }) => {
     const isHovered = hoveredId === item.id;
     return (
-      <TouchableOpacity
+      <Pressable
         style={[
           styles.transactionItem,
           isHovered && Platform.OS === 'web' && {
@@ -316,10 +317,9 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
             shadowOpacity: 0.08,
           }
         ]}
-        activeOpacity={0.7}
         onPress={() => navigation.navigate('EditTransaction', { transactionId: item.id })}
-        onMouseEnter={() => setHoveredId(item.id)}
-        onMouseLeave={() => setHoveredId(null)}
+        onHoverIn={() => setHoveredId(item.id)}
+        onHoverOut={() => setHoveredId(null)}
       >
       <View style={styles.transactionLeft}>
         <View style={[
@@ -352,7 +352,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         </Text>
         <Ionicons name="chevron-forward" size={18} color="#999999" />
       </View>
-    </TouchableOpacity>
+    </Pressable>
     );
   };
 
@@ -383,32 +383,30 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
             </View>
 
             <View style={styles.navMenu}>
-              <TouchableOpacity 
+              <Pressable
                 style={[
                   styles.navItemInactive,
                   hoveredNav === 'home' && { backgroundColor: 'rgba(255, 255, 255, 0.1)' }
-                ]} 
-                activeOpacity={0.7}
+                ]}
                 onPress={() => navigation.navigate('Home')}
-                onMouseEnter={() => setHoveredNav('home')}
-                onMouseLeave={() => setHoveredNav(null)}
+                onHoverIn={() => setHoveredNav('home')}
+                onHoverOut={() => setHoveredNav(null)}
               >
                 <Ionicons name="home-outline" size={24} color="rgba(255, 255, 255, 0.6)" />
                 <Text style={styles.navTextInactive}>Início</Text>
-              </TouchableOpacity>
+              </Pressable>
 
-              <TouchableOpacity 
+              <Pressable
                 style={[
                   styles.navItem,
                   hoveredNav === 'transactions' && { backgroundColor: 'rgba(255, 255, 255, 0.15)' }
-                ]} 
-                activeOpacity={0.7}
-                onMouseEnter={() => setHoveredNav('transactions')}
-                onMouseLeave={() => setHoveredNav(null)}
+                ]}
+                onHoverIn={() => setHoveredNav('transactions')}
+                onHoverOut={() => setHoveredNav(null)}
               >
                 <Ionicons name="receipt" size={24} color="#FFFFFF" />
                 <Text style={styles.navText}>Transações</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
 
@@ -498,6 +496,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         renderItem={renderTransactionItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={[styles.listContainer, isDesktop && styles.listContainerDesktop]}
+        style={{ flex: 1 }}
         ListEmptyComponent={loading ? (
           <View style={styles.centerState}>
             <ActivityIndicator size="large" color="#4a9fb8" />
@@ -506,7 +505,7 @@ export default function TransactionsScreen({ navigation }: TransactionsScreenPro
         ) : renderEmptyState()}
         ListFooterComponent={renderFooter}
         onEndReached={loadMoreTransactions}
-        onEndReachedThreshold={isDesktop ? 0.1 : 0.5}
+        onEndReachedThreshold={0.3}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
