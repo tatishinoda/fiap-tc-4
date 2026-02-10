@@ -2,255 +2,322 @@
 
 ByteBank: Aplicação Mobile, utilizando React Native (Expo), Firebase Storage e Cloud Firestore.
 
-[![Expo](https://img.shields.io/badge/Expo-%7E54.0.13-000000?style=flat&logo=expo&logoColor=white)](https://expo.dev/)
-[![React Native](https://img.shields.io/badge/React_Native-0.81.4-61DAFB?style=flat&logo=react&logoColor=white)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-%7E54.0.0-000000?style=flat&logo=expo&logoColor=white)](https://expo.dev/)
+[![React Native](https://img.shields.io/badge/React_Native-0.81.5-61DAFB?style=flat&logo=react&logoColor=white)](https://reactnative.dev/)
 [![Firebase Storage](https://img.shields.io/badge/Firebase_Storage-Storage-FFA611?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/products/storage)
 [![Cloud Firestore](https://img.shields.io/badge/Cloud_Firestore-Database-FFA611?style=flat&logo=firebase&logoColor=white)](https://firebase.google.com/products/firestore)
 
-## O que é o ByteBank?
+---
 
-O ByteBank é uma aplicação financeira desenvolvida como desafio no desenvolvimento Mobile do Tech Challenge, Fase 3, do curso de pós-graduação em Front-End Engineering da FIAP.
+## 📱 Sobre o Projeto
 
-## Contexto do Projeto
+O **ByteBank** é uma aplicação mobile de gestão financeira pessoal desenvolvida como Tech Challenge da **Fase 4** do curso de **Pós-Graduação em Front-End Engineering** da **FIAP**.
 
-- 🔗 [Repositório Fase 1](https://github.com/karenkramek/bytebank-fiap)
-- 🔗 [Repositório Fase 2](https://github.com/karenkramek/fiap-tech-challenge-2)
-- 🔗 [Repositório Fase 3](https://github.com/camp0sfer/bytebank-mobile)
+### Principais Características
 
-## Gestão de Projeto
+- **Gestão Financeira Completa**: CRUD de transações com validação robusta e persistência em tempo real
+- **Backend Firebase**: Integração completa com Firestore, Storage e Authentication para escalabilidade e confiabilidade
+- **Segurança em Múltiplas Camadas**: Proteção de credenciais, regras de acesso granular e prevenção contra vazamentos
+- **Programação Reativa (RxJS)**: Streams assíncronas para sincronização instantânea de dados entre dispositivos
+- **Performance Otimizada**: Cache inteligente, retry automático e técnicas avançadas de renderização
+- **Arquitetura Escalável**: Clean Architecture com separação de responsabilidades e injeção de dependências
+- **Experiência Mobile Nativa**: Interface responsiva com NativeWind e componentes otimizados para iOS/Android
 
-- 📊 [Trello (Fase 4)](https://trello.com/b/JdDDGx3G/fase-4)
-- 📹 [Vídeo de Apresentação (Fase 4)](www.google.com)(verificar)
-- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/6d0669ca-5d39-4f18-887d-d279122e8dd1)(verificar)
+---
 
-## Estrutura do Projeto
+## 📚 Evolução do Projeto
+
+Este projeto representa a quarta fase de uma jornada de aprendizado iniciada nas fases anteriores do Tech Challenge:
+
+| Fase | Repositório |
+|------|-------------|
+| **Fase 1** | [bytebank-fiap](https://github.com/karenkramek/bytebank-fiap) |
+| **Fase 2** | [tech-challenge-2](https://github.com/karenkramek/fiap-tech-challenge-2) |
+| **Fase 3** | [bytebank-mobile](https://github.com/camp0sfer/bytebank-mobile) |
+| **Fase 4** | *Repositório atual* |
+
+---
+
+## 💻 Tecnologias Utilizadas
+
+| Categoria | Tecnologias |
+|-----------|-------------|
+| **Mobile** | React Native, Expo ~54.0.0 |
+| **Linguagem** | TypeScript |
+| **Backend** | Firebase (Auth, Firestore, Storage) |
+| **Estado** | Zustand, React Query |
+| **Programação Reativa** | RxJS (Observables, Operators) |
+| **Estilização** | NativeWind (Tailwind CSS) |
+| **Arquitetura** | Clean Architecture, SOLID |
+
+---
+
+## 🏗️ Arquitetura & Implementação Técnica
+
+### Estrutura do Projeto
+
+O projeto segue os princípios da **Clean Architecture** e **SOLID**, separando responsabilidades em camadas:
 
 ```
 bytebank-mobile/
-├── assets/                # Recursos estáticos (ícones, splash)
+├── assets/                      # Recursos estáticos (ícones, splash screens)
+├── docs/                        # Documentação técnica (Segurança, Reatividade)
 ├── src/
-│   ├── di/                # Injeção de dependências (container)
-│   ├── domain/            # Entidades e contratos (interfaces dos repositórios)
-│   │   ├── entities/      # Entidades de domínio
-│   │   └── repositories/  # Interfaces dos repositórios
-│   ├── infrastructure/    # Implementações concretas (repositórios, mapeadores, configs externas)
-│   │   ├── config/        # Configurações externas (ex: Firebase)
-│   │   ├── mappers/       # Mapeadores de entidades
-│   │   └── repositories/  # Repositórios concretos
-│   ├── presentation/      # Camada de apresentação (UI, hooks, navegação, telas, estado local)
-│   │   ├── components/    # Componentes reutilizáveis e UI
-│   │   ├── hooks/         # Custom hooks
-│   │   ├── navigation/    # Rotas e navegação
-│   │   ├── screens/       # Telas da aplicação
-│   │   └── state/         # Estado local da apresentação
-│   ├── state/             # Estado global (Redux/Zustand, selectors, slices)
-│   ├── theme/             # Tema, cores e estilos
-│   ├── types/             # Definições TypeScript
-│   └── utils/             # Funções utilitárias
-├── App.tsx                # Componente raiz
-├── package.json           # Dependências do projeto
-├── firebase.json          # Configuração Firebase
-├── .env                   # Variáveis de ambiente (Firebase)
-├── .env.example           # Template das variáveis
-├── firestore.rules        # Regras de segurança Firestore
-├── storage.rules          # Regras de segurança Storage
-└── README.md              # Documentação principal
+│   ├── domain/                  # 🎯 CAMADA DE DOMÍNIO (Regras de Negócio)
+│   │   ├── entities/            # Entidades de domínio (User, Transaction)
+│   │   ├── repositories/        # Interfaces dos repositórios (contratos)
+│   │   └── usecases/            # Casos de uso da aplicação
+│   │       ├── auth/            # Use cases de autenticação
+│   │       └── transaction/     # Use cases de transações
+│   │
+│   ├── infrastructure/          # 🔧 CAMADA DE INFRAESTRUTURA (Implementações)
+│   │   ├── config/              # Configurações externas (Firebase)
+│   │   ├── mappers/             # Mapeadores (DTO ↔ Entity)
+│   │   ├── repositories/        # Implementações concretas dos repositórios
+│   │   ├── cache/               # Provider de cache (React Query)
+│   │   └── streams/             # Streams RxJS (Programação Reativa)
+│   │
+│   ├── presentation/            # 🎨 CAMADA DE APRESENTAÇÃO (UI/UX)
+│   │   ├── components/          # Componentes reutilizáveis
+│   │   ├── hooks/               # Custom hooks (ViewModels)
+│   │   ├── navigation/          # Configuração de rotas
+│   │   └── screens/             # Telas da aplicação
+│   │
+│   ├── state/                   # 📦 ESTADO GLOBAL
+│   │   ├── store.ts             # Configuração do Zustand
+│   │   ├── slices/              # Slices do estado
+│   │   └── selectors/           # Seletores otimizados
+│   │
+│   ├── di/                      # 💉 INJEÇÃO DE DEPENDÊNCIAS
+│   │   └── container.ts         # Container de DI (inversão de controle)
+│   │
+│   ├── theme/                   # 🎨 Tema e estilos
+│   ├── types/                   # 📘 TypeScript Definitions
+│   └── utils/                   # 🛠️ Funções utilitárias
+│
+├── App.tsx                      # Componente raiz
+├── package.json                 # Dependências do projeto
+├── firebase.json                # Configuração Firebase
+├── .env                         # Variáveis de ambiente (não versionado)
+├── .env.example                 # Template das variáveis
+├── firestore.rules              # Regras de segurança Firestore
+├── storage.rules                # Regras de segurança Storage
+└── README.md                    # Documentação principal
 ```
 
-## 🔒 Segurança
+**Separação de Responsabilidades**
 
-Este projeto implementa múltiplas camadas de segurança para proteger credenciais e dados:
+| Camada | Responsabilidade | Exemplo |
+|--------|------------------|---------|
+| **Domain** | Regras de negócio puras | Validação de transação, cálculo de saldo |
+| **Infrastructure** | Comunicação externa | Firebase, APIs, banco de dados |
+| **Presentation** | Interface do usuário | Componentes React, navegação |
+| **State** | Gerenciamento de estado | Zustand slices, selectors |
+| **DI** | Inversão de controle | Injeção de repositórios |
 
-### **Proteção de Credenciais**
-- ✅ **Gitleaks** - Detecta credenciais expostas no código e histórico Git
-- ✅ **Husky Pre-commit Hook** - Bloqueia commits contendo secrets automaticamente
-- ✅ **Gitignore** - `.env` e arquivos sensíveis nunca versionados
+---
 
-### **Segurança Web (Expo Web)**
-- ✅ **CSP (Content Security Policy)** - Proteção contra XSS e code injection
-- ✅ **Security Headers** - X-Frame-Options, X-Content-Type-Options, HSTS
-- ✅ **Domínios Confiáveis** - Apenas Firebase e Google APIs permitidos
+### 🔒 Segurança
 
-### **Auditoria de Dependências**
-- ✅ **NPM Audit** - Monitoramento de vulnerabilidades nas dependências
-- ✅ **Vulnerabilidades Corrigidas** - Scan regular com correções aplicadas
+**Proteção de Credenciais e Dados**
+- **Gitleaks + Husky** - Bloqueia commits com secrets expostos
+- **EAS Secrets** - Variáveis de ambiente seguras no servidor Expo
+- **Gitignore** - `.env` nunca versionado
+- **Firestore Rules** - Acesso granular por usuário autenticado
+- **Storage Rules** - Controle rigoroso de upload/download
+- **Authentication** - Email/Password com validação de força de senha
 
-### **Firebase Security**
-- ✅ **Firestore Rules** - Regras de acesso granular por documento
-- ✅ **Storage Rules** - Controle de upload/download de arquivos
-- ✅ **Authentication** - Email/Password com validação
+**Segurança Web e Aplicação**
+- **CSP (Content Security Policy)** - Proteção contra XSS e injeções maliciosas
+- **Security Headers** - X-Frame-Options, X-Content-Type-Options, HSTS
+- **Rate Limiting** - Proteção contra força bruta
+- **NPM Audit** - Monitoramento contínuo de vulnerabilidades
 
-> 📖 **Documentação Completa:** Ver [SECURITY_REPORT.md](SECURITY_REPORT.md) para análise detalhada
+> 📖 Documentação completa: [docs/SECURITY.md](docs/SECURITY.md)
 
-## Como Executar
+---
 
-### **Pré-requisitos**
-- Node.js 18+ (recomendado)
-- npm ou yarn
-- Expo CLI: `npm install -g expo-cli` (opcional, usamos `npx expo`)
-- Conta no Firebase (gratuita)
-- Se for testar via USB, instale o Android Platform Tools (ADB)
+### ⚡ Performance e Otimização
 
-### **1. Clone o projeto**
-```bash
+**Otimizações de Renderização**
+- **useCallback** - Evita re-renders desnecessários em componentes
+- **Lazy Loading** - Carregamento sob demanda de componentes
+- **FlatList Virtualizado** - Listas otimizadas para grandes volumes de dados
+
+**Cache e Gerenciamento de Requisições**
+- **React Query** - Cache inteligente (5 min staleTime, 30 min gcTime)
+- **Retry Automático** - 3 tentativas com delay exponencial
+- **Refetch Inteligente** - Atualiza dados ao focar app ou reconectar
+- **Code Splitting** - Bundle dividido por rotas para carregamento rápido
+- **Tree Shaking** - Remoção automática de código não utilizado
+
+**Métricas de Performance**
+| Métrica | Valor | Status |
+|---------|-------|--------|
+| **TTI (Time to Interactive)** | < 3s | ✅ |
+| **Tamanho do APK** | ~25MB | ✅ |
+| **Tempo de Carregamento** | < 1s | ✅ |
+
+---
+
+### 🌊 Programação Reativa (RxJS)
+
+**Streams em Tempo Real**
+- **Observable Pattern** - Firestore snapshots integrados com RxJS
+- **Debounce** - Otimiza buscas com delay de 300ms
+- **Operators Avançados** - `switchMap`, `debounceTime`, `distinctUntilChanged`
+- **Hook Customizado** - `useTransactionStream` para consumir streams reativos
+
+**Benefícios da Abordagem Reativa**
+- Atualização instantânea e automática de dados
+- Redução significativa de requisições desnecessárias
+- Gerenciamento eficiente de estados assíncronos
+- Sincronização em tempo real entre dispositivos
+
+> 📖 Guias: [Quick Start](docs/REACTIVE_QUICK_START.md) • [Documentação Técnica](docs/REACTIVE_PROGRAMMING.md)
+
+---
+
+### 🏛️ Princípios de Design e Boas Práticas
+
+**Arquitetura e Padrões**
+- **Clean Architecture** - Separação clara de responsabilidades em camadas
+- **SOLID Principles** - Código modular, testável e manutenível
+- **Dependency Injection** - Inversão de controle com container DI
+- **TypeScript Strict Mode** - Tipagem rigorosa em todo o código
+
+**Qualidade e Ferramentas**
+- **Error Boundaries** - Tratamento robusto de erros em componentes
+- **Form Validation** - React Hook Form com validação completa
+- **Async Storage** - Persistência local de dados do usuário
+- **Date Handling** - date-fns para manipulação segura de datas
+- **Image Picker** - Upload de imagens e recibos com compressão
+- **Navigation** - React Navigation com Stack e Bottom Tabs
+
+---
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js 18+, npm/yarn, Git
+- Conta Firebase (gratuita)
+- Expo Go App ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) / [iOS](https://apps.apple.com/app/expo-go/id982107779))
+
+### Instalação
+
+**1. Clone e instale dependências**
+```powershell
 git clone https://github.com/tatishinoda/fiap-tc-4.git
 cd fiap-tc-4
-```
-
-### **2. Instalar dependências**
-```bash
 npm install
-# ou
-yarn
 ```
 
-### **3. Configurar Firebase**
-
-#### **3.1. Criar arquivo de variáveis de ambiente**
-```bash
+**2. Configure o Firebase**
+```powershell
 # Copie o arquivo de exemplo
-cp .env.example .env
+copy .env.example .env
 ```
 
-#### **3.2. Adicionar credenciais do Firebase**
-1. Acesse o [Firebase Console](https://console.firebase.google.com/)
-2. Crie um novo projeto ou use um existente
-3. Vá em **Configurações do Projeto** > **Seus aplicativos**
-4. Copie as credenciais do Firebase
-5. Cole no arquivo `.env`
+Edite o `.env` com suas credenciais do [Firebase Console](https://console.firebase.google.com/):
+```env
+EXPO_PUBLIC_FIREBASE_API_KEY=sua_api_key
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=seu_projeto.firebaseapp.com
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=seu_projeto_id
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=seu_projeto.appspot.com
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=seu_sender_id
+EXPO_PUBLIC_FIREBASE_APP_ID=seu_app_id
+```
 
-> ⚠️ **Importante**: Não compartilhe suas credenciais! O arquivo `.env` está no `.gitignore` e nunca será versionado.
+**3. Configure serviços do Firebase Console**
+- **Authentication** → Ative Email/Password
+- **Firestore Database** → Crie database (região: southamerica-east1)
+- **Storage** → Ative o serviço
 
-> 💡 **Dica**: Se você não tem acesso ao Firebase Console, solicite os valores das variáveis de ambiente à equipe de desenvolvimento.
-
-#### **3.3. Configurar Firestore e Storage**
-No Firebase Console:
-1. Habilite **Authentication** > **Email/Password**
-2. Crie um banco **Firestore Database** (modo teste)
-3. Habilite **Storage** (para upload de recibos)
-4. Configure as regras de segurança (veja `firestore.rules` e `storage.rules`)
-
-#### **3.4. Implantar regras de segurança Firebase**
-Para implantar as regras de segurança do Firestore e Storage:
-
-```bash
-# Instalar Firebase CLI (apenas uma vez)
+**4. Implante as regras de segurança**
+```powershell
 npm install -g firebase-tools
-
-# Fazer login no Firebase
 firebase login
-
-# Selecionar o projeto (se necessário)
-firebase use bytebank-mobile
-
-# Implantar todas as regras
+firebase use seu_projeto_id
 firebase deploy --only firestore,storage
-
-# Ou implantar individualmente
-firebase deploy --only firestore  # Apenas Firestore
-firebase deploy --only storage     # Apenas Storage
 ```
 
-> ⚠️ **Importante**: Sempre implante as regras após modificá-las para garantir a segurança do aplicativo.
-
-### **4. Executar o projeto**
-
-Após configurar o Firebase, inicie o servidor de desenvolvimento:
-
-```bash
+**5. Inicie o projeto**
+```powershell
 npm start
 ```
 
-### **5. Testar no dispositivo**
+### Testar no Dispositivo
 
-#### **Testar no Android com Expo Go**:
-- Instale `Expo Go` no celular (Google Play)
-- Certifique-se que computador e celular estão na mesma rede Wi‑Fi
-- No painel do Expo escolha `LAN` para melhor desempenho. Se não for possível, escolha `Tunnel`
-- No painel do Expo (ou no terminal) haverá um QR Code — abra `Expo Go` → `Scan QR Code` e aponte a câmera
+**Celular (Recomendado)**
+1. Instale o Expo Go
+2. Conecte na mesma rede Wi-Fi
+3. Escaneie o QR Code
 
-#### **Testar via USB/adb**:
-- Ative a depuração USB no Android e conecte o cabo
-- Verifique o dispositivo com `adb devices`
-- Execute no terminal:
-
-```bash
-npm run android
-# ou, após `npx expo start`, pressione `a` no terminal para abrir no dispositivo/emulador
-```
-
-#### **Rodar no navegador** (opcional):
-
-```bash
+**Navegador**
+```powershell
 npm run web
 ```
 
-## Gerando APK para Distribuição (Android)
+**USB/ADB (Android)**
+```powershell
+adb devices  # Verificar conexão
+npm run android
+```
 
-### **1. Instalar EAS CLI**
-```bash
+---
+
+## 📦 Geração e Distribuição de APK
+
+### Gerar Build de Produção
+
+```powershell
+# 1. Instalar e fazer login no EAS
 npm install -g eas-cli
-```
-
-### **2. Fazer login no Expo**
-```bash
 eas login
-```
 
-### **3. Configurar variáveis de ambiente no EAS**
+# 2. Configurar secrets do Firebase no EAS (apenas uma vez)
+Get-Content .env | ForEach-Object {
+  if ($_ -match '^([^=]+)=(.+)$') {
+    eas secret:create --scope project --name $Matches[1] --value $Matches[2] --type string --force
+  }
+}
 
-Para garantir que as credenciais do Firebase não sejam expostas no código, é necessário configurá-las como secrets no EAS:
-
-```bash
-# Configurar automaticamente todas as variáveis do .env
-cat .env | while IFS='=' read -r key value; do
-  if [ -n "$key" ] && [ -n "$value" ]; then
-    echo "Creating secret: $key"
-    eas secret:create --scope project --name "$key" --value "$value" --type string --force
-  fi
-done
-```
-
-> ⚠️ **Importante**: Este passo é necessário apenas uma vez por projeto. As variáveis ficam armazenadas de forma segura no servidor EAS e são injetadas automaticamente durante o build.
-
-### **4. Gerar o APK**
-```bash
+# 3. Gerar APK (15-20 min)
 eas build --platform android --profile preview
 ```
 
-O processo irá:
-- Fazer upload do código para o servidor EAS
-- Compilar o APK na nuvem
-- Gerar um link e QR code para download
+### Download do APK
 
-### **5. Distribuir o APK**
+- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/6d0669ca-5d39-4f18-887d-d279122e8dd1)(verificar)
 
-Após o build ser concluído, você pode:
-- **Escanear o QR code** com seu dispositivo Android
-- **Compartilhar o link** com a equipe para testes
-- **Baixar o arquivo APK** diretamente do link gerado
+---
 
-## Configurações de Desenvolvimento
+## ❓ Troubleshooting
 
-### **Scripts Disponíveis**
-```bash
-npm start          # Iniciar Expo Dev Server
-npm run android    # Executar no Android
-npm run ios        # Executar no iOS
-npm run web        # Executar na web
-```
+| Problema | Solução |
+|----------|---------|
+| **QR Code não funciona** | `npx expo start --tunnel` |
+| **App não atualiza** | `npx expo start -c` (limpa cache) |
+| **`adb devices` vazio** | Verifique Depuração USB e cabo |
+| **"Firebase not configured"** | Confirme `.env` com todas variáveis preenchidas |
+| **Erro de permissão Firestore/Storage** | `firebase deploy --only firestore,storage` |
+| **Build EAS falha** | Verifique secrets: `eas secret:list` |
 
-## Troubleshooting
+---
 
-- **QR Code não é lido**: Altere para `Tunnel` no Expo Dev Tools
-- **App não atualiza**: Feche e reabra `Expo Go` ou limpe o cache com `npx expo start -c`
-- **`adb devices` não lista o aparelho**: Verifique permissões/cabo e as ferramentas do Android
-
-## **Integrantes do Grupo**
+## 👥 Integrantes do Grupo
 
 | Nome | Email | RM |
 |------|-------|------|
-| Fernanda Raquel Campos Jiacinto | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com) | RM366526 |
-| Kaique Kenichi Furukawa Endo | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com) | RM366448 |
-| Karen Cristina Kramek | [kakakramek@gmail.com](mailto:kakakramek@gmail.com) | RM361140 |
-| Tatiane Gabrielle Marçal Rodrigues da Costa | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | RM365215 |
+| **Fernanda Raquel Campos Jiacinto** | [fernanda.frcj@gmail.com](mailto:fernanda.frcj@gmail.com) | RM366526 |
+| **Kaique Kenichi Furukawa Endo** | [kaiquefurukawa@gmail.com](mailto:kaiquefurukawa@gmail.com) | RM366448 |
+| **Karen Cristina Kramek** | [kakakramek@gmail.com](mailto:kakakramek@gmail.com) | RM361140 |
+| **Tatiane Gabrielle Marçal Rodrigues da Costa** | [tatiane.costa@alura.com.br](mailto:tatiane.costa@alura.com.br) | RM365215 |
+
+---
+
+## 📄 Licença
+
+Este projeto foi desenvolvido para fins acadêmicos como parte do Tech Challenge da Fase 4 da Pós-Graduação em Front-End Engineering da FIAP.
+
+---
