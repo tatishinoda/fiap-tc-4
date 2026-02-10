@@ -61,6 +61,7 @@ O projeto segue os princípios da **Clean Architecture** e **SOLID**, separando 
 ```
 bytebank-mobile/
 ├── assets/                      # Recursos estáticos (ícones, splash screens)
+├── docs/                        # Documentação técnica (Segurança, Reatividade)
 ├── src/
 │   ├── domain/                  # 🎯 CAMADA DE DOMÍNIO (Regras de Negócio)
 │   │   ├── entities/            # Entidades de domínio (User, Transaction)
@@ -132,7 +133,7 @@ bytebank-mobile/
 - **Rate Limiting** - Proteção contra força bruta
 - **NPM Audit** - Monitoramento contínuo de vulnerabilidades
 
-> 📖 Documentação completa: [SECURITY_REPORT.md](SECURITY_REPORT.md)
+> 📖 Documentação completa: [docs/SECURITY.md](docs/SECURITY.md)
 
 ---
 
@@ -173,7 +174,7 @@ bytebank-mobile/
 - Gerenciamento eficiente de estados assíncronos
 - Sincronização em tempo real entre dispositivos
 
-> 📖 Guias de implementação: [PROGRAMACAO_REATIVA.md](PROGRAMACAO_REATIVA.md) • [REACTIVE_QUICK_START.md](REACTIVE_QUICK_START.md)
+> 📖 Guias: [Quick Start](docs/REACTIVE_QUICK_START.md) • [Documentação Técnica](docs/REACTIVE_PROGRAMMING.md)
 
 ---
 
