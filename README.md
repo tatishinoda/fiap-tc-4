@@ -133,8 +133,6 @@ bytebank-mobile/
 - **Rate Limiting** - Proteção contra força bruta
 - **NPM Audit** - Monitoramento contínuo de vulnerabilidades
 
-> 📖 Documentação completa: [docs/SECURITY.md](docs/SECURITY.md)
-
 ---
 
 ### ⚡ Performance e Otimização

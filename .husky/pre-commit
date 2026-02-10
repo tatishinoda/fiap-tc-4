@@ -26,7 +26,5 @@ else
     echo "   3. Use variáveis de ambiente (.env)"
     echo "   4. Certifique-se de que .env está no .gitignore"
     echo ""
-    echo "ℹ️  Para mais detalhes, veja: SECURITY_REPORT.md"
-    echo ""
     exit 1
 fi
