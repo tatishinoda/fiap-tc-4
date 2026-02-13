@@ -13,6 +13,10 @@ const firebaseConfig = {
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
+if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+  throw new Error('Firebase configuration is incomplete. Please check your .env file.');
+}
+
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);

@@ -1,19 +1,19 @@
-import { RecentTransactions } from '@/components/RecentTransactions';
 import { StackNavigationProp } from '@react-navigation/stack';
 import React, { useState } from 'react';
 import { Dimensions, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { CategoryAnalysis } from '../../components/CategoryAnalysis';
-import { FinancialChart } from '../../components/FinancialChart';
-import { FinancialInsights } from '../../components/FinancialInsights';
-import { FinancialOverview } from '../../components/FinancialOverview';
-import { FinancialPieChart } from '../../components/FinancialPieChart';
-import { QuickActions } from '../../components/QuickActions';
-import { Alert } from '../../components/ui';
-import { useAlert } from '../../hooks/useAlert';
+import { CategoryAnalysis } from '../../presentation/components/CategoryAnalysis';
+import { RecentTransactions } from '../../presentation/components/RecentTransactions';
+import { FinancialChart } from '../../presentation/components/FinancialChart';
+import { FinancialInsights } from '../../presentation/components/FinancialInsights';
+import { FinancialOverview } from '../../presentation/components/FinancialOverview';
+import { FinancialPieChart } from '../../presentation/components/FinancialPieChart';
+import { QuickActions } from '../../presentation/components/QuickActions';
+import { Alert } from '../../presentation/components/ui';
+import { useAlert } from '../../presentation/hooks/useAlert';
 import { useAuth } from '../../hooks/useAuth';
 import { useFinancialSummary, useTransactions } from '../../hooks/useTransactionQueries';
 import { colors, spacing } from '../../theme';
-import { TransactionType } from '../../types';
+import { TransactionType } from '../../domain/entities/Transaction';
 import { RootStackParamList } from '../../types/navigation';
 import { TRANSACTION_TYPE_CONFIG } from '../../utils';
 
@@ -35,8 +35,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   // Extrair valores do summary ou usar 0
   const balance = summary?.balance ?? 0;
-  const income = summary?.income ?? 0;
-  const expenses = summary?.expenses ?? 0;
+  const income = summary?.totalIncome ?? 0;
+  const expenses = summary?.totalExpense ?? 0;
 
   const onRefresh = async () => {
     setRefreshing(true);

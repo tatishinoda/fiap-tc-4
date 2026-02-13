@@ -3,7 +3,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import {
-    Alert,
     Dimensions,
     KeyboardAvoidingView,
     Platform,
@@ -16,6 +15,7 @@ import {
 } from 'react-native';
 import { colors } from '../../../theme/colors';
 import { RootStackParamList } from '../../../types/navigation';
+import { useNotification } from '../../hooks/useNotification';
 import { useSignUpViewModel } from '../../hooks/useSignUpViewModel';
 
 type SignUpScreenNavigationProp = StackNavigationProp<RootStackParamList, 'SignUp'>;
@@ -28,8 +28,10 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const lastErrorShown = React.useRef<string | null>(null);
   const windowWidth = Dimensions.get('window').width;
   const isDesktop = windowWidth >= 768;
+  const { showNotification } = useNotification();
 
   const emailRef = React.useRef<TextInput>(null);
   const passwordRef = React.useRef<TextInput>(null);
@@ -50,16 +52,19 @@ export default function SignUpScreen({ navigation }: SignUpScreenProps) {
   // Validação simples de confirmação de senha
   const handleSignUp = async () => {
     if (password !== confirmPassword) {
-      Alert.alert('Erro', 'As senhas não coincidem');
+      showNotification('As senhas não coincidem', 'error');
       return;
     }
     await signUp();
   };
 
-  // Mostrar erro se houver
+  // Mostrar erro se houver (funciona em mobile e web)
   useEffect(() => {
-    if (error) {
-      Alert.alert('Erro ao Criar Conta', error);
+    if (error && error !== lastErrorShown.current) {
+      showNotification(error, 'error');
+      lastErrorShown.current = error;
+    } else if (!error) {
+      lastErrorShown.current = null;
     }
   }, [error]);
 

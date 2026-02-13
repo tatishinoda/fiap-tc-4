@@ -121,7 +121,12 @@ export function useTransactionSearch() {
     if (searchTerm) {
       searchSubject.next(searchTerm);
     } else {
-      setResults(transactionStream.getCurrentTransactions());
+      // Retorna todas as transações quando não há busca
+      const subscription = transactionStream.transactions$.subscribe(setResults);
+      return () => {
+        subscription.unsubscribe();
+        searchSubject.complete();
+      };
     }
 
     return () => {

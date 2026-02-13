@@ -5,8 +5,8 @@ import 'react-native-gesture-handler';
 import './global.css';
 
 import { AppProviders } from './src/context/AppProviders';
+import { ErrorBoundary } from './src/presentation/components/ErrorBoundary';
 import { GlobalLoading } from './src/presentation/components/GlobalLoading';
-import { GlobalNotification } from './src/presentation/components/GlobalNotification';
 import { AppNavigator } from './src/presentation/navigation/AppNavigator';
 
 // Ignorar warnings específicos
@@ -39,10 +39,11 @@ export default function App() {
   }, []);
 
   return (
-    <AppProviders>
-      <AppNavigator />
-      <GlobalNotification />
-      <GlobalLoading />
-    </AppProviders>
+    <ErrorBoundary>
+      <AppProviders>
+        <AppNavigator />
+        <GlobalLoading />
+      </AppProviders>
+    </ErrorBoundary>
   );
 }
