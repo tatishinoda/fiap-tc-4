@@ -16,8 +16,8 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
-import { CategoryChips, CurrencyInput } from '../../components/ui';
-import { useAppContext } from '../../context';
+import { CategoryChips, CurrencyInput } from '../../presentation/components/ui';
+import { useNotification } from '../../presentation/hooks/useNotification';
 import { useAuth } from '../../hooks/useAuth';
 import {
     useCreateTransaction,
@@ -26,7 +26,7 @@ import {
     useUpdateTransaction,
 } from '../../hooks/useTransactionQueries';
 import { colors } from '../../theme';
-import { TransactionType } from '../../types';
+import { TransactionType } from '../../domain/entities/Transaction';
 import { RootStackParamList } from '../../types/navigation';
 import {
     combineCategories,
@@ -57,7 +57,7 @@ export default function TransactionFormScreen({ route, navigation }: Transaction
   const createMutation = useCreateTransaction();
   const updateMutation = useUpdateTransaction();
   const deleteMutation = useDeleteTransaction();
-  const { showNotification } = useAppContext();
+  const { showNotification } = useNotification();
   const { user } = useAuth();
 
   const transactionId = (route.params as any)?.transactionId;

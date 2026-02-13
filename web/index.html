@@ -6,18 +6,18 @@
     <!--
       Content Security Policy (CSP) - Segurança contra XSS e outros ataques
       Permite apenas domínios confiáveis como Firebase
+      Nota: unsafe-eval necessário para Metro bundler e Firebase no desenvolvimento
     -->
     <meta
       http-equiv="Content-Security-Policy"
       content="
         default-src 'self';
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com;
-        style-src 'self' 'unsafe-inline';
-        connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://firestore.googleapis.com wss://*.firebaseio.com;
-        img-src 'self' data: https: blob:;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.firebaseapp.com https://*.googleapis.com https://apis.google.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        connect-src 'self' http://localhost:* ws://localhost:* wss://localhost:* https://*.firebaseio.com https://*.googleapis.com https://*.firebaseapp.com https://firestore.googleapis.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com;
+        img-src 'self' data: https: blob: http://localhost:*;
         font-src 'self' data: https://fonts.gstatic.com;
         frame-ancestors 'none';
-        upgrade-insecure-requests;
       "
     />
 

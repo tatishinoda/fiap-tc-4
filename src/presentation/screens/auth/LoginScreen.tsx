@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,6 +14,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useLoginViewModel } from '../../hooks/useLoginViewModel';
+import { useNotification } from '../../hooks/useNotification';
 import { RootStackParamList } from '../../../types/navigation';
 import { colors } from '../../../theme/colors';
 
@@ -27,8 +27,10 @@ interface LoginScreenProps {
 export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false);
   const passwordRef = React.useRef<TextInput>(null);
+  const lastErrorShown = React.useRef<string | null>(null);
   const windowWidth = Dimensions.get('window').width;
   const isDesktop = windowWidth >= 768;
+  const { showNotification } = useNotification();
 
   const {
     email,
@@ -40,10 +42,13 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     error,
   } = useLoginViewModel();
 
-  // Mostrar erro se houver
+  // Mostrar erro se houver (funciona em mobile e web)
   useEffect(() => {
-    if (error) {
-      Alert.alert('Erro de Login', error);
+    if (error && error !== lastErrorShown.current) {
+      showNotification(error, 'error');
+      lastErrorShown.current = error;
+    } else if (!error) {
+      lastErrorShown.current = null;
     }
   }, [error]);
 

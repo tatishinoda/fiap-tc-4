@@ -75,14 +75,14 @@ export function AdvancedFiltersModal({
 
   const toggleCategory = (category: string) => {
     const unifiedCategory = getUnifiedCategory(
-      category, 
+      category,
       availableCategories,
       suggestedCategories
     );
-    
+
     setFilters(prev => {
       const isSelected = prev.categories.includes(unifiedCategory);
-      
+
       return {
         ...prev,
         categories: isSelected
@@ -193,7 +193,7 @@ export function AdvancedFiltersModal({
                         type="date"
                         value={filters.dateFrom ? filters.dateFrom.toISOString().split('T')[0] : ''}
                         onChange={(e) => {
-                          const date = e.target.value ? new Date(e.target.value) : null;
+                          const date = (e.target as HTMLInputElement).value ? new Date((e.target as HTMLInputElement).value) : null;
                           handleDateFromChange(date);
                         }}
                         style={{
@@ -226,7 +226,7 @@ export function AdvancedFiltersModal({
                         type="date"
                         value={filters.dateTo ? filters.dateTo.toISOString().split('T')[0] : ''}
                         onChange={(e) => {
-                          const date = e.target.value ? new Date(e.target.value) : null;
+                          const date = (e.target as HTMLInputElement).value ? new Date((e.target as HTMLInputElement).value) : null;
                           handleDateToChange(date);
                         }}
                         style={{

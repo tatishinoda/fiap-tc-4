@@ -3,7 +3,7 @@
  * Fornece validações para autenticação, transações e sanitização de dados
  */
 
-import { Alert } from 'react-native';
+import { showAlert } from './alert';
 import { TransactionFormData, ValidationResult } from '../types';
 
 // ============================================================================
@@ -130,7 +130,7 @@ export const validateFields = (validations: ValidationResult[]): boolean => {
   const firstError = validations.find(v => !v.isValid);
 
   if (firstError) {
-    Alert.alert('Erro de Validação', firstError.error);
+    showAlert('Erro de Validação', firstError.error);
     return false;
   }
 

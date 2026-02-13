@@ -20,16 +20,16 @@ interface FinancialOverviewProps {
   actions?: QuickAction[];
 }
 
-export function FinancialOverview({ 
-  balance, 
-  totalIncome, 
-  totalExpense, 
+export function FinancialOverview({
+  balance,
+  totalIncome,
+  totalExpense,
   isLoading = false,
-  actions = [] 
+  actions = []
 }: FinancialOverviewProps) {
   const [showBalance, setShowBalance] = useState(true);
   const [hoveredActionId, setHoveredActionId] = useState<string | null>(null);
-  
+
   const windowWidth = Dimensions.get('window').width;
   const isDesktop = Platform.OS === 'web' && windowWidth >= 768;
 
@@ -71,10 +71,10 @@ export function FinancialOverview({
                 <Text style={styles.headerTitle}>Saldo</Text>
               </View>
               <TouchableOpacity onPress={toggleBalanceVisibility} style={styles.eyeButton}>
-                <Ionicons 
-                  name={showBalance ? 'eye-outline' : 'eye-off-outline'} 
-                  size={22} 
-                  color="rgba(255, 255, 255, 0.7)" 
+                <Ionicons
+                  name={showBalance ? 'eye-outline' : 'eye-off-outline'}
+                  size={22}
+                  color="rgba(255, 255, 255, 0.7)"
                 />
               </TouchableOpacity>
             </View>
@@ -100,7 +100,7 @@ export function FinancialOverview({
                   {showBalance ? formatCurrency(totalIncome) : '••••••'}
                 </Text>
               </View>
-              
+
               <View style={styles.summaryItem}>
                 <View style={styles.summaryIndicator}>
                   <View style={[styles.dot, { backgroundColor: '#FF6B6B' }]} />
@@ -128,8 +128,10 @@ export function FinancialOverview({
                       ]}
                       onPress={action.onPress}
                       activeOpacity={0.7}
-                      onMouseEnter={() => setHoveredActionId(action.id)}
-                      onMouseLeave={() => setHoveredActionId(null)}
+                      {...(Platform.OS === 'web' && {
+                        onMouseEnter: () => setHoveredActionId(action.id),
+                        onMouseLeave: () => setHoveredActionId(null),
+                      } as any)}
                     >
                       <View style={[styles.iconCircle, { backgroundColor: action.color }]}>
                         <Ionicons name={action.icon as any} size={24} color="#FFFFFF" />

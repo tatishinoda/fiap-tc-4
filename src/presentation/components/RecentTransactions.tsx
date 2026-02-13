@@ -12,9 +12,9 @@ interface RecentTransactionsProps {
   onTransactionPress?: (transaction: Transaction) => void;
 }
 
-export function RecentTransactions({ 
-  transactions, 
-  isLoading = false, 
+export function RecentTransactions({
+  transactions,
+  isLoading = false,
   onSeeAll,
   showTitle = false,
   onTransactionPress
@@ -42,10 +42,12 @@ export function RecentTransactions({
       {showTitle && (
         <View style={styles.titleHeader}>
           <Text style={styles.sectionTitle}>Transações recentes</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={onSeeAll}
-            onMouseEnter={() => setSeeAllHovered(true)}
-            onMouseLeave={() => setSeeAllHovered(false)}
+            {...(Platform.OS === 'web' && {
+              onMouseEnter: () => setSeeAllHovered(true),
+              onMouseLeave: () => setSeeAllHovered(false),
+            } as any)}
           >
             <Text style={[
               styles.seeAllText,
@@ -54,7 +56,7 @@ export function RecentTransactions({
           </TouchableOpacity>
         </View>
       )}
-      
+
       {transactions.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="receipt-outline" size={56} color="#999999" />
@@ -66,8 +68,8 @@ export function RecentTransactions({
           {transactions.map((transaction) => {
             const isHovered = hoveredId === transaction.id;
             return (
-              <TouchableOpacity 
-                key={transaction.id} 
+              <TouchableOpacity
+                key={transaction.id}
                 style={[
                   styles.transactionItem,
                   isHovered && Platform.OS === 'web' && {
@@ -78,18 +80,20 @@ export function RecentTransactions({
                 ]}
                 activeOpacity={0.7}
                 onPress={() => onTransactionPress?.(transaction)}
-                onMouseEnter={() => setHoveredId(transaction.id)}
-                onMouseLeave={() => setHoveredId(null)}
+                {...(Platform.OS === 'web' && {
+                  onMouseEnter: () => setHoveredId(transaction.id),
+                  onMouseLeave: () => setHoveredId(null),
+                } as any)}
               >
               <View style={styles.transactionLeft}>
                 <View style={[
                   styles.iconContainer,
                   { backgroundColor: getTransactionColor(transaction.type) }
                 ]}>
-                  <Ionicons 
-                    name={getTransactionIcon(transaction.type)} 
-                    size={22} 
-                    color="#FFFFFF" 
+                  <Ionicons
+                    name={getTransactionIcon(transaction.type)}
+                    size={22}
+                    color="#FFFFFF"
                   />
                 </View>
                 <View style={styles.transactionInfo}>
