@@ -286,7 +286,7 @@ eas build --platform android --profile preview
 
 ### Download do APK
 
-- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/6d0669ca-5d39-4f18-887d-d279122e8dd1)(verificar)
+- 📱 [Link do APK (Android)](https://expo.dev/accounts/karenkramek/projects/bytebank-mobile/builds/de8f2872-66ab-4e1d-920e-13b1355ce82e)
 
 ---
 
